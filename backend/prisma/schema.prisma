@@ -1,0 +1,395 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// MASTER DATA TABLES
+// ============================================
+
+model User {
+  id           Int       @id @default(autoincrement())
+  username     String    @unique @db.VarChar(50)
+  email        String    @unique @db.VarChar(100)
+  passwordHash String    @map("password_hash") @db.VarChar(255)
+  fullName     String?   @map("full_name") @db.VarChar(100)
+  mobile       String?   @db.VarChar(15)
+  roleId       Int       @map("role_id")
+  role         Role      @relation(fields: [roleId], references: [id])
+  isActive     Boolean   @default(true) @map("is_active")
+  lastLogin    DateTime? @map("last_login")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  createdConsignments  Consignment[] @relation("ConsignmentCreator")
+  updatedConsignments  Consignment[] @relation("ConsignmentUpdater")
+  createdInvoices      Invoice[]     @relation("InvoiceCreator")
+  updatedInvoices      Invoice[]     @relation("InvoiceUpdater")
+  createdPayments      Payment[]
+  createdParties       Party[]       @relation("PartyCreator")
+  updatedParties       Party[]       @relation("PartyUpdater")
+  createdVehicles      Vehicle[]     @relation("VehicleCreator")
+  updatedVehicles      Vehicle[]     @relation("VehicleUpdater")
+  auditLogs            AuditLog[]
+  statusChanges        StatusHistory[]
+  approvedAmendments   PaymentAmendment[]
+
+  @@map("users")
+}
+
+model Role {
+  id          Int      @id @default(autoincrement())
+  roleName    String   @unique @map("role_name") @db.VarChar(50)
+  description String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  users           User[]
+  rolePermissions RolePermission[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id             Int      @id @default(autoincrement())
+  permissionCode String   @unique @map("permission_code") @db.VarChar(50)
+  module         String   @db.VarChar(50)
+  action         String   @db.VarChar(50)
+  description    String?  @db.Text
+
+  // Relations
+  rolePermissions RolePermission[]
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  id           Int        @id @default(autoincrement())
+  roleId       Int        @map("role_id")
+  permissionId Int        @map("permission_id")
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model Party {
+  id             Int      @id @default(autoincrement())
+  partyCode      String   @unique @map("party_code") @db.VarChar(20)
+  partyName      String   @map("party_name") @db.VarChar(200)
+  partyType      String   @map("party_type") @db.VarChar(20)
+  gstin          String?  @db.VarChar(15)
+  pan            String?  @db.VarChar(10)
+  addressLine1   String?  @map("address_line1") @db.VarChar(200)
+  addressLine2   String?  @map("address_line2") @db.VarChar(200)
+  city           String?  @db.VarChar(100)
+  state          String?  @db.VarChar(100)
+  pincode        String?  @db.VarChar(10)
+  country        String   @default("India") @db.VarChar(100)
+  contactPerson  String?  @map("contact_person") @db.VarChar(100)
+  mobile         String?  @db.VarChar(15)
+  email          String?  @db.VarChar(100)
+  bankName       String?  @map("bank_name") @db.VarChar(100)
+  bankAccountNo  String?  @map("bank_account_no") @db.VarChar(50)
+  bankIfsc       String?  @map("bank_ifsc") @db.VarChar(15)
+  bankBranch     String?  @map("bank_branch") @db.VarChar(100)
+  creditLimit    Decimal  @default(0) @map("credit_limit") @db.Decimal(15, 2)
+  creditDays     Int      @default(0) @map("credit_days")
+  isActive       Boolean  @default(true) @map("is_active")
+  isDeleted      Boolean  @default(false) @map("is_deleted")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  createdById    Int      @map("created_by")
+  updatedById    Int      @map("updated_by")
+
+  // Relations
+  createdBy              User          @relation("PartyCreator", fields: [createdById], references: [id])
+  updatedBy              User          @relation("PartyUpdater", fields: [updatedById], references: [id])
+  consignmentsAsConsignor Consignment[] @relation("Consignor")
+  consignmentsAsConsignee Consignment[] @relation("Consignee")
+  invoices               Invoice[]
+  payments               Payment[]
+  vehiclesAsBroker       Vehicle[]
+
+  @@index([partyName])
+  @@index([gstin])
+  @@index([isActive, isDeleted])
+  @@map("parties")
+}
+
+model Vehicle {
+  id               Int       @id @default(autoincrement())
+  vehicleNo        String    @unique @map("vehicle_no") @db.VarChar(20)
+  vehicleType      String?   @map("vehicle_type") @db.VarChar(50)
+  vehicleCapacity  Decimal?  @map("vehicle_capacity") @db.Decimal(10, 2)
+  ownerType        String    @map("owner_type") @db.VarChar(20)
+  ownerName        String?   @map("owner_name") @db.VarChar(200)
+  ownerMobile      String?   @map("owner_mobile") @db.VarChar(15)
+  ownerAddress     String?   @map("owner_address") @db.Text
+  brokerId         Int?      @map("broker_id")
+  broker           Party?    @relation(fields: [brokerId], references: [id])
+  rcNumber         String?   @map("rc_number") @db.VarChar(50)
+  rcExpiry         DateTime? @map("rc_expiry") @db.Date
+  insuranceNumber  String?   @map("insurance_number") @db.VarChar(50)
+  insuranceExpiry  DateTime? @map("insurance_expiry") @db.Date
+  fitnessExpiry    DateTime? @map("fitness_expiry") @db.Date
+  pollutionExpiry  DateTime? @map("pollution_expiry") @db.Date
+  driverName       String?   @map("driver_name") @db.VarChar(100)
+  driverMobile     String?   @map("driver_mobile") @db.VarChar(15)
+  driverLicense    String?   @map("driver_license") @db.VarChar(50)
+  isActive         Boolean   @default(true) @map("is_active")
+  isDeleted        Boolean   @default(false) @map("is_deleted")
+  notes            String?   @db.Text
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  createdById      Int       @map("created_by")
+  updatedById      Int       @map("updated_by")
+
+  // Relations
+  createdBy    User          @relation("VehicleCreator", fields: [createdById], references: [id])
+  updatedBy    User          @relation("VehicleUpdater", fields: [updatedById], references: [id])
+  consignments Consignment[]
+
+  @@index([vehicleNo])
+  @@index([isActive, isDeleted])
+  @@map("vehicles")
+}
+
+// ============================================
+// TRANSACTION TABLES
+// ============================================
+
+model Consignment {
+  id                  Int       @id @default(autoincrement())
+  grNumber            String    @unique @map("gr_number") @db.VarChar(20)
+  grDate              DateTime  @map("gr_date") @db.Date
+  consignmentNo       String?   @map("consignment_no") @db.VarChar(50)
+  consignorId         Int       @map("consignor_id")
+  consignor           Party     @relation("Consignor", fields: [consignorId], references: [id])
+  consigneeId         Int       @map("consignee_id")
+  consignee           Party     @relation("Consignee", fields: [consigneeId], references: [id])
+  fromLocation        String    @map("from_location") @db.VarChar(100)
+  toLocation          String    @map("to_location") @db.VarChar(100)
+  issuingBranch       String    @default("Surat") @map("issuing_branch") @db.VarChar(100)
+  deliveryOffice      String?   @map("delivery_office") @db.VarChar(100)
+  vehicleId           Int       @map("vehicle_id")
+  vehicle             Vehicle   @relation(fields: [vehicleId], references: [id])
+  vehicleNumber       String    @map("vehicle_number") @db.VarChar(20)
+  noOfPackages        Int?      @map("no_of_packages")
+  description         String?   @db.Text
+  vehicleType         String?   @map("vehicle_type") @db.VarChar(50)
+  actualWeight        Decimal?  @map("actual_weight") @db.Decimal(10, 3)
+  weightUnit          String    @default("MT") @map("weight_unit") @db.VarChar(10)
+  freightAmount       Decimal   @map("freight_amount") @db.Decimal(15, 2)
+  surcharge           Decimal   @default(0) @db.Decimal(15, 2)
+  otherCharges        Decimal   @default(0) @map("other_charges") @db.Decimal(15, 2)
+  grCharge            Decimal   @default(0) @map("gr_charge") @db.Decimal(15, 2)
+  totalAmount         Decimal   @map("total_amount") @db.Decimal(15, 2)
+  amountInWords       String?   @map("amount_in_words") @db.VarChar(500)
+  rateType            String?   @map("rate_type") @db.VarChar(20)
+  rateCalculationText String?   @map("rate_calculation_text") @db.Text
+  atRisk              String?   @map("at_risk") @db.VarChar(50)
+  paymentMode         String    @default("To Pay") @map("payment_mode") @db.VarChar(20)
+  status              String    @default("Booked") @db.VarChar(30)
+  bookedAt            DateTime  @default(now()) @map("booked_at")
+  loadedAt            DateTime? @map("loaded_at")
+  inTransitAt         DateTime? @map("in_transit_at")
+  deliveredAt         DateTime? @map("delivered_at")
+  settledAt           DateTime? @map("settled_at")
+  challanUploaded     Boolean   @default(false) @map("challan_uploaded")
+  challanFilePath     String?   @map("challan_file_path") @db.VarChar(500)
+  podUploaded         Boolean   @default(false) @map("pod_uploaded")
+  podFilePath         String?   @map("pod_file_path") @db.VarChar(500)
+  isInvoiced          Boolean   @default(false) @map("is_invoiced")
+  invoiceId           Int?      @map("invoice_id")
+  notes               String?   @db.Text
+  isDeleted           Boolean   @default(false) @map("is_deleted")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+  createdById         Int       @map("created_by")
+  updatedById         Int       @map("updated_by")
+
+  // Relations
+  createdBy        User               @relation("ConsignmentCreator", fields: [createdById], references: [id])
+  updatedBy        User               @relation("ConsignmentUpdater", fields: [updatedById], references: [id])
+  invoice          Invoice?           @relation(fields: [invoiceId], references: [id])
+  invoiceItems     InvoiceItem[]
+  statusHistory    StatusHistory[]
+  paymentAmendments PaymentAmendment[]
+
+  @@index([grNumber])
+  @@index([grDate])
+  @@index([status])
+  @@index([consignorId])
+  @@index([vehicleId])
+  @@map("consignments")
+}
+
+model Invoice {
+  id              Int       @id @default(autoincrement())
+  invoiceNumber   String    @unique @map("invoice_number") @db.VarChar(20)
+  invoiceDate     DateTime  @map("invoice_date") @db.Date
+  branch          String    @default("Surat") @db.VarChar(100)
+  partyId         Int       @map("party_id")
+  party           Party     @relation(fields: [partyId], references: [id])
+  partyName       String    @map("party_name") @db.VarChar(200)
+  partyAddress    String?   @map("party_address") @db.Text
+  partyGstin      String?   @map("party_gstin") @db.VarChar(15)
+  subtotal        Decimal   @db.Decimal(15, 2)
+  grCharge        Decimal   @default(0) @map("gr_charge") @db.Decimal(15, 2)
+  totalAmount     Decimal   @map("total_amount") @db.Decimal(15, 2)
+  amountInWords   String?   @map("amount_in_words") @db.VarChar(500)
+  paidAmount      Decimal   @default(0) @map("paid_amount") @db.Decimal(15, 2)
+  balanceAmount   Decimal   @map("balance_amount") @db.Decimal(15, 2)
+  paymentStatus   String    @default("Pending") @map("payment_status") @db.VarChar(20)
+  dueDate         DateTime? @map("due_date") @db.Date
+  pdfGenerated    Boolean   @default(false) @map("pdf_generated")
+  pdfFilePath     String?   @map("pdf_file_path") @db.VarChar(500)
+  isDeleted       Boolean   @default(false) @map("is_deleted")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  createdById     Int       @map("created_by")
+  updatedById     Int       @map("updated_by")
+
+  // Relations
+  createdBy         User               @relation("InvoiceCreator", fields: [createdById], references: [id])
+  updatedBy         User               @relation("InvoiceUpdater", fields: [updatedById], references: [id])
+  items             InvoiceItem[]
+  payments          Payment[]
+  consignments      Consignment[]
+  paymentAmendments PaymentAmendment[]
+
+  @@index([invoiceNumber])
+  @@index([invoiceDate])
+  @@index([partyId])
+  @@index([paymentStatus])
+  @@map("invoices")
+}
+
+model InvoiceItem {
+  id            Int         @id @default(autoincrement())
+  invoiceId     Int         @map("invoice_id")
+  invoice       Invoice     @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  consignmentId Int         @map("consignment_id")
+  consignment   Consignment @relation(fields: [consignmentId], references: [id])
+  grNumber      String      @map("gr_number") @db.VarChar(20)
+  grDate        DateTime    @map("gr_date") @db.Date
+  vehicleNumber String      @map("vehicle_number") @db.VarChar(20)
+  fromLocation  String      @map("from_location") @db.VarChar(100)
+  toLocation    String      @map("to_location") @db.VarChar(100)
+  contents      String?     @db.VarChar(500)
+  qtyInMt       Decimal?    @map("qty_in_mt") @db.Decimal(10, 3)
+  rateMt        Decimal?    @map("rate_mt") @db.Decimal(10, 2)
+  amount        Decimal     @db.Decimal(15, 2)
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  @@index([invoiceId])
+  @@index([consignmentId])
+  @@map("invoice_items")
+}
+
+model Payment {
+  id               Int       @id @default(autoincrement())
+  paymentNumber    String    @unique @map("payment_number") @db.VarChar(20)
+  paymentDate      DateTime  @map("payment_date") @db.Date
+  invoiceId        Int?      @map("invoice_id")
+  invoice          Invoice?  @relation(fields: [invoiceId], references: [id])
+  partyId          Int?      @map("party_id")
+  party            Party?    @relation(fields: [partyId], references: [id])
+  paymentMode      String?   @map("payment_mode") @db.VarChar(50)
+  paymentReference String?   @map("payment_reference") @db.VarChar(100)
+  amount           Decimal   @db.Decimal(15, 2)
+  bankName         String?   @map("bank_name") @db.VarChar(100)
+  bankAccountNo    String?   @map("bank_account_no") @db.VarChar(50)
+  bankIfsc         String?   @map("bank_ifsc") @db.VarChar(15)
+  remarks          String?   @db.Text
+  isDeleted        Boolean   @default(false) @map("is_deleted")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  createdById      Int       @map("created_by")
+
+  // Relations
+  createdBy User @relation(fields: [createdById], references: [id])
+
+  @@index([invoiceId])
+  @@index([partyId])
+  @@index([paymentDate])
+  @@map("payments")
+}
+
+model PaymentAmendment {
+  id             Int          @id @default(autoincrement())
+  invoiceId      Int?         @map("invoice_id")
+  invoice        Invoice?     @relation(fields: [invoiceId], references: [id])
+  consignmentId  Int?         @map("consignment_id")
+  consignment    Consignment? @relation(fields: [consignmentId], references: [id])
+  amendmentType  String       @map("amendment_type") @db.VarChar(50)
+  amount         Decimal      @db.Decimal(15, 2)
+  reason         String       @db.Text
+  approvedBy     Int?         @map("approved_by")
+  approver       User?        @relation(fields: [approvedBy], references: [id])
+  approvedAt     DateTime?    @map("approved_at")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  createdById    Int          @map("created_by")
+
+  @@map("payment_amendments")
+}
+
+// ============================================
+// AUDIT & LOGGING TABLES
+// ============================================
+
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  tableName  String   @map("table_name") @db.VarChar(50)
+  recordId   Int      @map("record_id")
+  action     String   @db.VarChar(20)
+  oldValues  Json?    @map("old_values")
+  newValues  Json?    @map("new_values")
+  changedBy  Int      @map("changed_by")
+  user       User     @relation(fields: [changedBy], references: [id])
+  changedAt  DateTime @default(now()) @map("changed_at")
+  ipAddress  String?  @map("ip_address") @db.VarChar(45)
+  userAgent  String?  @map("user_agent") @db.Text
+
+  @@index([tableName, recordId])
+  @@index([changedBy])
+  @@index([changedAt])
+  @@map("audit_logs")
+}
+
+model StatusHistory {
+  id            Int         @id @default(autoincrement())
+  consignmentId Int         @map("consignment_id")
+  consignment   Consignment @relation(fields: [consignmentId], references: [id], onDelete: Cascade)
+  fromStatus    String?     @map("from_status") @db.VarChar(30)
+  toStatus      String      @map("to_status") @db.VarChar(30)
+  remarks       String?     @db.Text
+  changedBy     Int         @map("changed_by")
+  user          User        @relation(fields: [changedBy], references: [id])
+  changedAt     DateTime    @default(now()) @map("changed_at")
+
+  @@index([consignmentId])
+  @@map("status_history")
+}
+
+model DailySummary {
+  id                 Int      @id @default(autoincrement())
+  summaryDate        DateTime @unique @map("summary_date") @db.Date
+  totalBookings      Int      @default(0) @map("total_bookings")
+  totalAmount        Decimal  @default(0) @map("total_amount") @db.Decimal(15, 2)
+  totalPayments      Decimal  @default(0) @map("total_payments") @db.Decimal(15, 2)
+  pendingDeliveries  Int      @default(0) @map("pending_deliveries")
+  vehiclesDeployed   Int      @default(0) @map("vehicles_deployed")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  @@map("daily_summary")
+}

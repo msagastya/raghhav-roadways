@@ -1,0 +1,13 @@
+# Create storage directories
+mkdir -p storage/consignments
+mkdir -p storage/invoices
+mkdir -p storage/challans
+mkdir -p logs
+mkdir -p uploads
+
+# Create .gitkeep files
+touch storage/consignments/.gitkeep
+touch storage/invoices/.gitkeep
+touch storage/challans/.gitkeep
+touch logs/.gitkeep
+touch uploads/.gitkeep
