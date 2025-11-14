@@ -113,7 +113,25 @@ const optionalAuth = async (req, res, next) => {
   }
 };
 
+/**
+ * Authorize based on permission
+ */
+const authorize = (permission) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return next(new ApiError(401, 'Unauthorized'));
+    }
+
+    if (!req.user.permissions.includes(permission)) {
+      return next(new ApiError(403, 'Insufficient permissions'));
+    }
+
+    next();
+  };
+};
+
 module.exports = {
   authenticateToken,
   optionalAuth,
+  authorize,
 };
