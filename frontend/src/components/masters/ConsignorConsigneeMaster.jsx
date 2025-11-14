@@ -41,7 +41,7 @@ export default function ConsignorConsigneeMaster() {
   const fetchRecords = async () => {
     try {
       const response = await mastersAPI.getConsignorConsignees({ limit: 100 });
-      setRecords(response.data.data.records || []);
+      setRecords(response.data?.data?.records || []);
     } catch (error) {
       showError(getErrorMessage(error));
     } finally {

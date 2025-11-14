@@ -91,7 +91,7 @@ export default function NewConsignmentPage() {
   const fetchVehicles = async () => {
     try {
       const response = await vehicleAPI.getAll({ limit: 100, isActive: true });
-      setVehicles(response.data.data.records || []);
+      setVehicles(response.data?.data?.records || []);
     } catch (error) {
       console.error('Error fetching vehicles:', error);
     }
@@ -100,7 +100,7 @@ export default function NewConsignmentPage() {
   const fetchConsignors = async () => {
     try {
       const response = await mastersAPI.getConsignorConsignees({ limit: 100 });
-      setConsignors(response.data.data.records || []);
+      setConsignors(response.data?.data?.records || []);
     } catch (error) {
       console.error('Error fetching consignors:', error);
     }
@@ -109,7 +109,7 @@ export default function NewConsignmentPage() {
   const fetchConsignees = async () => {
     try {
       const response = await mastersAPI.getConsignorConsignees({ limit: 100 });
-      setConsignees(response.data.data.records || []);
+      setConsignees(response.data?.data?.records || []);
     } catch (error) {
       console.error('Error fetching consignees:', error);
     }

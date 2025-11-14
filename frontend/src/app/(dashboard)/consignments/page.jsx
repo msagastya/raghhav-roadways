@@ -27,7 +27,7 @@ export default function ConsignmentsPage() {
   const fetchConsignments = async () => {
     try {
       const response = await consignmentAPI.getAll({ limit: 50 });
-      setConsignments(response.data.data.records || []);
+      setConsignments(response.data?.data?.records || []);
     } catch (error) {
       showError(getErrorMessage(error));
       setConsignments([]);

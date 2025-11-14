@@ -26,7 +26,7 @@ export default function PartiesPage() {
   const fetchParties = async () => {
     try {
       const response = await partyAPI.getAll({ limit: 100 });
-      const partiesData = response.data.data.records || [];
+      const partiesData = response.data?.data?.records || [];
       setParties(partiesData);
 
       // Calculate stats
