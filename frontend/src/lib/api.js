@@ -65,6 +65,22 @@ export const authAPI = {
   logout: () => api.post('/auth/logout'),
   getProfile: () => api.get('/auth/me'),
   changePassword: (data) => api.post('/auth/change-password', data),
+  signup: (data) => api.post('/auth/signup', data),
+};
+
+export const userAPI = {
+  getAll: (params) => api.get('/users', { params }),
+  updateApprovalStatus: (userId, status) => api.put(`/users/${userId}/approval`, { status }),
+  updateUserRole: (userId, roleId) => api.put(`/users/${userId}/role`, { roleId }),
+  delete: (userId) => api.delete(`/users/${userId}`),
+};
+
+export const permissionAPI = {
+  getAll: () => api.get('/permissions'),
+  getRoles: () => api.get('/permissions/roles'),
+  getRoleWithPermissions: (roleId) => api.get(`/permissions/roles/${roleId}`),
+  updateRolePermissions: (roleId, permissionIds) =>
+    api.put(`/permissions/roles/${roleId}/permissions`, { permissionIds }),
 };
 
 export const consignmentAPI = {

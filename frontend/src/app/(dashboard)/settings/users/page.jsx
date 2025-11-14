@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { userAPI, permissionAPI } from '@/lib/api/user';
-import useToast from '@/hooks/useToast';
-import { getErrorMessage } from '@/lib/utils';
+import { userAPI, permissionAPI } from '../../../lib/api';
+import useToast from '../../../hooks/useToast';
+import { getErrorMessage } from '../../../lib/utils';
 
 export default function UsersPage() {
   const [users, setUsers] = useState([]);

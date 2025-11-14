@@ -3,11 +3,12 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import apiClient from '@/lib/api/client';
-import { showSuccess, showError } from '@/utils/toast';
+import { authAPI } from '@/lib/api';
+import useToast from '@/hooks/useToast';
 
 export default function SignupPage() {
   const router = useRouter();
+  const { showSuccess, showError } = useToast();
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -39,7 +40,7 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      const response = await apiClient.post('/auth/signup', {
+      const response = await authAPI.signup({
         username: formData.username,
         email: formData.email,
         password: formData.password,
@@ -58,6 +59,10 @@ export default function SignupPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const getErrorMessage = (error) => {
+    return error.response?.data?.message || error.message || 'An error occurred';
   };
 
   return (
