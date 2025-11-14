@@ -35,6 +35,14 @@ const login = async (username, password) => {
     throw new ApiError(401, 'Your account has been deactivated');
   }
 
+  if (user.approvalStatus === 'pending') {
+    throw new ApiError(401, 'Your account is pending approval');
+  }
+
+  if (user.approvalStatus === 'rejected') {
+    throw new ApiError(401, 'Your account has been rejected');
+  }
+
   // Verify password
   const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
   if (!isPasswordValid) {
@@ -205,9 +213,73 @@ const changePassword = async (userId, oldPassword, newPassword) => {
   logger.info(`User ${user.username} changed password`);
 };
 
+/**
+ * Sign up new user
+ * @param {Object} userData
+ * @returns {Object} - created user info
+ */
+const signup = async (userData) => {
+  const { username, email, password, fullName, mobile } = userData;
+
+  // Check if user already exists
+  const existingUser = await prisma.user.findFirst({
+    where: {
+      OR: [{ username }, { email }],
+    },
+  });
+
+  if (existingUser) {
+    if (existingUser.username === username) {
+      throw new ApiError(400, 'Username already exists');
+    }
+    if (existingUser.email === email) {
+      throw new ApiError(400, 'Email already exists');
+    }
+  }
+
+  // Hash password
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  // Get default viewer role
+  const viewerRole = await prisma.role.findFirst({
+    where: { roleName: 'Viewer' },
+  });
+
+  if (!viewerRole) {
+    throw new ApiError(500, 'Default role not found');
+  }
+
+  // Create user with pending approval
+  const user = await prisma.user.create({
+    data: {
+      username,
+      email,
+      passwordHash: hashedPassword,
+      fullName,
+      mobile,
+      roleId: viewerRole.id,
+      isActive: false,
+      approvalStatus: 'pending',
+    },
+    select: {
+      id: true,
+      username: true,
+      email: true,
+      fullName: true,
+      mobile: true,
+      createdAt: true,
+    },
+  });
+
+  logger.info(`New user signed up: ${username}`);
+
+  return user;
+};
+
 module.exports = {
   login,
   refreshAccessToken,
   getUserById,
   changePassword,
+  signup,
 };

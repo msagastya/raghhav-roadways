@@ -104,8 +104,13 @@ export default function LoginPage() {
           </Button>
         </form>
         <div className="mt-6 text-center text-sm text-gray-600">
-          <p>Default credentials:</p>
-          <p className="mt-1 font-mono text-xs">Username: admin1 | Password: admin123</p>
+          <p>Don't have an account?{' '}
+            <a href="/signup" className="font-medium text-primary-600 hover:text-primary-700">
+              Sign up here
+            </a>
+          </p>
+          <p className="mt-4">Default credentials:</p>
+          <p className="mt-1 font-mono text-xs">Username: msagastya | Password: 162414</p>
         </div>
       </CardContent>
     </Card>

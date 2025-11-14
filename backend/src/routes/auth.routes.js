@@ -48,4 +48,11 @@ router.get('/me', authenticateToken, authController.getProfile);
  */
 router.post('/change-password', authenticateToken, authController.changePassword);
 
+/**
+ * @route   POST /api/v1/auth/signup
+ * @desc    Sign up new user
+ * @access  Public
+ */
+router.post('/signup', authController.signup);
+
 module.exports = router;

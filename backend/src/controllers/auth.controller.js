@@ -82,10 +82,35 @@ const changePassword = asyncHandler(async (req, res) => {
   });
 });
 
+/**
+ * Sign up new user
+ * POST /api/v1/auth/signup
+ */
+const signup = asyncHandler(async (req, res) => {
+  const { username, email, password, fullName, mobile } = req.body;
+
+  const user = await authService.signup({
+    username,
+    email,
+    password,
+    fullName,
+    mobile,
+  });
+
+  logger.info(`New user signed up: ${username}`);
+
+  res.status(201).json({
+    success: true,
+    message: 'Sign up successful. Please wait for admin approval.',
+    data: user,
+  });
+});
+
 module.exports = {
   login,
   logout,
   refreshToken,
   getProfile,
   changePassword,
+  signup,
 };
