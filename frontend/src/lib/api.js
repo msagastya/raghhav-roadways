@@ -122,3 +122,39 @@ export const reportAPI = {
   getMonthlyStatement: (params) => api.get('/reports/monthly-statement', { params }),
   getVehicleSettlement: (params) => api.get('/reports/vehicle-settlement', { params }),
 };
+
+export const mastersAPI = {
+  // State-City
+  getStates: () => api.get('/masters/states'),
+  getCitiesByState: (stateId) => api.get(`/masters/states/${stateId}/cities`),
+  getAllCities: () => api.get('/masters/cities'),
+  addCity: (data) => api.post('/masters/cities', data),
+  searchCities: (params) => api.get('/masters/cities/search', { params }),
+
+  // Consignor/Consignee
+  getConsignorConsignees: (params) => api.get('/masters/consignor-consignees', { params }),
+  getConsignorConsigneeById: (id) => api.get(`/masters/consignor-consignees/${id}`),
+  createConsignorConsignee: (data) => api.post('/masters/consignor-consignees', data),
+  updateConsignorConsignee: (id, data) => api.patch(`/masters/consignor-consignees/${id}`, data),
+  deleteConsignorConsignee: (id) => api.delete(`/masters/consignor-consignees/${id}`),
+  searchConsignorConsignees: (params) => api.get('/masters/consignor-consignees/search', { params }),
+
+  // Invoice Party
+  getInvoiceParties: (params) => api.get('/masters/invoice-parties', { params }),
+  getInvoicePartyById: (id) => api.get(`/masters/invoice-parties/${id}`),
+  createInvoiceParty: (data) => api.post('/masters/invoice-parties', data),
+  updateInvoiceParty: (id, data) => api.patch(`/masters/invoice-parties/${id}`, data),
+  deleteInvoiceParty: (id) => api.delete(`/masters/invoice-parties/${id}`),
+  searchInvoiceParties: (params) => api.get('/masters/invoice-parties/search', { params }),
+
+  // Vehicle Owner/Broker
+  getVehicleOwners: (params) => api.get('/masters/vehicle-owners', { params }),
+  getVehicleOwnerById: (id) => api.get(`/masters/vehicle-owners/${id}`),
+  createVehicleOwner: (data) => api.post('/masters/vehicle-owners', data),
+  updateVehicleOwner: (id, data) => api.patch(`/masters/vehicle-owners/${id}`, data),
+  deleteVehicleOwner: (id) => api.delete(`/masters/vehicle-owners/${id}`),
+  searchVehicleOwners: (params) => api.get('/masters/vehicle-owners/search', { params }),
+  addVehicleToOwner: (ownerId, data) => api.post(`/masters/vehicle-owners/${ownerId}/vehicles`, data),
+  updateOwnerVehicle: (ownerId, vehicleId, data) => api.patch(`/masters/vehicle-owners/${ownerId}/vehicles/${vehicleId}`, data),
+  deleteOwnerVehicle: (ownerId, vehicleId) => api.delete(`/masters/vehicle-owners/${ownerId}/vehicles/${vehicleId}`),
+};

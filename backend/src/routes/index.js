@@ -9,6 +9,7 @@ const consignmentRoutes = require('./consignment.routes');
 const invoiceRoutes = require('./invoice.routes');
 const paymentRoutes = require('./payment.routes');
 const reportRoutes = require('./report.routes');
+const mastersRoutes = require('./masters.routes');
 
 // Health check route
 router.get('/health', (req, res) => {
@@ -27,6 +28,7 @@ router.use('/consignments', consignmentRoutes);
 router.use('/invoices', invoiceRoutes);
 router.use('/payments', paymentRoutes);
 router.use('/reports', reportRoutes);
+router.use('/masters', mastersRoutes);
 
 // API documentation route (you can expand this later)
 router.get('/', (req, res) => {
@@ -42,6 +44,7 @@ router.get('/', (req, res) => {
       invoices: '/api/v1/invoices',
       payments: '/api/v1/payments',
       reports: '/api/v1/reports',
+      masters: '/api/v1/masters',
     },
   });
 });

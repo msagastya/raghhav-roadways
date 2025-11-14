@@ -21,9 +21,10 @@ export default function PaymentsPage() {
   const fetchPayments = async () => {
     try {
       const response = await paymentAPI.getAll({ limit: 50 });
-      setPayments(response.data.data.records);
+      setPayments(response.data.data.records || []);
     } catch (error) {
       showError(getErrorMessage(error));
+      setPayments([]);
     } finally {
       setLoading(false);
     }

@@ -184,11 +184,14 @@ model Consignment {
   vehicleId           Int       @map("vehicle_id")
   vehicle             Vehicle   @relation(fields: [vehicleId], references: [id])
   vehicleNumber       String    @map("vehicle_number") @db.VarChar(20)
+  vehicleSize         String?   @map("vehicle_size") @db.VarChar(50)
   noOfPackages        Int?      @map("no_of_packages")
   description         String?   @db.Text
   vehicleType         String?   @map("vehicle_type") @db.VarChar(50)
   actualWeight        Decimal?  @map("actual_weight") @db.Decimal(10, 3)
+  chargedWeight       Decimal?  @map("charged_weight") @db.Decimal(10, 3)
   weightUnit          String    @default("MT") @map("weight_unit") @db.VarChar(10)
+  shipmentValue       Decimal?  @map("shipment_value") @db.Decimal(15, 2)
   freightAmount       Decimal   @map("freight_amount") @db.Decimal(15, 2)
   surcharge           Decimal   @default(0) @db.Decimal(15, 2)
   otherCharges        Decimal   @default(0) @map("other_charges") @db.Decimal(15, 2)
@@ -207,6 +210,12 @@ model Consignment {
   settledAt           DateTime? @map("settled_at")
   challanUploaded     Boolean   @default(false) @map("challan_uploaded")
   challanFilePath     String?   @map("challan_file_path") @db.VarChar(500)
+  ewayBillNo          String?   @map("eway_bill_no") @db.VarChar(20)
+  ewayBillFromDate    DateTime? @map("eway_bill_from_date") @db.Date
+  ewayBillValidUpto   DateTime? @map("eway_bill_valid_upto") @db.Date
+  ewayBillFilePath    String?   @map("eway_bill_file_path") @db.VarChar(500)
+  policyNo            String?   @map("policy_no") @db.VarChar(50)
+  policyAmount        Decimal?  @map("policy_amount") @db.Decimal(15, 2)
   podUploaded         Boolean   @default(false) @map("pod_uploaded")
   podFilePath         String?   @map("pod_file_path") @db.VarChar(500)
   isInvoiced          Boolean   @default(false) @map("is_invoiced")
@@ -392,4 +401,134 @@ model DailySummary {
   createdAt          DateTime @default(now()) @map("created_at")
 
   @@map("daily_summary")
+}
+
+// ============================================
+// NEW MASTER DATA TABLES
+// ============================================
+
+model State {
+  id        Int      @id @default(autoincrement())
+  stateName String   @unique @map("state_name") @db.VarChar(100)
+  stateCode String?  @map("state_code") @db.VarChar(10)
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  cities                  City[]
+  consignorConsignees     ConsignorConsignee[]
+  invoiceParties          InvoiceParty[]
+  vehicleOwnerBrokers     VehicleOwnerBroker[]
+
+  @@map("states")
+}
+
+model City {
+  id        Int      @id @default(autoincrement())
+  cityName  String   @map("city_name") @db.VarChar(100)
+  stateId   Int      @map("state_id")
+  state     State    @relation(fields: [stateId], references: [id])
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  consignorConsignees     ConsignorConsignee[]
+  invoiceParties          InvoiceParty[]
+  vehicleOwnerBrokers     VehicleOwnerBroker[]
+
+  @@unique([cityName, stateId])
+  @@index([stateId])
+  @@map("cities")
+}
+
+model ConsignorConsignee {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(200)
+  address   String?  @db.Text
+  cityId    Int      @map("city_id")
+  city      City     @relation(fields: [cityId], references: [id])
+  stateId   Int      @map("state_id")
+  state     State    @relation(fields: [stateId], references: [id])
+  pincode   String?  @db.VarChar(10)
+  gstin     String?  @db.VarChar(15)
+  contact   String?  @db.VarChar(15)
+  remarks   String?  @db.Text
+  isActive  Boolean  @default(true) @map("is_active")
+  isDeleted Boolean  @default(false) @map("is_deleted")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([name])
+  @@index([gstin])
+  @@index([cityId])
+  @@index([stateId])
+  @@map("consignor_consignees")
+}
+
+model InvoiceParty {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(200)
+  address   String?  @db.Text
+  cityId    Int      @map("city_id")
+  city      City     @relation(fields: [cityId], references: [id])
+  stateId   Int      @map("state_id")
+  state     State    @relation(fields: [stateId], references: [id])
+  pincode   String?  @db.VarChar(10)
+  gstin     String?  @db.VarChar(15)
+  contact   String?  @db.VarChar(15)
+  remarks   String?  @db.Text
+  isActive  Boolean  @default(true) @map("is_active")
+  isDeleted Boolean  @default(false) @map("is_deleted")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([name])
+  @@index([gstin])
+  @@index([cityId])
+  @@index([stateId])
+  @@map("invoice_parties")
+}
+
+model VehicleOwnerBroker {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(200)
+  type      String   @db.VarChar(20) // 'owner' or 'broker'
+  address   String?  @db.Text
+  cityId    Int      @map("city_id")
+  city      City     @relation(fields: [cityId], references: [id])
+  stateId   Int      @map("state_id")
+  state     State    @relation(fields: [stateId], references: [id])
+  pincode   String?  @db.VarChar(10)
+  contact   String?  @db.VarChar(15)
+  remarks   String?  @db.Text
+  isActive  Boolean  @default(true) @map("is_active")
+  isDeleted Boolean  @default(false) @map("is_deleted")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  vehicles OwnerVehicle[]
+
+  @@index([name])
+  @@index([cityId])
+  @@index([stateId])
+  @@map("vehicle_owner_brokers")
+}
+
+model OwnerVehicle {
+  id            Int                @id @default(autoincrement())
+  ownerId       Int                @map("owner_id")
+  owner         VehicleOwnerBroker @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  vehicleNo     String             @map("vehicle_no") @db.VarChar(20)
+  vehicleSize   String?            @map("vehicle_size") @db.VarChar(50)
+  vehicleType   String?            @map("vehicle_type") @db.VarChar(50)
+  noOfTrips     Int                @default(0) @map("no_of_trips")
+  remarks       String?            @db.Text
+  isActive      Boolean            @default(true) @map("is_active")
+  createdAt     DateTime           @default(now()) @map("created_at")
+  updatedAt     DateTime           @updatedAt @map("updated_at")
+
+  @@index([ownerId])
+  @@index([vehicleNo])
+  @@map("owner_vehicles")
 }

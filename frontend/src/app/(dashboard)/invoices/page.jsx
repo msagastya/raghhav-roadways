@@ -22,9 +22,10 @@ export default function InvoicesPage() {
   const fetchInvoices = async () => {
     try {
       const response = await invoiceAPI.getAll({ limit: 50 });
-      setInvoices(response.data.data.records);
+      setInvoices(response.data.data.records || []);
     } catch (error) {
       showError(getErrorMessage(error));
+      setInvoices([]);
     } finally {
       setLoading(false);
     }

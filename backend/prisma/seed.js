@@ -71,9 +71,11 @@ async function main() {
     { code: 'payment.approve_amendment', module: 'payment', action: 'approve', desc: 'Approve payment amendments' },
     
     // Master data permissions
+    { code: 'master.party.view', module: 'master', action: 'view', desc: 'View party details' },
     { code: 'master.party.create', module: 'master', action: 'create', desc: 'Add new party' },
     { code: 'master.party.edit', module: 'master', action: 'edit', desc: 'Edit party details' },
     { code: 'master.party.delete', module: 'master', action: 'delete', desc: 'Delete party' },
+    { code: 'master.vehicle.view', module: 'master', action: 'view', desc: 'View vehicle details' },
     { code: 'master.vehicle.create', module: 'master', action: 'create', desc: 'Add new vehicle' },
     { code: 'master.vehicle.edit', module: 'master', action: 'edit', desc: 'Edit vehicle details' },
     { code: 'master.vehicle.delete', module: 'master', action: 'delete', desc: 'Delete vehicle' },

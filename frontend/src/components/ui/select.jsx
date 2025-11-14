@@ -6,6 +6,7 @@ export default function Select({
   options = [],
   className,
   containerClassName,
+  children,
   ...props
 }) {
   return (
@@ -24,7 +25,8 @@ export default function Select({
         )}
         {...props}
       >
-        {options.map((option) => (
+        {/* Support both children and options prop */}
+        {children ? children : options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
           </option>
