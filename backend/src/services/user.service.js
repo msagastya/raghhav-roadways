@@ -16,9 +16,6 @@ const getAllUsers = async (filters = {}) => {
 
   const users = await prisma.user.findMany({
     where,
-    include: {
-      role: true,
-    },
     select: {
       id: true,
       username: true,
