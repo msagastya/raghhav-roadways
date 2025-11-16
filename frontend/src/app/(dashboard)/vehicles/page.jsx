@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Plus } from 'lucide-react';
+import { Plus, Edit, Trash2 } from 'lucide-react';
 import { vehicleAPI } from '../../../lib/api';
 import { Card, CardContent } from '../../../components/ui/card';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../../components/ui/table';
@@ -13,9 +14,10 @@ import useToast from '../../../hooks/useToast';
 import { getErrorMessage } from '../../../lib/utils';
 
 export default function VehiclesPage() {
+  const router = useRouter();
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { showError } = useToast();
+  const { showError, showSuccess } = useToast();
 
   useEffect(() => {
     fetchVehicles();
@@ -30,6 +32,24 @@ export default function VehiclesPage() {
       setVehicles([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEdit = (vehicle) => {
+    router.push(`/vehicles/edit/${vehicle.id}`);
+  };
+
+  const handleDelete = async (vehicle) => {
+    if (!window.confirm(`Are you sure you want to delete vehicle ${vehicle.vehicleNo}?`)) {
+      return;
+    }
+
+    try {
+      await vehicleAPI.delete(vehicle.id);
+      showSuccess('Vehicle deleted successfully');
+      fetchVehicles();
+    } catch (error) {
+      showError(getErrorMessage(error));
     }
   };
 
@@ -86,12 +106,13 @@ export default function VehiclesPage() {
                   <TableHead>Owner Name</TableHead>
                   <TableHead>Driver Name</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {vehicles.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-gray-500 py-8">
+                    <TableCell colSpan={7} className="text-center text-gray-500 py-8">
                       No vehicles found
                     </TableCell>
                   </TableRow>
@@ -107,6 +128,24 @@ export default function VehiclesPage() {
                         <Badge variant={vehicle.isActive ? 'success' : 'danger'}>
                           {vehicle.isActive ? 'Active' : 'Inactive'}
                         </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <button
+                            onClick={() => handleEdit(vehicle)}
+                            className="p-1.5 sm:p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
+                            title="Edit vehicle"
+                          >
+                            <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(vehicle)}
+                            className="p-1.5 sm:p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
+                            title="Delete vehicle"
+                          >
+                            <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                          </button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))

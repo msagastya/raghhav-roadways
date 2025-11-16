@@ -68,11 +68,13 @@ export default function LoginPage() {
     <Card className="w-full max-w-md">
       <CardHeader className="text-center">
         <div className="flex flex-col items-center mb-6">
-          <img
-            src="/logo.png"
-            alt="Raghhav Roadways Logo"
-            className="w-40 h-40 sm:w-48 sm:h-48 object-contain mb-4 rounded-2xl shadow-lg"
-          />
+          <div className="relative p-4 rounded-3xl bg-gradient-to-br from-brand-100 via-brand-50 to-white shadow-xl">
+            <img
+              src="/logo.png"
+              alt="Raghhav Roadways Logo"
+              className="w-32 h-32 sm:w-40 sm:h-40 object-contain rounded-2xl"
+            />
+          </div>
           <div className="space-y-1">
             <h1 className="text-5xl sm:text-6xl font-brand font-bold text-brand-600 tracking-wider uppercase leading-tight">
               RAGHHAV
