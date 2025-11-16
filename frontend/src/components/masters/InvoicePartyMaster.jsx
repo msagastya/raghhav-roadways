@@ -41,7 +41,7 @@ export default function InvoicePartyMaster() {
   const fetchRecords = async () => {
     try {
       const response = await mastersAPI.getInvoiceParties({ limit: 100 });
-      setRecords(response.data?.data?.records || []);
+      setRecords(response.data?.data?.parties || []);
     } catch (error) {
       showError(getErrorMessage(error));
     } finally {

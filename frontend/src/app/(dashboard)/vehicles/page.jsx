@@ -24,7 +24,7 @@ export default function VehiclesPage() {
   const fetchVehicles = async () => {
     try {
       const response = await vehicleAPI.getAll({ limit: 100 });
-      setVehicles(response.data?.data?.records || []);
+      setVehicles(response.data?.data?.vehicles || []);
     } catch (error) {
       showError(getErrorMessage(error));
       setVehicles([]);

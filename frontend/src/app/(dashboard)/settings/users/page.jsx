@@ -25,7 +25,7 @@ export default function UsersPage() {
       else if (filter === 'rejected') params.approvalStatus = 'rejected';
 
       const response = await userAPI.getAll(params);
-      setUsers(response.data?.data?.records || []);
+      setUsers(response.data?.data?.users || []);
     } catch (error) {
       showError(getErrorMessage(error));
     } finally {

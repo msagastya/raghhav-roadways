@@ -72,7 +72,7 @@ export default function VehicleOwnerBrokerMaster() {
   const fetchRecords = async () => {
     try {
       const response = await mastersAPI.getVehicleOwners({ limit: 100 });
-      setRecords(response.data?.data?.records || []);
+      setRecords(response.data?.data?.vehicleOwners || []);
     } catch (error) {
       showError(getErrorMessage(error));
     } finally {
