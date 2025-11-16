@@ -42,21 +42,24 @@ export default function SettingsPage() {
               </Card>
             </Link>
 
-            <Card className="opacity-50 cursor-not-allowed">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div className="p-3 bg-gray-100 rounded-lg">
-                      <Shield className="w-6 h-6 text-gray-400" />
+            <Link href="/settings/roles">
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer border-2 hover:border-purple-500">
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div className="p-3 bg-purple-100 rounded-lg">
+                        <Shield className="w-6 h-6 text-purple-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">Role Management</h3>
+                        <p className="text-sm text-gray-600 mt-1">Configure roles and permissions</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">Role Management</h3>
-                      <p className="text-sm text-gray-600 mt-1">Configure roles and permissions (Coming Soon)</p>
-                    </div>
+                    <ChevronRight className="w-5 h-5 text-gray-400" />
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </Link>
           </div>
         </div>
       )}
