@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { invoiceAPI } from '../../../lib/api';
 import { Card, CardContent } from '../../../components/ui/card';
@@ -66,6 +67,12 @@ export default function InvoicesPage() {
           <h1 className="text-2xl font-bold text-gray-900">Invoices</h1>
           <p className="text-gray-600 mt-1">Manage all invoice records</p>
         </div>
+        <Link href="/invoices/new">
+          <Button className="flex items-center gap-2">
+            <Plus className="w-4 h-4" />
+            New Invoice
+          </Button>
+        </Link>
       </div>
 
       <Card>
