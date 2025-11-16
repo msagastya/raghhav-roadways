@@ -109,8 +109,6 @@ export default function LoginPage() {
               Sign up here
             </a>
           </p>
-          <p className="mt-4">Default credentials:</p>
-          <p className="mt-1 font-mono text-xs">Username: msagastya | Password: 162414</p>
         </div>
       </CardContent>
     </Card>

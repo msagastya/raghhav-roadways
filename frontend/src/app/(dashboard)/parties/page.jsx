@@ -17,6 +17,7 @@ export default function PartiesPage() {
   const [parties, setParties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ total: 0, active: 0, inactive: 0, withGSTIN: 0 });
+  const [filter, setFilter] = useState('all'); // all, active, inactive, withGSTIN
   const { showError } = useToast();
 
   useEffect(() => {
@@ -46,6 +47,23 @@ export default function PartiesPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Filter parties based on selected filter
+  const filteredParties = parties.filter(party => {
+    if (filter === 'all') return true;
+    if (filter === 'active') return party.isActive;
+    if (filter === 'inactive') return !party.isActive;
+    if (filter === 'withGSTIN') return party.gstin && party.gstin.trim() !== '';
+    return true;
+  });
+
+  const getFilterTitle = () => {
+    if (filter === 'all') return 'All Parties';
+    if (filter === 'active') return 'Active Parties';
+    if (filter === 'inactive') return 'Inactive Parties';
+    if (filter === 'withGSTIN') return 'Parties with GSTIN';
+    return 'All Parties';
   };
 
   if (loading) {
@@ -123,20 +141,22 @@ export default function PartiesPage() {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[
-          { label: 'Total Parties', value: stats.total, icon: Users, bg: 'bg-blue-100', iconColor: 'text-blue-600' },
-          { label: 'Active', value: stats.active, icon: Building2, bg: 'bg-green-100', iconColor: 'text-green-600' },
-          { label: 'Inactive', value: stats.inactive, icon: Building2, bg: 'bg-red-100', iconColor: 'text-red-600' },
-          { label: 'With GSTIN', value: stats.withGSTIN, icon: Users, bg: 'bg-purple-100', iconColor: 'text-purple-600' }
+          { label: 'Total Parties', value: stats.total, icon: Users, bg: 'bg-blue-100', iconColor: 'text-blue-600', filterKey: 'all' },
+          { label: 'Active', value: stats.active, icon: Building2, bg: 'bg-green-100', iconColor: 'text-green-600', filterKey: 'active' },
+          { label: 'Inactive', value: stats.inactive, icon: Building2, bg: 'bg-red-100', iconColor: 'text-red-600', filterKey: 'inactive' },
+          { label: 'With GSTIN', value: stats.withGSTIN, icon: Users, bg: 'bg-purple-100', iconColor: 'text-purple-600', filterKey: 'withGSTIN' }
         ].map((stat, index) => {
           const Icon = stat.icon;
+          const isActive = filter === stat.filterKey;
           return (
             <motion.div
               key={stat.label}
               initial={{ opacity: 0, y: 20, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.4, delay: 0.1 + index * 0.05 }}
+              onClick={() => setFilter(stat.filterKey)}
             >
-              <Card animate={false} hover3d={true} className="group cursor-pointer">
+              <Card animate={false} hover3d={true} className={`group cursor-pointer transition-all ${isActive ? 'ring-2 ring-offset-2 ring-blue-500' : ''}`}>
                 <CardContent className="p-3 sm:p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
@@ -166,7 +186,7 @@ export default function PartiesPage() {
       >
         <Card animate={false} hover3d={true}>
           <CardHeader>
-            <h3 className="text-base sm:text-lg font-bold text-gray-900">All Parties</h3>
+            <h3 className="text-base sm:text-lg font-bold text-gray-900">{getFilterTitle()}</h3>
           </CardHeader>
           <CardContent className="p-0 sm:p-6">
             <div className="overflow-x-auto">
@@ -182,7 +202,7 @@ export default function PartiesPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {parties.length === 0 ? (
+                  {filteredParties.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={6} className="text-center text-gray-500 py-8">
                         <div className="flex flex-col items-center gap-3">
@@ -198,7 +218,7 @@ export default function PartiesPage() {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    parties.map((party, index) => (
+                    filteredParties.map((party, index) => (
                       <TableRow key={party.id} animate={true} index={index}>
                         <TableCell className="font-medium text-xs sm:text-sm">{party.partyCode}</TableCell>
                         <TableCell className="text-xs sm:text-sm">{party.partyName}</TableCell>
