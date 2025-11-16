@@ -67,16 +67,21 @@ export default function LoginPage() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="text-center">
-        <div className="flex justify-center mb-4">
+        <div className="flex flex-col items-center mb-6">
           <img
             src="/logo.png"
             alt="Raghhav Roadways Logo"
-            className="w-24 h-24 object-contain"
+            className="w-40 h-40 sm:w-48 sm:h-48 object-contain mb-4"
           />
+          <div className="space-y-1">
+            <h1 className="text-5xl sm:text-6xl font-brand font-bold text-brand-600 tracking-wider uppercase leading-tight">
+              RAGHHAV
+            </h1>
+            <h1 className="text-5xl sm:text-6xl font-brand font-bold text-brand-600 tracking-wider uppercase leading-tight">
+              ROADWAYS
+            </h1>
+          </div>
         </div>
-        <h1 className="text-3xl font-brand font-bold text-brand-600 tracking-wider uppercase">
-          Raghhav Roadways
-        </h1>
         <p className="text-gray-600 mt-2 text-sm">Transport Management System</p>
       </CardHeader>
       <CardContent>

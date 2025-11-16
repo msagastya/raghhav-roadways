@@ -69,17 +69,22 @@ export default function SignupPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-brand-50 to-primary-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <div className="flex justify-center mb-4">
+          <div className="flex flex-col items-center mb-6">
             <img
               src="/logo.png"
               alt="Raghhav Roadways Logo"
-              className="w-20 h-20 object-contain"
+              className="w-32 h-32 sm:w-40 sm:h-40 object-contain mb-4"
             />
+            <div className="space-y-1">
+              <h1 className="text-4xl sm:text-5xl font-brand font-bold text-brand-600 tracking-wider uppercase leading-tight text-center">
+                RAGHHAV
+              </h1>
+              <h1 className="text-4xl sm:text-5xl font-brand font-bold text-brand-600 tracking-wider uppercase leading-tight text-center">
+                ROADWAYS
+              </h1>
+            </div>
           </div>
-          <h1 className="text-center text-2xl font-brand font-bold text-brand-600 tracking-wider uppercase mb-2">
-            Raghhav Roadways
-          </h1>
-          <h2 className="mt-2 text-center text-2xl font-bold text-gray-900">
+          <h2 className="mt-4 text-center text-2xl font-bold text-gray-900">
             Create your account
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">

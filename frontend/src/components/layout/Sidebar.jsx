@@ -60,12 +60,12 @@ export default function Sidebar({ isOpen }) {
       >
         <div className="flex flex-col h-full overflow-hidden">
           <motion.div
-            className="flex items-center justify-between h-16 sm:h-20 px-3 sm:px-4 lg:px-6 border-b border-brand-600/20 bg-gradient-to-r from-brand-700/30 to-transparent"
+            className={`flex items-center justify-between px-3 sm:px-4 lg:px-6 border-b border-brand-600/20 bg-gradient-to-r from-brand-700/30 to-transparent ${isOpen ? 'h-32 sm:h-36 flex-col py-4' : 'h-16 sm:h-20'}`}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
           >
-            <div className="flex items-center gap-2">
+            <div className={`flex ${isOpen ? 'flex-col items-center w-full' : 'items-center'} gap-2`}>
               <motion.div
                 className="relative"
                 whileHover={{ scale: 1.1 }}
@@ -74,18 +74,23 @@ export default function Sidebar({ isOpen }) {
                 <img
                   src="/logo.png"
                   alt="Raghhav Roadways"
-                  className="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg"
+                  className={isOpen ? "w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-lg" : "w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg"}
                 />
               </motion.div>
               {isOpen && (
-                <motion.span
-                  className="text-base sm:text-lg font-brand font-bold text-brand-100 tracking-wide drop-shadow-lg uppercase"
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
+                <motion.div
+                  className="flex flex-col items-center space-y-0"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: 0.1 }}
                 >
-                  Raghhav Roadways
-                </motion.span>
+                  <span className="text-xl sm:text-2xl font-brand font-bold text-brand-100 tracking-wider drop-shadow-lg uppercase leading-tight">
+                    RAGHHAV
+                  </span>
+                  <span className="text-xl sm:text-2xl font-brand font-bold text-brand-100 tracking-wider drop-shadow-lg uppercase leading-tight">
+                    ROADWAYS
+                  </span>
+                </motion.div>
               )}
             </div>
             {isOpen && (
