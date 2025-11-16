@@ -156,6 +156,15 @@ const getInvoiceById = async (id) => {
  * Create new invoice
  */
 const createInvoice = async (data, userId, ipAddress, userAgent) => {
+  // Check if this is custom invoice format (with grItems) or standard format (with consignmentIds)
+  const isCustomFormat = data.grItems && Array.isArray(data.grItems);
+
+  if (isCustomFormat) {
+    // Custom invoice format with editable fields
+    return await createCustomInvoice(data, userId, ipAddress, userAgent);
+  }
+
+  // Standard invoice format (backward compatibility)
   const { partyId, consignmentIds, grCharge = 0, dueDate = null } = data;
 
   // Verify party exists
@@ -279,6 +288,160 @@ const createInvoice = async (data, userId, ipAddress, userAgent) => {
           updatedById: userId,
         },
       });
+    }
+
+    return invoice;
+  });
+
+  // Create audit log
+  await createAuditLog({
+    tableName: 'invoices',
+    recordId: result.id,
+    action: AUDIT_ACTION.CREATE,
+    newValues: result,
+    userId,
+    ipAddress,
+    userAgent,
+  });
+
+  return result;
+};
+
+/**
+ * Create custom invoice with editable fields
+ */
+const createCustomInvoice = async (data, userId, ipAddress, userAgent) => {
+  const {
+    partyId,
+    partyName,
+    partyAddress,
+    partyGST,
+    grItems = [],
+    extraItems = [],
+    grCharges = 0,
+    totalAmount,
+    invoiceDate,
+    dueDate = null,
+  } = data;
+
+  // Verify party exists
+  const party = await prisma.party.findUnique({
+    where: { id: parseInt(partyId) },
+  });
+
+  if (!party || party.isDeleted) {
+    throw new ApiError(404, 'Party not found');
+  }
+
+  // Validate GR items
+  if (grItems.length === 0) {
+    throw new ApiError(400, 'At least one GR item is required');
+  }
+
+  // Generate invoice number
+  const lastInvoice = await prisma.invoice.findFirst({
+    orderBy: { invoiceNumber: 'desc' },
+  });
+
+  const lastNumber = lastInvoice
+    ? parseInt(lastInvoice.invoiceNumber.replace('INV', ''))
+    : 0;
+  const invoiceNumber = generateCode('INV', lastNumber, 4);
+
+  // Calculate subtotal from GR items
+  const grTotal = grItems.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+
+  // Calculate extra items total
+  const extraTotal = extraItems.reduce((sum, item) => sum + Number(item.charge || 0), 0);
+
+  // Calculate total
+  const calculatedTotal = grTotal + extraTotal + Number(grCharges);
+
+  // Convert amount to words
+  const amountInWords = convertAmountToWords(calculatedTotal);
+
+  // Create invoice in a transaction
+  const result = await prisma.$transaction(async (tx) => {
+    // Create invoice
+    const invoice = await tx.invoice.create({
+      data: {
+        invoiceNumber,
+        invoiceDate: new Date(invoiceDate || new Date()),
+        branch: data.branch || 'Surat',
+        partyId: parseInt(partyId),
+        partyName: partyName || party.partyName,
+        partyAddress: partyAddress || '',
+        partyGstin: partyGST || party.gstin,
+        subtotal: grTotal + extraTotal,
+        grCharge: Number(grCharges),
+        totalAmount: calculatedTotal,
+        amountInWords,
+        balanceAmount: calculatedTotal,
+        paymentStatus: PAYMENT_STATUS.PENDING,
+        dueDate: dueDate ? new Date(dueDate) : null,
+        createdById: userId,
+        updatedById: userId,
+      },
+    });
+
+    // Create invoice items from GR items
+    for (const grItem of grItems) {
+      // Try to find matching consignment by GR number
+      const consignment = await tx.consignment.findFirst({
+        where: {
+          grNumber: grItem.grNumber,
+          isDeleted: false,
+        },
+      });
+
+      await tx.invoiceItem.create({
+        data: {
+          invoiceId: invoice.id,
+          consignmentId: consignment?.id || null,
+          grNumber: grItem.grNumber,
+          grDate: grItem.grDate ? new Date(grItem.grDate) : new Date(),
+          vehicleNumber: grItem.vehicleNo || '',
+          fromLocation: grItem.from || '',
+          toLocation: grItem.to || '',
+          contents: grItem.contents || '',
+          qtyInMt: null,
+          rateMt: null,
+          amount: Number(grItem.amount || 0),
+        },
+      });
+
+      // Update consignment as invoiced if found
+      if (consignment && !consignment.isInvoiced) {
+        await tx.consignment.update({
+          where: { id: consignment.id },
+          data: {
+            isInvoiced: true,
+            invoiceId: invoice.id,
+            updatedById: userId,
+          },
+        });
+      }
+    }
+
+    // Create invoice items for extra items
+    for (const extraItem of extraItems) {
+      if (extraItem.content || extraItem.charge) {
+        await tx.invoiceItem.create({
+          data: {
+            invoiceId: invoice.id,
+            consignmentId: null,
+            grNumber: null,
+            grDate: new Date(),
+            vehicleNumber: null,
+            fromLocation: null,
+            toLocation: null,
+            contents: extraItem.content || 'Extra Item',
+            qtyInMt: null,
+            rateMt: null,
+            amount: Number(extraItem.charge || 0),
+          },
+        });
+      }
     }
 
     return invoice;
