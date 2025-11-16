@@ -30,8 +30,10 @@ const corsOptions = {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
 
-    // Check if origin is allowed or matches ngrok pattern
-    if (allowedOrigins.indexOf(origin) !== -1 || origin.includes('.ngrok-free.dev') || origin.includes('.vercel.app')) {
+    // Check if origin is allowed or matches ngrok/vercel pattern
+    if (allowedOrigins.indexOf(origin) !== -1 ||
+        origin.includes('.ngrok') ||
+        origin.includes('.vercel.app')) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
