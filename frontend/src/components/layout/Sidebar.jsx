@@ -71,13 +71,11 @@ export default function Sidebar({ isOpen }) {
                 whileHover={{ scale: 1.1 }}
                 transition={{ duration: 0.3 }}
               >
-                <div className={isOpen ? "p-3 rounded-2xl bg-gradient-to-br from-brand-600/20 via-brand-700/30 to-brand-800/40 shadow-2xl backdrop-blur-sm border border-brand-500/20" : "p-2 rounded-xl bg-gradient-to-br from-brand-600/20 via-brand-700/30 to-brand-800/40 shadow-xl backdrop-blur-sm border border-brand-500/20"}>
-                  <img
-                    src="/logo.png"
-                    alt="Raghhav Roadways"
-                    className={isOpen ? "w-10 h-10 sm:w-14 sm:h-14 object-contain drop-shadow-lg rounded-xl" : "w-6 h-6 sm:w-8 sm:h-8 object-contain drop-shadow-lg rounded-lg"}
-                  />
-                </div>
+                <img
+                  src="/logo.png"
+                  alt="Raghhav Roadways"
+                  className={isOpen ? "w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-lg rounded-xl" : "w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg rounded-lg"}
+                />
               </motion.div>
               {isOpen && (
                 <motion.div

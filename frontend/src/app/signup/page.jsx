@@ -70,13 +70,11 @@ export default function SignupPage() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <div className="flex flex-col items-center mb-6">
-            <div className="relative p-3 rounded-3xl bg-gradient-to-br from-brand-100 via-brand-50 to-white shadow-xl mb-4">
-              <img
-                src="/logo.png"
-                alt="Raghhav Roadways Logo"
-                className="w-26 h-26 sm:w-32 sm:h-32 object-contain rounded-2xl"
-              />
-            </div>
+            <img
+              src="/logo.png"
+              alt="Raghhav Roadways Logo"
+              className="w-32 h-32 sm:w-40 sm:h-40 object-contain mb-4 rounded-2xl shadow-lg"
+            />
             <div className="space-y-1">
               <h1 className="text-4xl sm:text-5xl font-brand font-bold text-brand-600 tracking-wider uppercase leading-tight text-center">
                 RAGHHAV
