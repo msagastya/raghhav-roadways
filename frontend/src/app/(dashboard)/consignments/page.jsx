@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, Edit, Trash2 } from 'lucide-react';
 import { consignmentAPI } from '../../../lib/api';
 import { Card, CardContent } from '../../../components/ui/card';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../../components/ui/table';
@@ -15,10 +16,11 @@ import useToast from '../../../hooks/useToast';
 import { formatDate, formatCurrency, getErrorMessage } from '../../../lib/utils';
 
 export default function ConsignmentsPage() {
+  const router = useRouter();
   const [consignments, setConsignments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const { showError } = useToast();
+  const { showError, showSuccess } = useToast();
 
   useEffect(() => {
     fetchConsignments();
@@ -33,6 +35,24 @@ export default function ConsignmentsPage() {
       setConsignments([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEdit = (consignment) => {
+    router.push(`/consignments/edit/${consignment.id}`);
+  };
+
+  const handleDelete = async (consignment) => {
+    if (!window.confirm(`Are you sure you want to delete consignment ${consignment.grNumber}?`)) {
+      return;
+    }
+
+    try {
+      await consignmentAPI.delete(consignment.id);
+      showSuccess('Consignment deleted successfully');
+      fetchConsignments();
+    } catch (error) {
+      showError(getErrorMessage(error));
     }
   };
 
@@ -113,12 +133,13 @@ export default function ConsignmentsPage() {
                   <TableHead>From - To</TableHead>
                   <TableHead>Amount</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredConsignments.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-gray-500 py-8">
+                    <TableCell colSpan={7} className="text-center text-gray-500 py-8">
                       No consignments found
                     </TableCell>
                   </TableRow>
@@ -132,6 +153,24 @@ export default function ConsignmentsPage() {
                       <TableCell>{formatCurrency(consignment.totalAmount)}</TableCell>
                       <TableCell>
                         <Badge variant={consignment.status}>{consignment.status}</Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <button
+                            onClick={() => handleEdit(consignment)}
+                            className="p-1.5 sm:p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
+                            title="Edit consignment"
+                          >
+                            <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(consignment)}
+                            className="p-1.5 sm:p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
+                            title="Delete consignment"
+                          >
+                            <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                          </button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))

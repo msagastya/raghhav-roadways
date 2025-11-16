@@ -71,7 +71,7 @@ export default function LoginPage() {
           <img
             src="/logo.png"
             alt="Raghhav Roadways Logo"
-            className="w-40 h-40 sm:w-48 sm:h-48 object-contain mb-4"
+            className="w-40 h-40 sm:w-48 sm:h-48 object-contain mb-4 rounded-2xl shadow-lg"
           />
           <div className="space-y-1">
             <h1 className="text-5xl sm:text-6xl font-brand font-bold text-brand-600 tracking-wider uppercase leading-tight">

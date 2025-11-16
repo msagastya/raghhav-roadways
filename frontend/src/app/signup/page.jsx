@@ -73,7 +73,7 @@ export default function SignupPage() {
             <img
               src="/logo.png"
               alt="Raghhav Roadways Logo"
-              className="w-32 h-32 sm:w-40 sm:h-40 object-contain mb-4"
+              className="w-32 h-32 sm:w-40 sm:h-40 object-contain mb-4 rounded-2xl shadow-lg"
             />
             <div className="space-y-1">
               <h1 className="text-4xl sm:text-5xl font-brand font-bold text-brand-600 tracking-wider uppercase leading-tight text-center">

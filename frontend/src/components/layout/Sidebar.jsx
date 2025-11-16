@@ -74,7 +74,7 @@ export default function Sidebar({ isOpen }) {
                 <img
                   src="/logo.png"
                   alt="Raghhav Roadways"
-                  className={isOpen ? "w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-lg" : "w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg"}
+                  className={isOpen ? "w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-lg rounded-xl" : "w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg rounded-lg"}
                 />
               </motion.div>
               {isOpen && (

@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Plus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Plus, Edit, Trash2 } from 'lucide-react';
 import { invoiceAPI } from '../../../lib/api';
 import { Card, CardContent } from '../../../components/ui/card';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../../components/ui/table';
@@ -11,9 +12,10 @@ import useToast from '../../../hooks/useToast';
 import { formatDate, formatCurrency, getErrorMessage } from '../../../lib/utils';
 
 export default function InvoicesPage() {
+  const router = useRouter();
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { showError } = useToast();
+  const { showError, showSuccess } = useToast();
 
   useEffect(() => {
     fetchInvoices();
@@ -28,6 +30,24 @@ export default function InvoicesPage() {
       setInvoices([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEdit = (invoice) => {
+    router.push(`/invoices/edit/${invoice.id}`);
+  };
+
+  const handleDelete = async (invoice) => {
+    if (!window.confirm(`Are you sure you want to delete invoice ${invoice.invoiceNumber}?`)) {
+      return;
+    }
+
+    try {
+      await invoiceAPI.delete(invoice.id);
+      showSuccess('Invoice deleted successfully');
+      fetchInvoices();
+    } catch (error) {
+      showError(getErrorMessage(error));
     }
   };
 
@@ -59,12 +79,13 @@ export default function InvoicesPage() {
                 <TableHead>Total Amount</TableHead>
                 <TableHead>Balance</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {invoices.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-gray-500 py-8">
+                  <TableCell colSpan={7} className="text-center text-gray-500 py-8">
                     No invoices found
                   </TableCell>
                 </TableRow>
@@ -78,6 +99,24 @@ export default function InvoicesPage() {
                     <TableCell>{formatCurrency(invoice.balanceAmount)}</TableCell>
                     <TableCell>
                       <Badge variant={invoice.paymentStatus}>{invoice.paymentStatus}</Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <button
+                          onClick={() => handleEdit(invoice)}
+                          className="p-1.5 sm:p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
+                          title="Edit invoice"
+                        >
+                          <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(invoice)}
+                          className="p-1.5 sm:p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Delete invoice"
+                        >
+                          <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                        </button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
