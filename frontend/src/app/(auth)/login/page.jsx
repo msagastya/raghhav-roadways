@@ -68,12 +68,16 @@ export default function LoginPage() {
     <Card className="w-full max-w-md">
       <CardHeader className="text-center">
         <div className="flex justify-center mb-4">
-          <div className="bg-primary-600 p-3 rounded-full">
-            <Truck className="w-8 h-8 text-white" />
-          </div>
+          <img
+            src="/logo.png"
+            alt="Raghhav Roadways Logo"
+            className="w-24 h-24 object-contain"
+          />
         </div>
-        <h1 className="text-2xl font-bold text-gray-900">Raghhav Roadways</h1>
-        <p className="text-gray-600 mt-1">Transport Management System</p>
+        <h1 className="text-3xl font-brand font-bold text-brand-600 tracking-wider uppercase">
+          Raghhav Roadways
+        </h1>
+        <p className="text-gray-600 mt-2 text-sm">Transport Management System</p>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">

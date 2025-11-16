@@ -52,7 +52,7 @@ export default function Sidebar({ isOpen }) {
       <motion.div
         className={cn(
           'fixed left-0 top-0 h-full text-white transition-all duration-300 z-40 shadow-2xl',
-          'bg-gradient-to-b from-gray-900/95 via-gray-800/90 to-gray-900/95 backdrop-blur-xl border-r border-white/10',
+          'bg-gradient-to-b from-brand-900/95 via-brand-800/90 to-brand-900/95 backdrop-blur-xl border-r border-brand-600/20',
           isOpen ? 'w-64 sm:w-72' : 'w-0 md:w-16 lg:w-20'
         )}
         initial={false}
@@ -60,23 +60,26 @@ export default function Sidebar({ isOpen }) {
       >
         <div className="flex flex-col h-full overflow-hidden">
           <motion.div
-            className="flex items-center justify-between h-14 sm:h-16 px-3 sm:px-4 lg:px-6 border-b border-white/10 bg-gradient-to-r from-white/5 to-transparent"
+            className="flex items-center justify-between h-16 sm:h-20 px-3 sm:px-4 lg:px-6 border-b border-brand-600/20 bg-gradient-to-r from-brand-700/30 to-transparent"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
           >
-            <div className="flex items-center">
+            <div className="flex items-center gap-2">
               <motion.div
                 className="relative"
-                whileHover={{ scale: 1.15, rotate: 360 }}
-                transition={{ duration: 0.6, type: 'spring' }}
+                whileHover={{ scale: 1.1 }}
+                transition={{ duration: 0.3 }}
               >
-                <div className="absolute inset-0 bg-primary-500/30 blur-xl rounded-full" />
-                <Truck className="relative w-7 h-7 sm:w-8 sm:h-8 text-primary-400 drop-shadow-lg" />
+                <img
+                  src="/logo.png"
+                  alt="Raghhav Roadways"
+                  className="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg"
+                />
               </motion.div>
               {isOpen && (
                 <motion.span
-                  className="ml-2 sm:ml-3 text-base sm:text-lg font-bold bg-gradient-to-r from-white via-primary-200 to-white bg-clip-text text-transparent drop-shadow-lg"
+                  className="text-base sm:text-lg font-brand font-bold text-brand-100 tracking-wide drop-shadow-lg uppercase"
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.3, delay: 0.1 }}
