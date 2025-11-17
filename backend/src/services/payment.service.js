@@ -152,7 +152,10 @@ const getPaymentById = async (id) => {
  * Create new payment (planned payment)
  */
 const createPayment = async (data, userId, ipAddress, userAgent) => {
-  const { invoiceId, partyId, totalAmount, description } = data;
+  // Convert IDs to integers or null
+  const invoiceId = data.invoiceId ? parseInt(data.invoiceId) : null;
+  const partyId = data.partyId ? parseInt(data.partyId) : null;
+  const { totalAmount, description } = data;
 
   // Validate that either invoiceId or partyId is provided
   if (!invoiceId && !partyId) {
