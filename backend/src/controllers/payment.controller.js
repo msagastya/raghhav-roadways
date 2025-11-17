@@ -14,6 +14,7 @@ const getPayments = asyncHandler(async (req, res) => {
     toDate: req.query.toDate,
     partyId: req.query.partyId,
     invoiceId: req.query.invoiceId,
+    paymentStatus: req.query.paymentStatus,
   };
 
   const result = await paymentService.getPayments(filters);
@@ -188,14 +189,76 @@ const rejectPaymentAmendment = asyncHandler(async (req, res) => {
   });
 });
 
+/**
+ * Update payment (edit total amount)
+ * PATCH /api/v1/payments/:id
+ */
+const updatePayment = asyncHandler(async (req, res) => {
+  const payment = await paymentService.updatePayment(
+    req.params.id,
+    req.body,
+    req.user.id,
+    req.ip,
+    req.get('user-agent')
+  );
+
+  res.status(200).json({
+    success: true,
+    message: 'Payment updated successfully',
+    data: payment,
+  });
+});
+
+/**
+ * Add payment transaction (partial payment)
+ * POST /api/v1/payments/:id/transactions
+ */
+const addPaymentTransaction = asyncHandler(async (req, res) => {
+  const transaction = await paymentService.addPaymentTransaction(
+    req.params.id,
+    req.body,
+    req.user.id,
+    req.ip,
+    req.get('user-agent'),
+    req.file
+  );
+
+  res.status(201).json({
+    success: true,
+    message: 'Payment transaction added successfully',
+    data: transaction,
+  });
+});
+
+/**
+ * Delete payment transaction
+ * DELETE /api/v1/payment-transactions/:id
+ */
+const deletePaymentTransaction = asyncHandler(async (req, res) => {
+  await paymentService.deletePaymentTransaction(
+    req.params.id,
+    req.user.id,
+    req.ip,
+    req.get('user-agent')
+  );
+
+  res.status(200).json({
+    success: true,
+    message: 'Payment transaction deleted successfully',
+  });
+});
+
 module.exports = {
   getPayments,
   getPaymentById,
   createPayment,
+  updatePayment,
   deletePayment,
   getTodaysPayments,
   getPaymentsByInvoice,
   getPaymentsByParty,
+  addPaymentTransaction,
+  deletePaymentTransaction,
   createPaymentAmendment,
   getPendingAmendments,
   approvePaymentAmendment,
