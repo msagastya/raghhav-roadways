@@ -29,6 +29,10 @@ const initialFormData = {
   email: '',
   contactPerson: '',
   isActive: true,
+  isVehicleOwner: false,
+  isBroker: false,
+  isReceivable: false,
+  isPayable: false,
 };
 
 export default function PartiesPage() {
@@ -544,6 +548,52 @@ export default function PartiesPage() {
               />
               <span className="text-sm font-medium text-gray-700">Active</span>
             </label>
+          </div>
+
+          {/* Party Categories */}
+          <div className="border-t pt-4">
+            <h3 className="text-sm font-semibold text-gray-900 mb-3">Party Categories</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={formData.isVehicleOwner}
+                  onChange={(e) => setFormData({ ...formData, isVehicleOwner: e.target.checked })}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-700">Vehicle Owner</span>
+              </label>
+
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={formData.isBroker}
+                  onChange={(e) => setFormData({ ...formData, isBroker: e.target.checked })}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-700">Broker</span>
+              </label>
+
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={formData.isReceivable}
+                  onChange={(e) => setFormData({ ...formData, isReceivable: e.target.checked })}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-700">Receivable (We Receive Money)</span>
+              </label>
+
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={formData.isPayable}
+                  onChange={(e) => setFormData({ ...formData, isPayable: e.target.checked })}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-700">Payable (We Pay Money)</span>
+              </label>
+            </div>
           </div>
 
           <div className="flex justify-end gap-2 mt-6 pt-4 border-t">

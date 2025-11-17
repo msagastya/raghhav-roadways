@@ -111,9 +111,24 @@ export const invoiceAPI = {
 
 export const paymentAPI = {
   getAll: (params) => api.get('/payments', { params }),
+  getById: (id) => api.get(`/payments/${id}`),
   create: (data) => api.post('/payments', data),
-  createAmendment: (data) => api.post('/payment-amendments', data),
-  approveAmendment: (id) => api.patch(`/payment-amendments/${id}/approve`),
+  update: (id, data) => api.patch(`/payments/${id}`, data),
+  delete: (id) => api.delete(`/payments/${id}`),
+  addTransaction: (paymentId, data) => {
+    const formData = new FormData();
+    Object.keys(data).forEach(key => {
+      if (data[key] !== null && data[key] !== undefined) {
+        formData.append(key, data[key]);
+      }
+    });
+    return api.post(`/payments/${paymentId}/transactions`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+  deleteTransaction: (transactionId) => api.delete(`/payments/transactions/${transactionId}`),
+  createAmendment: (data) => api.post('/payments/amendments', data),
+  approveAmendment: (id) => api.patch(`/payments/amendments/${id}/approve`),
 };
 
 export const partyAPI = {
