@@ -17,6 +17,7 @@ const getPayments = async (filters = {}) => {
     toDate = null,
     partyId = null,
     invoiceId = null,
+    paymentStatus = null,
   } = filters;
 
   const skip = (page - 1) * limit;
@@ -29,7 +30,7 @@ const getPayments = async (filters = {}) => {
   if (search) {
     where.OR = [
       { paymentNumber: { contains: search, mode: 'insensitive' } },
-      { paymentReference: { contains: search, mode: 'insensitive' } },
+      { description: { contains: search, mode: 'insensitive' } },
     ];
   }
 
@@ -55,6 +56,10 @@ const getPayments = async (filters = {}) => {
     where.invoiceId = parseInt(invoiceId);
   }
 
+  if (paymentStatus) {
+    where.paymentStatus = paymentStatus;
+  }
+
   // Get total count
   const totalRecords = await prisma.payment.count({ where });
 
@@ -78,6 +83,10 @@ const getPayments = async (filters = {}) => {
           id: true,
           partyName: true,
         },
+      },
+      transactions: {
+        orderBy: { transactionDate: 'desc' },
+        take: 1, // Latest transaction
       },
       createdBy: {
         select: {
@@ -112,6 +121,17 @@ const getPaymentById = async (id) => {
         },
       },
       party: true,
+      transactions: {
+        orderBy: { transactionDate: 'desc' },
+        include: {
+          createdBy: {
+            select: {
+              username: true,
+              fullName: true,
+            },
+          },
+        },
+      },
       createdBy: {
         select: {
           username: true,
@@ -129,14 +149,18 @@ const getPaymentById = async (id) => {
 };
 
 /**
- * Create new payment
+ * Create new payment (planned payment)
  */
 const createPayment = async (data, userId, ipAddress, userAgent) => {
-  const { invoiceId, partyId, amount } = data;
+  const { invoiceId, partyId, totalAmount, description } = data;
 
   // Validate that either invoiceId or partyId is provided
   if (!invoiceId && !partyId) {
     throw new ApiError(400, 'Either invoice ID or party ID is required');
+  }
+
+  if (!totalAmount || Number(totalAmount) <= 0) {
+    throw new ApiError(400, 'Total amount must be greater than 0');
   }
 
   let invoice = null;
@@ -153,14 +177,6 @@ const createPayment = async (data, userId, ipAddress, userAgent) => {
 
     if (!invoice || invoice.isDeleted) {
       throw new ApiError(404, 'Invoice not found');
-    }
-
-    // Validate payment amount
-    if (Number(amount) > Number(invoice.balanceAmount)) {
-      throw new ApiError(
-        400,
-        `Payment amount (₹${amount}) exceeds invoice balance (₹${invoice.balanceAmount})`
-      );
     }
 
     party = invoice.party;
@@ -185,52 +201,161 @@ const createPayment = async (data, userId, ipAddress, userAgent) => {
     : 0;
   const paymentNumber = generateCode('PAY', lastNumber, 4);
 
-  // Create payment in transaction
-  const result = await prisma.$transaction(async (tx) => {
-    // Create payment
-    const payment = await tx.payment.create({
-      data: {
-        paymentNumber,
-        paymentDate: new Date(data.paymentDate),
-        invoiceId: invoiceId || null,
-        partyId: party.id,
-        paymentMode: data.paymentMode || null,
-        paymentReference: data.paymentReference || null,
-        amount: Number(amount),
-        bankName: data.bankName || null,
-        bankAccountNo: data.bankAccountNo || null,
-        bankIfsc: data.bankIfsc || null,
-        remarks: data.remarks || null,
-        createdById: userId,
-      },
-    });
-
-    // If invoice payment, update invoice
-    if (invoiceId) {
-      const newPaidAmount = Number(invoice.paidAmount) + Number(amount);
-      const newBalanceAmount = Number(invoice.totalAmount) - newPaidAmount;
-
-      await tx.invoice.update({
-        where: { id: invoiceId },
-        data: {
-          paidAmount: newPaidAmount,
-          balanceAmount: newBalanceAmount,
-          updatedById: userId,
-        },
-      });
-    }
-
-    return payment;
+  // Create payment
+  const payment = await prisma.payment.create({
+    data: {
+      paymentNumber,
+      paymentDate: new Date(data.paymentDate || new Date()),
+      invoiceId: invoiceId || null,
+      partyId: party.id,
+      description: description || null,
+      totalAmount: Number(totalAmount),
+      paidAmount: 0,
+      balanceAmount: Number(totalAmount),
+      paymentStatus: 'Pending',
+      createdById: userId,
+    },
   });
-
-  // Update payment status if invoice payment
-  if (invoiceId) {
-    await updatePaymentStatus(invoiceId);
-  }
 
   // Create audit log
   await createAuditLog({
     tableName: 'payments',
+    recordId: payment.id,
+    action: AUDIT_ACTION.CREATE,
+    newValues: payment,
+    userId,
+    ipAddress,
+    userAgent,
+  });
+
+  return payment;
+};
+
+/**
+ * Update payment (edit total amount)
+ */
+const updatePayment = async (id, data, userId, ipAddress, userAgent) => {
+  const payment = await prisma.payment.findUnique({
+    where: { id: parseInt(id) },
+  });
+
+  if (!payment || payment.isDeleted) {
+    throw new ApiError(404, 'Payment not found');
+  }
+
+  const { totalAmount, description, paymentDate } = data;
+
+  const updateData = {};
+
+  if (totalAmount !== undefined) {
+    const newTotalAmount = Number(totalAmount);
+    if (newTotalAmount <= 0) {
+      throw new ApiError(400, 'Total amount must be greater than 0');
+    }
+    if (newTotalAmount < Number(payment.paidAmount)) {
+      throw new ApiError(
+        400,
+        `Total amount cannot be less than paid amount (₹${payment.paidAmount})`
+      );
+    }
+    updateData.totalAmount = newTotalAmount;
+    updateData.balanceAmount = newTotalAmount - Number(payment.paidAmount);
+  }
+
+  if (description !== undefined) {
+    updateData.description = description;
+  }
+
+  if (paymentDate !== undefined) {
+    updateData.paymentDate = new Date(paymentDate);
+  }
+
+  const updatedPayment = await prisma.payment.update({
+    where: { id: parseInt(id) },
+    data: updateData,
+  });
+
+  // Create audit log
+  await createAuditLog({
+    tableName: 'payments',
+    recordId: parseInt(id),
+    action: AUDIT_ACTION.UPDATE,
+    oldValues: payment,
+    newValues: updatedPayment,
+    userId,
+    ipAddress,
+    userAgent,
+  });
+
+  return updatedPayment;
+};
+
+/**
+ * Add payment transaction (partial payment)
+ */
+const addPaymentTransaction = async (paymentId, data, userId, ipAddress, userAgent, file = null) => {
+  const payment = await prisma.payment.findUnique({
+    where: { id: parseInt(paymentId) },
+  });
+
+  if (!payment || payment.isDeleted) {
+    throw new ApiError(404, 'Payment not found');
+  }
+
+  const { amount, transactionDate, paymentMode, paymentReference, bankName, bankAccountNo, bankIfsc, upiId, remarks } = data;
+
+  if (!amount || Number(amount) <= 0) {
+    throw new ApiError(400, 'Transaction amount must be greater than 0');
+  }
+
+  if (Number(amount) > Number(payment.balanceAmount)) {
+    throw new ApiError(
+      400,
+      `Transaction amount (₹${amount}) exceeds balance amount (₹${payment.balanceAmount})`
+    );
+  }
+
+  // Calculate new amounts
+  const newPaidAmount = Number(payment.paidAmount) + Number(amount);
+  const newBalanceAmount = Number(payment.totalAmount) - newPaidAmount;
+  const newStatus = newBalanceAmount === 0 ? 'Completed' : newPaidAmount > 0 ? 'Partial' : 'Pending';
+
+  // Create transaction in database transaction
+  const result = await prisma.$transaction(async (tx) => {
+    // Create payment transaction
+    const transaction = await tx.paymentTransaction.create({
+      data: {
+        paymentId: parseInt(paymentId),
+        transactionDate: new Date(transactionDate || new Date()),
+        amount: Number(amount),
+        paymentMode: paymentMode || null,
+        paymentReference: paymentReference || null,
+        bankName: bankName || null,
+        bankAccountNo: bankAccountNo || null,
+        bankIfsc: bankIfsc || null,
+        upiId: upiId || null,
+        receiptFilePath: file ? file.path : null,
+        remarks: remarks || null,
+        createdById: userId,
+      },
+    });
+
+    // Update payment
+    await tx.payment.update({
+      where: { id: parseInt(paymentId) },
+      data: {
+        paidAmount: newPaidAmount,
+        balanceAmount: newBalanceAmount,
+        paymentStatus: newStatus,
+      },
+    });
+
+    return transaction;
+  });
+
+  // Create audit log
+  await createAuditLog({
+    tableName: 'payment_transactions',
     recordId: result.id,
     action: AUDIT_ACTION.CREATE,
     newValues: result,
@@ -243,13 +368,67 @@ const createPayment = async (data, userId, ipAddress, userAgent) => {
 };
 
 /**
+ * Delete payment transaction
+ */
+const deletePaymentTransaction = async (transactionId, userId, ipAddress, userAgent) => {
+  const transaction = await prisma.paymentTransaction.findUnique({
+    where: { id: parseInt(transactionId) },
+    include: {
+      payment: true,
+    },
+  });
+
+  if (!transaction) {
+    throw new ApiError(404, 'Payment transaction not found');
+  }
+
+  const payment = transaction.payment;
+
+  // Calculate new amounts
+  const newPaidAmount = Number(payment.paidAmount) - Number(transaction.amount);
+  const newBalanceAmount = Number(payment.totalAmount) - newPaidAmount;
+  const newStatus = newBalanceAmount === 0 ? 'Completed' : newPaidAmount > 0 ? 'Partial' : 'Pending';
+
+  // Delete in transaction
+  await prisma.$transaction(async (tx) => {
+    // Delete transaction
+    await tx.paymentTransaction.delete({
+      where: { id: parseInt(transactionId) },
+    });
+
+    // Update payment
+    await tx.payment.update({
+      where: { id: payment.id },
+      data: {
+        paidAmount: newPaidAmount,
+        balanceAmount: newBalanceAmount,
+        paymentStatus: newStatus,
+      },
+    });
+  });
+
+  // Create audit log
+  await createAuditLog({
+    tableName: 'payment_transactions',
+    recordId: parseInt(transactionId),
+    action: AUDIT_ACTION.DELETE,
+    oldValues: transaction,
+    userId,
+    ipAddress,
+    userAgent,
+  });
+
+  return { message: 'Payment transaction deleted successfully' };
+};
+
+/**
  * Delete payment (soft delete)
  */
 const deletePayment = async (id, userId, ipAddress, userAgent) => {
   const payment = await prisma.payment.findUnique({
     where: { id: parseInt(id) },
     include: {
-      invoice: true,
+      transactions: true,
     },
   });
 
@@ -257,37 +436,20 @@ const deletePayment = async (id, userId, ipAddress, userAgent) => {
     throw new ApiError(404, 'Payment not found');
   }
 
-  // Delete in transaction
-  await prisma.$transaction(async (tx) => {
-    // Soft delete payment
-    await tx.payment.update({
-      where: { id: parseInt(id) },
-      data: {
-        isDeleted: true,
-      },
-    });
-
-    // If invoice payment, update invoice
-    if (payment.invoiceId) {
-      const invoice = payment.invoice;
-      const newPaidAmount = Number(invoice.paidAmount) - Number(payment.amount);
-      const newBalanceAmount = Number(invoice.totalAmount) - newPaidAmount;
-
-      await tx.invoice.update({
-        where: { id: payment.invoiceId },
-        data: {
-          paidAmount: newPaidAmount,
-          balanceAmount: newBalanceAmount,
-          updatedById: userId,
-        },
-      });
-    }
-  });
-
-  // Update payment status if invoice payment
-  if (payment.invoiceId) {
-    await updatePaymentStatus(payment.invoiceId);
+  if (payment.transactions.length > 0) {
+    throw new ApiError(
+      400,
+      'Cannot delete payment with existing transactions. Delete transactions first.'
+    );
   }
+
+  // Soft delete payment
+  await prisma.payment.update({
+    where: { id: parseInt(id) },
+    data: {
+      isDeleted: true,
+    },
+  });
 
   // Create audit log
   await createAuditLog({
@@ -339,13 +501,19 @@ const getTodaysPayments = async () => {
   });
 
   const totalAmount = payments.reduce(
-    (sum, payment) => sum + Number(payment.amount),
+    (sum, payment) => sum + Number(payment.totalAmount),
+    0
+  );
+
+  const paidAmount = payments.reduce(
+    (sum, payment) => sum + Number(payment.paidAmount),
     0
   );
 
   return {
     count: payments.length,
     totalAmount,
+    paidAmount,
     payments,
   };
 };
@@ -360,6 +528,9 @@ const getPaymentsByInvoice = async (invoiceId) => {
       isDeleted: false,
     },
     include: {
+      transactions: {
+        orderBy: { transactionDate: 'desc' },
+      },
       createdBy: {
         select: {
           username: true,
@@ -404,6 +575,9 @@ const getPaymentsByParty = async (partyId, fromDate = null, toDate = null) => {
           invoiceNumber: true,
           totalAmount: true,
         },
+      },
+      transactions: {
+        orderBy: { transactionDate: 'desc' },
       },
     },
     orderBy: {
@@ -628,6 +802,9 @@ module.exports = {
   getPayments,
   getPaymentById,
   createPayment,
+  updatePayment,
+  addPaymentTransaction,
+  deletePaymentTransaction,
   deletePayment,
   getTodaysPayments,
   getPaymentsByInvoice,

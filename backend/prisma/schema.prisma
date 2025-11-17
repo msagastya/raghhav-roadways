@@ -30,18 +30,19 @@ model User {
   updatedAt      DateTime  @updatedAt @map("updated_at")
 
   // Relations
-  createdConsignments  Consignment[] @relation("ConsignmentCreator")
-  updatedConsignments  Consignment[] @relation("ConsignmentUpdater")
-  createdInvoices      Invoice[]     @relation("InvoiceCreator")
-  updatedInvoices      Invoice[]     @relation("InvoiceUpdater")
-  createdPayments      Payment[]
-  createdParties       Party[]       @relation("PartyCreator")
-  updatedParties       Party[]       @relation("PartyUpdater")
-  createdVehicles      Vehicle[]     @relation("VehicleCreator")
-  updatedVehicles      Vehicle[]     @relation("VehicleUpdater")
-  auditLogs            AuditLog[]
-  statusChanges        StatusHistory[]
-  approvedAmendments   PaymentAmendment[]
+  createdConsignments     Consignment[]        @relation("ConsignmentCreator")
+  updatedConsignments     Consignment[]        @relation("ConsignmentUpdater")
+  createdInvoices         Invoice[]            @relation("InvoiceCreator")
+  updatedInvoices         Invoice[]            @relation("InvoiceUpdater")
+  createdPayments         Payment[]
+  createdPaymentTransactions PaymentTransaction[]
+  createdParties          Party[]              @relation("PartyCreator")
+  updatedParties          Party[]              @relation("PartyUpdater")
+  createdVehicles         Vehicle[]            @relation("VehicleCreator")
+  updatedVehicles         Vehicle[]            @relation("VehicleUpdater")
+  auditLogs               AuditLog[]
+  statusChanges           StatusHistory[]
+  approvedAmendments      PaymentAmendment[]
 
   @@map("users")
 }
@@ -105,6 +106,10 @@ model Party {
   bankBranch     String?  @map("bank_branch") @db.VarChar(100)
   creditLimit    Decimal  @default(0) @map("credit_limit") @db.Decimal(15, 2)
   creditDays     Int      @default(0) @map("credit_days")
+  isVehicleOwner Boolean  @default(false) @map("is_vehicle_owner")
+  isBroker       Boolean  @default(false) @map("is_broker")
+  isReceivable   Boolean  @default(false) @map("is_receivable")
+  isPayable      Boolean  @default(false) @map("is_payable")
   isActive       Boolean  @default(true) @map("is_active")
   isDeleted      Boolean  @default(false) @map("is_deleted")
   createdAt      DateTime @default(now()) @map("created_at")
@@ -315,24 +320,50 @@ model Payment {
   invoice          Invoice?  @relation(fields: [invoiceId], references: [id])
   partyId          Int?      @map("party_id")
   party            Party?    @relation(fields: [partyId], references: [id])
+  description      String?   @db.Text
+  totalAmount      Decimal   @map("total_amount") @db.Decimal(15, 2)
+  paidAmount       Decimal   @default(0) @map("paid_amount") @db.Decimal(15, 2)
+  balanceAmount    Decimal   @map("balance_amount") @db.Decimal(15, 2)
+  paymentStatus    String    @default("Pending") @map("payment_status") @db.VarChar(20)
+  isDeleted        Boolean   @default(false) @map("is_deleted")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  createdById      Int       @map("created_by")
+
+  // Relations
+  createdBy    User                  @relation(fields: [createdById], references: [id])
+  transactions PaymentTransaction[]
+
+  @@index([invoiceId])
+  @@index([partyId])
+  @@index([paymentDate])
+  @@index([paymentStatus])
+  @@map("payments")
+}
+
+model PaymentTransaction {
+  id               Int       @id @default(autoincrement())
+  paymentId        Int       @map("payment_id")
+  payment          Payment   @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  transactionDate  DateTime  @map("transaction_date") @db.Date
+  amount           Decimal   @db.Decimal(15, 2)
   paymentMode      String?   @map("payment_mode") @db.VarChar(50)
   paymentReference String?   @map("payment_reference") @db.VarChar(100)
-  amount           Decimal   @db.Decimal(15, 2)
   bankName         String?   @map("bank_name") @db.VarChar(100)
   bankAccountNo    String?   @map("bank_account_no") @db.VarChar(50)
   bankIfsc         String?   @map("bank_ifsc") @db.VarChar(15)
+  upiId            String?   @map("upi_id") @db.VarChar(100)
+  receiptFilePath  String?   @map("receipt_file_path") @db.VarChar(500)
   remarks          String?   @db.Text
-  isDeleted        Boolean   @default(false) @map("is_deleted")
   createdAt        DateTime  @default(now()) @map("created_at")
   createdById      Int       @map("created_by")
 
   // Relations
   createdBy User @relation(fields: [createdById], references: [id])
 
-  @@index([invoiceId])
-  @@index([partyId])
-  @@index([paymentDate])
-  @@map("payments")
+  @@index([paymentId])
+  @@index([transactionDate])
+  @@map("payment_transactions")
 }
 
 model PaymentAmendment {
