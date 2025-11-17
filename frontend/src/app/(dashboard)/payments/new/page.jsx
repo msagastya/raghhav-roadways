@@ -26,13 +26,8 @@ export default function NewPaymentPage() {
   const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedInvoiceId, setSelectedInvoiceId] = useState('');
   const [selectedPartyId, setSelectedPartyId] = useState('');
-  const [paymentMode, setPaymentMode] = useState('');
-  const [paymentReference, setPaymentReference] = useState('');
-  const [amount, setAmount] = useState('');
-  const [bankName, setBankName] = useState('');
-  const [bankAccountNo, setBankAccountNo] = useState('');
-  const [bankIfsc, setBankIfsc] = useState('');
-  const [remarks, setRemarks] = useState('');
+  const [description, setDescription] = useState('');
+  const [totalAmount, setTotalAmount] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -64,7 +59,8 @@ export default function NewPaymentPage() {
         // Auto-fill party from invoice
         setSelectedPartyId(invoice.partyId?.toString() || '');
         // Auto-fill amount with balance amount
-        setAmount(invoice.balanceAmount || invoice.totalAmount || '');
+        setTotalAmount(invoice.balanceAmount || invoice.totalAmount || '');
+        setDescription(`Payment for Invoice ${invoice.invoiceNumber}`);
       }
     }
   };
@@ -72,13 +68,18 @@ export default function NewPaymentPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!paymentDate || !amount) {
-      showError('Please fill in required fields: Payment Date and Amount');
+    if (!paymentDate || !totalAmount) {
+      showError('Please fill in required fields: Payment Date and Total Amount');
       return;
     }
 
     if (!selectedInvoiceId && !selectedPartyId) {
       showError('Please select either an Invoice or a Party');
+      return;
+    }
+
+    if (parseFloat(totalAmount) <= 0) {
+      showError('Total amount must be greater than 0');
       return;
     }
 
@@ -89,17 +90,12 @@ export default function NewPaymentPage() {
         paymentDate,
         invoiceId: selectedInvoiceId ? parseInt(selectedInvoiceId) : null,
         partyId: selectedPartyId ? parseInt(selectedPartyId) : null,
-        paymentMode: paymentMode || null,
-        paymentReference: paymentReference || null,
-        amount: parseFloat(amount),
-        bankName: bankName || null,
-        bankAccountNo: bankAccountNo || null,
-        bankIfsc: bankIfsc || null,
-        remarks: remarks || null,
+        description: description || null,
+        totalAmount: parseFloat(totalAmount),
       };
 
       await paymentAPI.create(paymentData);
-      showSuccess('Payment recorded successfully');
+      showSuccess('Payment created successfully. You can now add transactions to this payment.');
       router.push('/payments');
     } catch (error) {
       showError(getErrorMessage(error));
@@ -127,8 +123,8 @@ export default function NewPaymentPage() {
             </Button>
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Record Payment</h1>
-            <p className="text-gray-600 mt-1">Record a new payment transaction</p>
+            <h1 className="text-2xl font-bold text-gray-900">Create Payment Record</h1>
+            <p className="text-gray-600 mt-1">Record a planned payment amount (you can add actual payments later)</p>
           </div>
         </div>
       </div>
@@ -137,6 +133,7 @@ export default function NewPaymentPage() {
         <Card>
           <CardHeader>
             <h2 className="text-lg font-semibold text-gray-900">Payment Details</h2>
+            <p className="text-sm text-gray-600">This creates a payment record. After creating, you can add partial payments with different payment modes.</p>
           </CardHeader>
           <CardContent className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -156,19 +153,22 @@ export default function NewPaymentPage() {
                 onChange={handleInvoiceChange}
               >
                 <option value="">Select Invoice...</option>
-                {invoices.map((invoice) => (
-                  <option key={invoice.id} value={invoice.id}>
-                    {invoice.invoiceNumber} - {invoice.partyName} - ₹{invoice.balanceAmount || invoice.totalAmount}
-                  </option>
-                ))}
+                {invoices
+                  .filter(inv => inv.balanceAmount > 0)
+                  .map((invoice) => (
+                    <option key={invoice.id} value={invoice.id}>
+                      {invoice.invoiceNumber} - {invoice.partyName} - ₹{invoice.balanceAmount}
+                    </option>
+                  ))}
               </Select>
 
               {/* Party Selection */}
               <Select
-                label="Party (Optional if Invoice selected)"
+                label="Party"
                 value={selectedPartyId}
                 onChange={(e) => setSelectedPartyId(e.target.value)}
                 disabled={!!selectedInvoiceId}
+                required={!selectedInvoiceId}
               >
                 <option value="">Select Party...</option>
                 {parties.map((party) => (
@@ -178,80 +178,26 @@ export default function NewPaymentPage() {
                 ))}
               </Select>
 
-              {/* Amount */}
+              {/* Total Amount */}
               <Input
-                label="Amount"
+                label="Total Amount"
                 type="number"
                 step="0.01"
                 min="0"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="Enter amount"
+                value={totalAmount}
+                onChange={(e) => setTotalAmount(e.target.value)}
+                placeholder="Enter total amount to pay"
                 required
               />
 
-              {/* Payment Mode */}
-              <Select
-                label="Payment Mode"
-                value={paymentMode}
-                onChange={(e) => setPaymentMode(e.target.value)}
-              >
-                <option value="">Select Payment Mode...</option>
-                <option value="Cash">Cash</option>
-                <option value="Cheque">Cheque</option>
-                <option value="NEFT">NEFT</option>
-                <option value="RTGS">RTGS</option>
-                <option value="IMPS">IMPS</option>
-                <option value="UPI">UPI</option>
-                <option value="Bank Transfer">Bank Transfer</option>
-                <option value="Demand Draft">Demand Draft</option>
-              </Select>
-
-              {/* Payment Reference */}
-              <Input
-                label="Payment Reference"
-                type="text"
-                value={paymentReference}
-                onChange={(e) => setPaymentReference(e.target.value)}
-                placeholder="Cheque number, Transaction ID, etc."
-              />
-
-              {/* Bank Details (Optional) */}
-              <Input
-                label="Bank Name"
-                type="text"
-                value={bankName}
-                onChange={(e) => setBankName(e.target.value)}
-                placeholder="Bank name (optional)"
-              />
-
-              <Input
-                label="Bank Account Number"
-                type="text"
-                value={bankAccountNo}
-                onChange={(e) => setBankAccountNo(e.target.value)}
-                placeholder="Account number (optional)"
-              />
-
-              <Input
-                label="Bank IFSC Code"
-                type="text"
-                value={bankIfsc}
-                onChange={(e) => setBankIfsc(e.target.value)}
-                placeholder="IFSC code (optional)"
-              />
-
-              {/* Remarks */}
+              {/* Description */}
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Remarks
-                </label>
-                <textarea
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                  rows={3}
-                  value={remarks}
-                  onChange={(e) => setRemarks(e.target.value)}
-                  placeholder="Additional notes or remarks..."
+                <Input
+                  label="Description"
+                  type="text"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="e.g., Payment to vehicle owner for transport"
                 />
               </div>
             </div>
@@ -264,12 +210,28 @@ export default function NewPaymentPage() {
               </Link>
               <Button type="submit" disabled={saving}>
                 <Save className="w-4 h-4 mr-2" />
-                {saving ? 'Saving...' : 'Record Payment'}
+                {saving ? 'Creating...' : 'Create Payment Record'}
               </Button>
             </div>
           </CardContent>
         </Card>
       </form>
+
+      <Card>
+        <CardContent className="p-6">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h3 className="font-semibold text-blue-900 mb-2">How it works:</h3>
+            <ol className="list-decimal list-inside text-sm text-blue-800 space-y-1">
+              <li>Create a payment record with the total amount you plan to pay</li>
+              <li>After creating, go to the payment details page to add actual payments</li>
+              <li>You can pay in multiple installments (e.g., ₹4,000 today, ₹6,000 next week)</li>
+              <li>Each payment can have different payment modes (Cash/UPI/Bank Transfer)</li>
+              <li>Upload receipts for each payment transaction</li>
+              <li>The system tracks: Total Amount, Paid Amount, and Balance</li>
+            </ol>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
