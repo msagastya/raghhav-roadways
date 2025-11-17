@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { paymentAPI } from '../../../lib/api';
 import { Card, CardContent } from '../../../components/ui/card';
@@ -65,10 +66,12 @@ export default function PaymentsPage() {
           <h1 className="text-2xl font-bold text-gray-900">Payments</h1>
           <p className="text-gray-600 mt-1">Manage all payment records</p>
         </div>
-        <Button className="flex items-center gap-2">
-          <Plus className="w-4 h-4" />
-          Record Payment
-        </Button>
+        <Link href="/payments/new">
+          <Button className="flex items-center gap-2">
+            <Plus className="w-4 h-4" />
+            Record Payment
+          </Button>
+        </Link>
       </div>
 
       <Card>

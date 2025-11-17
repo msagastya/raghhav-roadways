@@ -3,12 +3,11 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2 } from 'lucide-react';
 import { vehicleAPI } from '../../../lib/api';
 import { Card, CardContent } from '../../../components/ui/card';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../../components/ui/table';
 import { TableSkeleton } from '../../../components/ui/skeleton';
-import Button from '../../../components/ui/button';
 import Badge from '../../../components/ui/badge';
 import useToast from '../../../hooks/useToast';
 import { getErrorMessage } from '../../../lib/utils';
@@ -84,10 +83,6 @@ export default function VehiclesPage() {
           <h1 className="text-2xl font-bold text-gray-900">Vehicles</h1>
           <p className="text-gray-600 mt-1">Manage all vehicle records</p>
         </div>
-        <Button className="flex items-center gap-2">
-          <Plus className="w-4 h-4" />
-          Add Vehicle
-        </Button>
       </motion.div>
 
       <motion.div
