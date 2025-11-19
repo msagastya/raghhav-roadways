@@ -12,6 +12,7 @@ const invoiceRoutes = require('./invoice.routes');
 const paymentRoutes = require('./payment.routes');
 const reportRoutes = require('./report.routes');
 const mastersRoutes = require('./masters.routes');
+const seedRoutes = require('./seed.routes');
 
 // Health check route
 router.get('/health', (req, res) => {
@@ -33,6 +34,7 @@ router.use('/invoices', invoiceRoutes);
 router.use('/payments', paymentRoutes);
 router.use('/reports', reportRoutes);
 router.use('/masters', mastersRoutes);
+router.use('/seed', seedRoutes);
 
 // API documentation route (you can expand this later)
 router.get('/', (req, res) => {
