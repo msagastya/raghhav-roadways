@@ -153,12 +153,20 @@ const generateInvoicePDF = async (invoice) => {
       amount: Number(item.amount).toFixed(2),
     }));
 
+    // Determine watermark based on payment status
+    let watermark = 'UNPAID';
+    if (invoice.paymentStatus === 'Paid') {
+      watermark = 'PAID';
+    } else if (invoice.paymentStatus === 'Partial') {
+      watermark = 'PARTIAL';
+    }
+
     // Prepare data
     const data = {
       company: COMPANY,
       invoiceNumber: invoice.invoiceNumber,
       invoiceDate: new Date(invoice.invoiceDate).toLocaleDateString('en-IN'),
-      branch: invoice.branch,
+      branch: invoice.branch || 'SURAT',
       party: {
         name: invoice.partyName,
         address: invoice.partyAddress || '',
@@ -168,6 +176,7 @@ const generateInvoicePDF = async (invoice) => {
       grCharge: Number(invoice.grCharge).toFixed(2),
       totalAmount: Number(invoice.totalAmount).toFixed(2),
       amountInWords: invoice.amountInWords,
+      watermark: watermark,
     };
 
     // Generate HTML
