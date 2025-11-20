@@ -51,4 +51,16 @@ router.delete(
   userController.deleteUser
 );
 
+/**
+ * @route   PUT /api/v1/users/:id/reset-password
+ * @desc    Reset user password (Admin only)
+ * @access  Private - Admin only
+ */
+router.put(
+  '/:id/reset-password',
+  authenticateToken,
+  authorize('settings.users'),
+  userController.resetPassword
+);
+
 module.exports = router;

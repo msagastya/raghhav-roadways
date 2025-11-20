@@ -73,6 +73,7 @@ export const userAPI = {
   updateApprovalStatus: (userId, status) => api.put(`/users/${userId}/approval`, { status }),
   updateUserRole: (userId, roleId) => api.put(`/users/${userId}/role`, { roleId }),
   delete: (userId) => api.delete(`/users/${userId}`),
+  resetPassword: (userId, newPassword) => api.put(`/users/${userId}/reset-password`, { newPassword }),
 };
 
 export const permissionAPI = {

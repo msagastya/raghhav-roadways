@@ -10,6 +10,8 @@ export default function UsersPage() {
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // all, pending, approved, rejected
+  const [resetPasswordModal, setResetPasswordModal] = useState({ open: false, userId: null, username: '' });
+  const [newPassword, setNewPassword] = useState('');
   const { showSuccess, showError } = useToast();
 
   useEffect(() => {
@@ -79,6 +81,31 @@ export default function UsersPage() {
       await userAPI.delete(userId);
       showSuccess('User deleted successfully');
       fetchUsers();
+    } catch (error) {
+      showError(getErrorMessage(error));
+    }
+  };
+
+  const openResetPasswordModal = (userId, username) => {
+    setResetPasswordModal({ open: true, userId, username });
+    setNewPassword('');
+  };
+
+  const closeResetPasswordModal = () => {
+    setResetPasswordModal({ open: false, userId: null, username: '' });
+    setNewPassword('');
+  };
+
+  const handleResetPassword = async () => {
+    if (!newPassword || newPassword.length < 6) {
+      showError('Password must be at least 6 characters long');
+      return;
+    }
+
+    try {
+      await userAPI.resetPassword(resetPasswordModal.userId, newPassword);
+      showSuccess('Password reset successfully');
+      closeResetPasswordModal();
     } catch (error) {
       showError(getErrorMessage(error));
     }
@@ -201,6 +228,14 @@ export default function UsersPage() {
                         </button>
                       </>
                     )}
+                    {user.approvalStatus === 'approved' && (
+                      <button
+                        onClick={() => openResetPasswordModal(user.id, user.username)}
+                        className="text-blue-600 hover:text-blue-900"
+                      >
+                        Reset Password
+                      </button>
+                    )}
                     {user.username !== 'msagastya' && (
                       <button
                         onClick={() => handleDelete(user.id)}
@@ -214,6 +249,50 @@ export default function UsersPage() {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Reset Password Modal */}
+      {resetPasswordModal.open && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div className="mt-3">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">
+                Reset Password for @{resetPasswordModal.username}
+              </h3>
+              <div className="mt-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  New Password
+                </label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Enter new password (min 6 characters)"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      handleResetPassword();
+                    }
+                  }}
+                />
+              </div>
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={handleResetPassword}
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  Reset Password
+                </button>
+                <button
+                  onClick={closeResetPasswordModal}
+                  className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

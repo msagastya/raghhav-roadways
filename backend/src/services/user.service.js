@@ -1,4 +1,5 @@
 const prisma = require('../config/database');
+const bcrypt = require('bcryptjs');
 const { ApiError } = require('../middleware/errorHandler');
 const logger = require('../utils/logger');
 
@@ -241,6 +242,32 @@ const deleteUser = async (userId) => {
   logger.info(`User ${user.username} deleted`);
 };
 
+/**
+ * Reset user password (Admin only)
+ * @param {number} userId
+ * @param {string} newPassword
+ */
+const resetPassword = async (userId, newPassword) => {
+  const user = await prisma.user.findUnique({
+    where: { id: parseInt(userId) },
+  });
+
+  if (!user) {
+    throw new ApiError(404, 'User not found');
+  }
+
+  // Hash new password
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  // Update password
+  await prisma.user.update({
+    where: { id: parseInt(userId) },
+    data: { passwordHash: hashedPassword },
+  });
+
+  logger.info(`Password reset for user: ${user.username}`);
+};
+
 module.exports = {
   getAllUsers,
   updateApprovalStatus,
@@ -250,4 +277,5 @@ module.exports = {
   getRoleWithPermissions,
   updateRolePermissions,
   deleteUser,
+  resetPassword,
 };

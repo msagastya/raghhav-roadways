@@ -139,6 +139,31 @@ const deleteUser = asyncHandler(async (req, res) => {
   });
 });
 
+/**
+ * Reset user password
+ * PUT /api/v1/users/:id/reset-password
+ */
+const resetPassword = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { newPassword } = req.body;
+
+  if (!newPassword || newPassword.length < 6) {
+    return res.status(400).json({
+      success: false,
+      message: 'Password must be at least 6 characters long',
+    });
+  }
+
+  await userService.resetPassword(id, newPassword);
+
+  logger.info(`Password reset for user ID: ${id}`);
+
+  res.status(200).json({
+    success: true,
+    message: 'Password reset successfully',
+  });
+});
+
 module.exports = {
   getAllUsers,
   updateApprovalStatus,
@@ -148,4 +173,5 @@ module.exports = {
   getRoleWithPermissions,
   updateRolePermissions,
   deleteUser,
+  resetPassword,
 };
