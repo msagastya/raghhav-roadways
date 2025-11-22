@@ -7,9 +7,13 @@ const prisma = require('../config/database');
  */
 const authenticateToken = async (req, res, next) => {
   try {
-    // Get token from header
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+    // Get token from cookie first, then fall back to header (for backward compatibility)
+    let token = req.cookies?.accessToken;
+
+    if (!token) {
+      const authHeader = req.headers['authorization'];
+      token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+    }
 
     if (!token) {
       throw new ApiError(401, 'Access token is required');

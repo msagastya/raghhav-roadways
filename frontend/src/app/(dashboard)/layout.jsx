@@ -9,6 +9,7 @@ import CommandPalette from '../../components/shared/CommandPalette';
 import useAuth from '../../hooks/useAuth';
 import useUIStore from '../../store/uiStore';
 import useKeyboardShortcuts from '../../hooks/useKeyboardShortcuts';
+import useServiceWorker from '../../hooks/useServiceWorker';
 import ErrorBoundary from '../../components/shared/ErrorBoundary';
 import { cn } from '../../lib/utils';
 
@@ -19,6 +20,9 @@ export default function DashboardLayout({ children }) {
 
   // Enable keyboard shortcuts
   useKeyboardShortcuts();
+
+  // Register service worker
+  useServiceWorker();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {

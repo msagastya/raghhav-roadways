@@ -13,7 +13,7 @@ import { getErrorMessage } from '../../../lib/utils';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { setUser, setTokens } = useAuthStore();
+  const { setUser } = useAuthStore();
   const { showSuccess, showError } = useToast();
 
   const [formData, setFormData] = useState({
@@ -50,9 +50,9 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const response = await authAPI.login(formData);
-      const { user, accessToken, refreshToken } = response.data.data;
+      const { user } = response.data.data;
 
-      setTokens(accessToken, refreshToken);
+      // Tokens are now set via httpOnly cookies automatically
       setUser(user);
 
       showSuccess('Login successful!');

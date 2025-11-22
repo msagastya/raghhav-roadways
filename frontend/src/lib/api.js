@@ -2,31 +2,40 @@ import axios from 'axios';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
 
-// Create axios instance
+// Store CSRF token
+let csrfToken = null;
+
+// Create axios instance with credentials for httpOnly cookies
 const api = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true, // Important: Send cookies with requests
 });
 
-// Request interceptor to add auth token
+// Request interceptor to add CSRF token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    // Add CSRF token to mutation requests
+    if (csrfToken && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(config.method?.toUpperCase())) {
+      config.headers['X-CSRF-Token'] = csrfToken;
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Response interceptor to handle errors
+// Response interceptor to handle errors and token refresh
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Store CSRF token from response headers
+    const newCsrfToken = response.headers['x-csrf-token'];
+    if (newCsrfToken) {
+      csrfToken = newCsrfToken;
+    }
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
 
@@ -35,20 +44,17 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const refreshToken = localStorage.getItem('refreshToken');
-        const response = await axios.post(`${API_URL}/auth/refresh`, {
-          refreshToken,
-        });
+        // Attempt to refresh token (cookie-based)
+        await axios.post(`${API_URL}/auth/refresh`, {}, { withCredentials: true });
 
-        const { accessToken } = response.data.data;
-        localStorage.setItem('accessToken', accessToken);
-
-        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        // Retry the original request
         return api(originalRequest);
       } catch (refreshError) {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        window.location.href = '/login';
+        // Clear user data and redirect to login
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('user');
+          window.location.href = '/login';
+        }
         return Promise.reject(refreshError);
       }
     }
@@ -66,6 +72,7 @@ export const authAPI = {
   getProfile: () => api.get('/auth/me'),
   changePassword: (data) => api.post('/auth/change-password', data),
   signup: (data) => api.post('/auth/signup', data),
+  refresh: () => api.post('/auth/refresh'),
 };
 
 export const userAPI = {

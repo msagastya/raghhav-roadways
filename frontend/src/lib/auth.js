@@ -1,47 +1,45 @@
-export function setAuthTokens(accessToken, refreshToken) {
-  localStorage.setItem('accessToken', accessToken);
-  if (refreshToken) {
-    localStorage.setItem('refreshToken', refreshToken);
-  }
-
-  // Also set in cookies for server-side middleware access
-  // Set cookie with 7 days expiry
-  const expiryDate = new Date();
-  expiryDate.setDate(expiryDate.getDate() + 7);
-
-  document.cookie = `accessToken=${accessToken}; expires=${expiryDate.toUTCString()}; path=/; SameSite=Lax`;
-  if (refreshToken) {
-    document.cookie = `refreshToken=${refreshToken}; expires=${expiryDate.toUTCString()}; path=/; SameSite=Lax`;
-  }
-}
-
-export function getAccessToken() {
-  return localStorage.getItem('accessToken');
-}
-
-export function getRefreshToken() {
-  return localStorage.getItem('refreshToken');
-}
-
-export function clearAuthTokens() {
-  localStorage.removeItem('accessToken');
-  localStorage.removeItem('refreshToken');
-  localStorage.removeItem('user');
-
-  // Also clear cookies
-  document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-  document.cookie = 'refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-}
+// User management (tokens are now handled via httpOnly cookies)
 
 export function setUser(user) {
-  localStorage.setItem('user', JSON.stringify(user));
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('user', JSON.stringify(user));
+  }
 }
 
 export function getUser() {
-  const user = localStorage.getItem('user');
-  return user ? JSON.parse(user) : null;
+  if (typeof window !== 'undefined') {
+    const user = localStorage.getItem('user');
+    return user ? JSON.parse(user) : null;
+  }
+  return null;
+}
+
+export function clearUser() {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('user');
+  }
 }
 
 export function isAuthenticated() {
-  return !!getAccessToken();
+  return !!getUser();
+}
+
+// Legacy functions for backward compatibility (no longer store tokens client-side)
+export function setAuthTokens() {
+  // Tokens are now handled via httpOnly cookies - this is a no-op
+  console.warn('setAuthTokens is deprecated - tokens are now managed via httpOnly cookies');
+}
+
+export function getAccessToken() {
+  // Tokens are now handled via httpOnly cookies
+  return null;
+}
+
+export function getRefreshToken() {
+  // Tokens are now handled via httpOnly cookies
+  return null;
+}
+
+export function clearAuthTokens() {
+  clearUser();
 }

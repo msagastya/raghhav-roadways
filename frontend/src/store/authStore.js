@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { setAuthTokens, clearAuthTokens, setUser as saveUser, getUser as getSavedUser } from '../lib/auth';
+import { setUser as saveUser, getUser as getSavedUser, clearUser } from '../lib/auth';
+import { authAPI } from '../lib/api';
 
 const useAuthStore = create((set) => ({
   user: null,
@@ -11,12 +12,14 @@ const useAuthStore = create((set) => ({
     set({ user, isAuthenticated: true, isLoading: false });
   },
 
-  setTokens: (accessToken, refreshToken) => {
-    setAuthTokens(accessToken, refreshToken);
-  },
-
-  logout: () => {
-    clearAuthTokens();
+  logout: async () => {
+    try {
+      // Call logout endpoint to clear httpOnly cookies on server
+      await authAPI.logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+    clearUser();
     set({ user: null, isAuthenticated: false });
   },
 

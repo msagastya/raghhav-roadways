@@ -2,6 +2,15 @@ const authService = require('../services/auth.service');
 const { asyncHandler } = require('../middleware/errorHandler');
 const logger = require('../utils/logger');
 
+// Cookie options for security
+const getCookieOptions = (maxAge) => ({
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+  maxAge,
+  path: '/',
+});
+
 /**
  * Login user
  * POST /api/v1/auth/login
@@ -11,12 +20,19 @@ const login = asyncHandler(async (req, res) => {
 
   const result = await authService.login(username, password);
 
+  // Set httpOnly cookies
+  res.cookie('accessToken', result.accessToken, getCookieOptions(7 * 24 * 60 * 60 * 1000)); // 7 days
+  res.cookie('refreshToken', result.refreshToken, getCookieOptions(30 * 24 * 60 * 60 * 1000)); // 30 days
+
   logger.info(`User ${username} logged in successfully`);
 
+  // Return user data without tokens in response body
   res.status(200).json({
     success: true,
     message: 'Login successful',
-    data: result,
+    data: {
+      user: result.user,
+    },
   });
 });
 
@@ -25,8 +41,9 @@ const login = asyncHandler(async (req, res) => {
  * POST /api/v1/auth/logout
  */
 const logout = asyncHandler(async (req, res) => {
-  // In a stateless JWT system, logout is handled on the client side
-  // by removing the token. This endpoint is for logging purposes.
+  // Clear httpOnly cookies
+  res.clearCookie('accessToken', { path: '/' });
+  res.clearCookie('refreshToken', { path: '/' });
 
   logger.info(`User ${req.user.username} logged out`);
 
@@ -41,14 +58,25 @@ const logout = asyncHandler(async (req, res) => {
  * POST /api/v1/auth/refresh
  */
 const refreshToken = asyncHandler(async (req, res) => {
-  const { refreshToken } = req.body;
+  // Get refresh token from cookie or body (for backward compatibility)
+  const token = req.cookies.refreshToken || req.body.refreshToken;
 
-  const result = await authService.refreshAccessToken(refreshToken);
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      message: 'Refresh token required',
+    });
+  }
+
+  const result = await authService.refreshAccessToken(token);
+
+  // Set new access token cookie
+  res.cookie('accessToken', result.accessToken, getCookieOptions(7 * 24 * 60 * 60 * 1000));
 
   res.status(200).json({
     success: true,
     message: 'Token refreshed successfully',
-    data: result,
+    data: { refreshed: true },
   });
 });
 

@@ -3,6 +3,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const compression = require('compression');
+const cookieParser = require('cookie-parser');
 require('dotenv').config();
 
 const routes = require('./routes');
@@ -12,6 +13,7 @@ const {
   notFound,
 } = require('./middleware/errorHandler');
 const { apiLimiter } = require('./middleware/rateLimiter');
+const { setCsrfToken, doubleCsrfProtection, csrfErrorHandler } = require('./middleware/csrf');
 const logger = require('./utils/logger');
 
 const app = express();
@@ -71,6 +73,9 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
+// Cookie parser middleware
+app.use(cookieParser());
+
 // Body parser middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -96,6 +101,11 @@ app.use((req, res, next) => {
 
 // Apply rate limiting to all API routes
 app.use('/api/v1', apiLimiter);
+
+// CSRF Protection - set token on GET requests, validate on mutations
+app.use('/api/v1', setCsrfToken);
+app.use('/api/v1', doubleCsrfProtection);
+app.use(csrfErrorHandler);
 
 // API routes
 app.use('/api/v1', routes);

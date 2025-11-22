@@ -6,6 +6,8 @@ const { validate } = require('../middleware/validator');
 const { authLimiter, passwordResetLimiter } = require('../middleware/rateLimiter');
 const {
   loginValidation,
+  signupValidation,
+  changePasswordValidation,
   refreshTokenValidation,
 } = require('../validations/auth.validation');
 
@@ -47,13 +49,13 @@ router.get('/me', authenticateToken, authController.getProfile);
  * @desc    Change password
  * @access  Private
  */
-router.post('/change-password', authenticateToken, authController.changePassword);
+router.post('/change-password', authenticateToken, changePasswordValidation, validate, authController.changePassword);
 
 /**
  * @route   POST /api/v1/auth/signup
  * @desc    Sign up new user
  * @access  Public
  */
-router.post('/signup', authLimiter, authController.signup);
+router.post('/signup', authLimiter, signupValidation, validate, authController.signup);
 
 module.exports = router;
