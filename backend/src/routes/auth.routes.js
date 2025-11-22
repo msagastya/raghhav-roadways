@@ -3,6 +3,7 @@ const router = express.Router();
 const authController = require('../controllers/auth.controller');
 const { authenticateToken } = require('../middleware/auth');
 const { validate } = require('../middleware/validator');
+const { authLimiter, passwordResetLimiter } = require('../middleware/rateLimiter');
 const {
   loginValidation,
   refreshTokenValidation,
@@ -13,7 +14,7 @@ const {
  * @desc    Login user
  * @access  Public
  */
-router.post('/login', loginValidation, validate, authController.login);
+router.post('/login', authLimiter, loginValidation, validate, authController.login);
 
 /**
  * @route   POST /api/v1/auth/logout
@@ -53,6 +54,6 @@ router.post('/change-password', authenticateToken, authController.changePassword
  * @desc    Sign up new user
  * @access  Public
  */
-router.post('/signup', authController.signup);
+router.post('/signup', authLimiter, authController.signup);
 
 module.exports = router;

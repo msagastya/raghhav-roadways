@@ -44,6 +44,8 @@ model User {
   statusChanges           StatusHistory[]
   approvedAmendments      PaymentAmendment[]
 
+  @@index([roleId])
+  @@index([isActive])
   @@map("users")
 }
 
@@ -245,7 +247,10 @@ model Consignment {
   @@index([grDate])
   @@index([status])
   @@index([consignorId])
+  @@index([consigneeId])
   @@index([vehicleId])
+  @@index([isInvoiced, isDeleted])
+  @@index([paymentMode])
   @@map("consignments")
 }
 

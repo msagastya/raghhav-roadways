@@ -1,8 +1,9 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Menu, LogOut, User } from 'lucide-react';
+import { Menu, LogOut, User, Moon, Sun, Command } from 'lucide-react';
 import useAuthStore from '../../store/authStore';
 import useUIStore from '../../store/uiStore';
 import Button from '../ui/button';
@@ -10,7 +11,12 @@ import Button from '../ui/button';
 export default function Header() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
-  const { toggleSidebar } = useUIStore();
+  const { toggleSidebar, darkMode, toggleDarkMode, initDarkMode, toggleCommandPalette } = useUIStore();
+
+  // Initialize dark mode on mount
+  useEffect(() => {
+    initDarkMode();
+  }, [initDarkMode]);
 
   const handleLogout = () => {
     logout();
@@ -19,7 +25,7 @@ export default function Header() {
 
   return (
     <motion.header
-      className="bg-gradient-to-r from-white via-gray-50/30 to-white border-b-2 border-gray-200/50 sticky top-0 z-30 backdrop-blur-md shadow-md"
+      className="bg-gradient-to-r from-white via-gray-50/30 to-white dark:from-gray-900 dark:via-gray-800/30 dark:to-gray-900 border-b-2 border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-30 backdrop-blur-md shadow-md"
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
@@ -28,17 +34,17 @@ export default function Header() {
         <div className="flex items-center gap-2 sm:gap-3">
           <motion.button
             onClick={toggleSidebar}
-            className="p-2 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 shadow-md hover:shadow-lg focus:outline-none transition-all"
+            className="p-2 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-200 dark:hover:from-gray-700 dark:hover:to-gray-600 shadow-md hover:shadow-lg focus:outline-none transition-all"
             whileHover={{ scale: 1.05, rotate: 90, y: -2 }}
             whileTap={{ scale: 0.95 }}
             transition={{ duration: 0.2, type: 'spring' }}
           >
-            <Menu className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
+            <Menu className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700 dark:text-gray-300" />
           </motion.button>
 
           {/* App Name on Mobile */}
           <motion.h1
-            className="block sm:hidden text-sm font-bold text-primary-600"
+            className="block sm:hidden text-sm font-bold text-primary-600 dark:text-primary-400"
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
           >
@@ -52,6 +58,33 @@ export default function Header() {
           animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 0.4, delay: 0.2 }}
         >
+          {/* Command Palette Button */}
+          <motion.button
+            onClick={toggleCommandPalette}
+            className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            title="Press Ctrl+K to open"
+          >
+            <Command className="w-3.5 h-3.5" />
+            <span className="text-xs">Ctrl+K</span>
+          </motion.button>
+
+          {/* Dark Mode Toggle */}
+          <motion.button
+            onClick={toggleDarkMode}
+            className="p-2 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-200 dark:hover:from-gray-700 dark:hover:to-gray-600 shadow-md hover:shadow-lg focus:outline-none transition-all"
+            whileHover={{ scale: 1.1, rotate: 15 }}
+            whileTap={{ scale: 0.95 }}
+            title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {darkMode ? (
+              <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500" />
+            ) : (
+              <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
+            )}
+          </motion.button>
+
           {/* User Info */}
           <motion.div
             className="flex items-center gap-2 sm:gap-3 p-1.5 sm:p-2 rounded-xl hover:bg-gray-50/50 transition-all"

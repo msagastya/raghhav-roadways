@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const compression = require('compression');
 require('dotenv').config();
 
 const routes = require('./routes');
@@ -10,12 +11,38 @@ const {
   errorHandler,
   notFound,
 } = require('./middleware/errorHandler');
+const { apiLimiter } = require('./middleware/rateLimiter');
 const logger = require('./utils/logger');
 
 const app = express();
 
-// Security middleware
-app.use(helmet());
+// Trust proxy for rate limiting behind reverse proxies (Render, Vercel, etc.)
+app.set('trust proxy', 1);
+
+// Compression middleware - compress all responses
+app.use(compression({
+  level: 6, // Balanced compression level
+  threshold: 1024, // Only compress responses > 1KB
+  filter: (req, res) => {
+    if (req.headers['x-no-compression']) {
+      return false;
+    }
+    return compression.filter(req, res);
+  }
+}));
+
+// Security middleware with enhanced configuration
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+  crossOriginEmbedderPolicy: false, // Allow embedding for PDF viewers
+}));
 
 // CORS configuration
 const corsOptions = {
@@ -66,6 +93,9 @@ app.use((req, res, next) => {
   logger.info(`${req.method} ${req.path}`);
   next();
 });
+
+// Apply rate limiting to all API routes
+app.use('/api/v1', apiLimiter);
 
 // API routes
 app.use('/api/v1', routes);

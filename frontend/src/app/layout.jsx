@@ -6,7 +6,23 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
   title: 'Raghhav Roadways - Transport Management System',
-  description: 'Comprehensive transport and logistics management system',
+  description: 'Comprehensive transport and logistics management system for Raghhav Roadways',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Raghhav Roadways',
+  },
+  formatDetection: {
+    telephone: false,
+  },
+}
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: '#1e40af',
 }
 
 export default function RootLayout({ children }) {

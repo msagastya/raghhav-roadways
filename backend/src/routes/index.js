@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('../config/swagger');
 
 // Import route modules
 const authRoutes = require('./auth.routes');
@@ -12,7 +14,9 @@ const invoiceRoutes = require('./invoice.routes');
 const paymentRoutes = require('./payment.routes');
 const reportRoutes = require('./report.routes');
 const mastersRoutes = require('./masters.routes');
-const seedRoutes = require('./seed.routes');
+const exportRoutes = require('./export.routes');
+const gstRoutes = require('./gst.routes');
+const trackingRoutes = require('./tracking.routes');
 
 // Health check route
 router.get('/health', (req, res) => {
@@ -21,6 +25,19 @@ router.get('/health', (req, res) => {
     message: 'API is running',
     timestamp: new Date().toISOString(),
   });
+});
+
+// Swagger API Documentation
+router.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  explorer: true,
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Raghhav Roadways API Docs'
+}));
+
+// Swagger JSON endpoint
+router.get('/docs.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
 });
 
 // Mount routes
@@ -34,14 +51,17 @@ router.use('/invoices', invoiceRoutes);
 router.use('/payments', paymentRoutes);
 router.use('/reports', reportRoutes);
 router.use('/masters', mastersRoutes);
-router.use('/seed', seedRoutes);
+router.use('/export', exportRoutes);
+router.use('/gst', gstRoutes);
+router.use('/track', trackingRoutes);
 
-// API documentation route (you can expand this later)
+// API documentation route
 router.get('/', (req, res) => {
   res.status(200).json({
     success: true,
     message: 'Raghhav Roadways API',
     version: '1.0.0',
+    documentation: '/api/v1/docs',
     endpoints: {
       auth: '/api/v1/auth',
       parties: '/api/v1/parties',
@@ -51,6 +71,9 @@ router.get('/', (req, res) => {
       payments: '/api/v1/payments',
       reports: '/api/v1/reports',
       masters: '/api/v1/masters',
+      export: '/api/v1/export',
+      gst: '/api/v1/gst',
+      tracking: '/api/v1/track',
     },
   });
 });

@@ -38,10 +38,14 @@ const authenticateToken = async (req, res, next) => {
       throw new ApiError(401, 'User not found or inactive');
     }
 
+    if (!user.role) {
+      throw new ApiError(401, 'User role not configured');
+    }
+
     // Extract permissions
-    const permissions = user.role.rolePermissions.map(
-      (rp) => rp.permission.permissionCode
-    );
+    const permissions = user.role.rolePermissions?.map(
+      (rp) => rp.permission?.permissionCode
+    ).filter(Boolean) || [];
 
     // Attach user info to request
     req.user = {
