@@ -6,7 +6,7 @@ import { cn } from '../../lib/utils';
 export function Skeleton({ className, ...props }) {
   return (
     <motion.div
-      className={cn('animate-pulse rounded-md bg-gray-200 dark:bg-gray-700', className)}
+      className={cn('animate-pulse rounded-md bg-gray-200 dark:bg-slate-700/80', className)}
       initial={{ opacity: 0.6 }}
       animate={{ opacity: [0.6, 1, 0.6] }}
       transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
@@ -43,7 +43,7 @@ export function TableSkeleton({ rows = 5, columns = 5 }) {
 
 export function CardSkeleton() {
   return (
-    <div className="bg-white rounded-lg shadow border border-gray-200 p-6 space-y-4">
+    <div className="bg-white dark:bg-gradient-to-br dark:from-slate-800/90 dark:to-slate-900/90 rounded-lg shadow dark:shadow-dark-lg border border-gray-200 dark:border-slate-700/50 p-6 space-y-4">
       <Skeleton className="h-6 w-1/3" />
       <Skeleton className="h-4 w-full" />
       <Skeleton className="h-4 w-5/6" />

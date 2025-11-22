@@ -23,9 +23,9 @@ export function Card({ children, className, animate = true, hover3d = true, ...p
   return (
     <Component
       className={cn(
-        'bg-gradient-to-br from-white to-gray-50/50 rounded-xl shadow-lg border border-gray-200/50 backdrop-blur-sm',
-        'hover:shadow-2xl hover:border-gray-300/50 transition-all duration-300 transform-gpu',
-        'relative overflow-hidden',
+        'bg-gradient-to-br from-white to-gray-50/50 dark:from-slate-800/90 dark:to-slate-900/90 rounded-xl shadow-lg dark:shadow-dark-lg border border-gray-200/50 dark:border-slate-700/50 backdrop-blur-sm',
+        'hover:shadow-2xl dark:hover:shadow-dark-xl hover:border-gray-300/50 dark:hover:border-slate-600/50 transition-all duration-300 transform-gpu',
+        'relative overflow-hidden dark:hover:shadow-glow-primary/20',
         className
       )}
       {...animationProps}
@@ -33,7 +33,7 @@ export function Card({ children, className, animate = true, hover3d = true, ...p
       {...props}
     >
       {/* 3D Effect Border */}
-      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/50 to-transparent pointer-events-none" />
+      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/50 dark:from-white/5 to-transparent pointer-events-none" />
 
       {/* Content */}
       <div className="relative z-10">
@@ -46,7 +46,7 @@ export function Card({ children, className, animate = true, hover3d = true, ...p
 export function CardHeader({ children, className, ...props }) {
   return (
     <div
-      className={cn('px-4 sm:px-6 py-4 sm:py-5 border-b border-gray-200/70', className)}
+      className={cn('px-4 sm:px-6 py-4 sm:py-5 border-b border-gray-200/70 dark:border-slate-700/50', className)}
       {...props}
     >
       {children}
@@ -65,7 +65,7 @@ export function CardContent({ children, className, ...props }) {
 export function CardFooter({ children, className, ...props }) {
   return (
     <div
-      className={cn('px-4 sm:px-6 py-4 sm:py-5 border-t border-gray-200/70', className)}
+      className={cn('px-4 sm:px-6 py-4 sm:py-5 border-t border-gray-200/70 dark:border-slate-700/50', className)}
       {...props}
     >
       {children}

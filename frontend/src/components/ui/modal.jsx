@@ -32,7 +32,7 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md', f
           <div className="flex min-h-screen items-end sm:items-center justify-center p-0 sm:p-4">
             {/* Animated Backdrop with Blur */}
             <motion.div
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+              className="fixed inset-0 bg-black/60 dark:bg-black/70 backdrop-blur-sm"
               onClick={onClose}
               variants={backdropVariants}
               initial="hidden"
@@ -43,9 +43,9 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md', f
             {/* Animated Modal with 3D Effect */}
             <motion.div
               className={cn(
-                'relative bg-gradient-to-br from-white via-white to-gray-50/50 w-full',
-                'rounded-t-3xl sm:rounded-2xl shadow-2xl border-2 border-gray-200/50',
-                'transform-gpu overflow-hidden',
+                'relative bg-gradient-to-br from-white via-white to-gray-50/50 dark:from-slate-800 dark:via-slate-800/95 dark:to-slate-900 w-full',
+                'rounded-t-3xl sm:rounded-2xl shadow-2xl dark:shadow-dark-xl border-2 border-gray-200/50 dark:border-slate-700/50',
+                'transform-gpu overflow-hidden backdrop-blur-xl',
                 sizes[size]
               )}
               variants={modalVariants}
@@ -54,17 +54,17 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md', f
               exit="exit"
             >
               {/* 3D Effect Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/60 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-br from-white/60 dark:from-white/5 via-transparent to-transparent pointer-events-none" />
 
               {/* Shine Effect */}
-              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 dark:via-primary-500/5 to-transparent pointer-events-none" />
 
               {/* Header */}
-              <div className="relative z-10 flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5 border-b border-gray-200/70 bg-gradient-to-r from-primary-50/30 to-transparent">
-                <h3 className="text-base sm:text-lg lg:text-xl font-bold text-gray-900 drop-shadow-sm">{title}</h3>
+              <div className="relative z-10 flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5 border-b border-gray-200/70 dark:border-slate-700/50 bg-gradient-to-r from-primary-50/30 dark:from-primary-500/10 to-transparent">
+                <h3 className="text-base sm:text-lg lg:text-xl font-bold text-gray-900 dark:text-white drop-shadow-sm">{title}</h3>
                 <motion.button
                   onClick={onClose}
-                  className="text-gray-400 hover:text-gray-600 focus:outline-none rounded-full p-2 hover:bg-white/80 transition-all shadow-md hover:shadow-lg"
+                  className="text-gray-400 dark:text-slate-400 hover:text-gray-600 dark:hover:text-white focus:outline-none rounded-full p-2 hover:bg-white/80 dark:hover:bg-slate-700/50 transition-all shadow-md dark:shadow-dark-sm hover:shadow-lg"
                   whileHover={{ scale: 1.15, rotate: 90 }}
                   whileTap={{ scale: 0.9 }}
                 >
@@ -79,7 +79,7 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md', f
 
               {/* Footer */}
               {footer && (
-                <div className="relative z-10 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-200/70 bg-gray-50/30">
+                <div className="relative z-10 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-200/70 dark:border-slate-700/50 bg-gray-50/30 dark:bg-slate-900/50">
                   {footer}
                 </div>
               )}

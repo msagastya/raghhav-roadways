@@ -6,7 +6,7 @@ import { cn } from '../../lib/utils';
 export function Table({ children, className, ...props }) {
   return (
     <div className="overflow-x-auto">
-      <table className={cn('min-w-full divide-y divide-gray-200', className)} {...props}>
+      <table className={cn('min-w-full divide-y divide-gray-200 dark:divide-slate-700', className)} {...props}>
         {children}
       </table>
     </div>
@@ -15,7 +15,7 @@ export function Table({ children, className, ...props }) {
 
 export function TableHeader({ children, className, ...props }) {
   return (
-    <thead className={cn('bg-gray-50', className)} {...props}>
+    <thead className={cn('bg-gray-50 dark:bg-slate-800/80', className)} {...props}>
       {children}
     </thead>
   );
@@ -23,7 +23,7 @@ export function TableHeader({ children, className, ...props }) {
 
 export function TableBody({ children, className, ...props }) {
   return (
-    <tbody className={cn('bg-white divide-y divide-gray-200', className)} {...props}>
+    <tbody className={cn('bg-white dark:bg-slate-800/50 divide-y divide-gray-200 dark:divide-slate-700/50', className)} {...props}>
       {children}
     </tbody>
   );
@@ -44,7 +44,7 @@ export function TableRow({ children, className, animate = false, index = 0, ...p
 
   return (
     <Component
-      className={cn('hover:bg-gray-50 transition-colors duration-150', className)}
+      className={cn('hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors duration-150', className)}
       {...animationProps}
       {...props}
     >
@@ -57,7 +57,7 @@ export function TableHead({ children, className, ...props }) {
   return (
     <th
       className={cn(
-        'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
+        'px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider',
         className
       )}
       {...props}
@@ -69,7 +69,7 @@ export function TableHead({ children, className, ...props }) {
 
 export function TableCell({ children, className, ...props }) {
   return (
-    <td className={cn('px-6 py-4 whitespace-nowrap text-sm text-gray-900', className)} {...props}>
+    <td className={cn('px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-slate-200', className)} {...props}>
       {children}
     </td>
   );

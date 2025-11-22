@@ -25,7 +25,7 @@ export default function Header() {
 
   return (
     <motion.header
-      className="bg-gradient-to-r from-white via-gray-50/30 to-white dark:from-gray-900 dark:via-gray-800/30 dark:to-gray-900 border-b-2 border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-30 backdrop-blur-md shadow-md"
+      className="bg-gradient-to-r from-white via-gray-50/50 to-white dark:from-slate-900/95 dark:via-slate-800/90 dark:to-slate-900/95 border-b border-gray-200/50 dark:border-slate-700/50 sticky top-0 z-30 backdrop-blur-xl shadow-sm dark:shadow-dark-md"
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
@@ -61,7 +61,7 @@ export default function Header() {
           {/* Command Palette Button */}
           <motion.button
             onClick={toggleCommandPalette}
-            className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-slate-800/80 text-gray-500 dark:text-slate-400 text-sm hover:bg-gray-200 dark:hover:bg-slate-700/80 border border-transparent dark:border-slate-600/30 transition-all"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             title="Press Ctrl+K to open"
@@ -73,7 +73,7 @@ export default function Header() {
           {/* Dark Mode Toggle */}
           <motion.button
             onClick={toggleDarkMode}
-            className="p-2 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-200 dark:hover:from-gray-700 dark:hover:to-gray-600 shadow-md hover:shadow-lg focus:outline-none transition-all"
+            className="p-2 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-700 hover:from-amber-50 hover:to-amber-100 dark:hover:from-indigo-900/50 dark:hover:to-purple-900/50 shadow-sm dark:shadow-dark-sm hover:shadow-md dark:hover:shadow-glow-purple focus:outline-none transition-all border border-transparent dark:border-slate-600/30 dark:hover:border-purple-500/30"
             whileHover={{ scale: 1.1, rotate: 15 }}
             whileTap={{ scale: 0.95 }}
             title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}

@@ -51,8 +51,11 @@ export default function Sidebar({ isOpen }) {
 
       <motion.div
         className={cn(
-          'fixed left-0 top-0 h-full text-white transition-all duration-300 z-40 shadow-2xl',
-          'bg-gradient-to-b from-brand-900/95 via-brand-800/90 to-brand-900/95 backdrop-blur-xl border-r border-brand-600/20',
+          'fixed left-0 top-0 h-full text-white transition-all duration-300 z-40',
+          'bg-gradient-to-b from-brand-900 via-brand-800 to-brand-900',
+          'dark:from-slate-900 dark:via-slate-800 dark:to-slate-900',
+          'backdrop-blur-xl border-r border-brand-600/20 dark:border-slate-700/50',
+          'shadow-2xl dark:shadow-dark-xl',
           isOpen ? 'w-64 sm:w-72' : 'w-0 md:w-16 lg:w-20'
         )}
         initial={false}
@@ -60,7 +63,7 @@ export default function Sidebar({ isOpen }) {
       >
         <div className="flex flex-col h-full overflow-hidden">
           <motion.div
-            className={`flex items-center justify-between px-3 sm:px-4 lg:px-6 border-b border-brand-600/20 bg-gradient-to-r from-brand-700/30 to-transparent ${isOpen ? 'h-32 sm:h-36 flex-col py-4' : 'h-16 sm:h-20'}`}
+            className={`flex items-center justify-between px-3 sm:px-4 lg:px-6 border-b border-brand-600/20 dark:border-slate-700/50 bg-gradient-to-r from-brand-700/30 dark:from-slate-800/50 to-transparent ${isOpen ? 'h-32 sm:h-36 flex-col py-4' : 'h-16 sm:h-20'}`}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
@@ -118,10 +121,10 @@ export default function Sidebar({ isOpen }) {
                   <Link key={item.name} href={item.href}>
                     <motion.div
                       className={cn(
-                        'flex items-center px-2 sm:px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200 relative overflow-hidden backdrop-blur-sm',
+                        'flex items-center px-2 sm:px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-300 relative overflow-hidden backdrop-blur-sm',
                         isActive
-                          ? 'bg-gradient-to-r from-primary-600/90 to-primary-700/90 text-white shadow-lg shadow-primary-600/30 border border-primary-400/30'
-                          : 'text-gray-300 hover:bg-white/10 hover:text-white border border-transparent hover:border-white/20'
+                          ? 'bg-gradient-to-r from-primary-500 to-emerald-600 text-white shadow-lg shadow-primary-500/40 dark:shadow-primary-500/30 border border-primary-400/30'
+                          : 'text-gray-300 dark:text-slate-400 hover:bg-white/10 dark:hover:bg-slate-700/50 hover:text-white border border-transparent hover:border-white/20 dark:hover:border-slate-600/50'
                       )}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
@@ -165,7 +168,7 @@ export default function Sidebar({ isOpen }) {
             </div>
           </nav>
 
-          <div className="border-t border-white/10 p-3 sm:p-4 bg-gradient-to-t from-white/5 to-transparent backdrop-blur-sm">
+          <div className="border-t border-white/10 dark:border-slate-700/50 p-3 sm:p-4 bg-gradient-to-t from-white/5 dark:from-slate-800/50 to-transparent backdrop-blur-sm">
             {isOpen ? (
               <p className="text-xs text-gray-400 text-center">v1.0.0</p>
             ) : (
