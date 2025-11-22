@@ -23,17 +23,17 @@ export function Card({ children, className, animate = true, hover3d = true, ...p
   return (
     <Component
       className={cn(
-        'bg-gradient-to-br from-white to-gray-50/50 dark:from-slate-800/90 dark:to-slate-900/90 rounded-xl shadow-lg dark:shadow-dark-lg border border-gray-200/50 dark:border-slate-700/50 backdrop-blur-sm',
-        'hover:shadow-2xl dark:hover:shadow-dark-xl hover:border-gray-300/50 dark:hover:border-slate-600/50 transition-all duration-300 transform-gpu',
-        'relative overflow-hidden dark:hover:shadow-glow-primary/20',
+        'bg-white dark:bg-slate-800 rounded-xl shadow-lg dark:shadow-xl border border-gray-200 dark:border-slate-600 backdrop-blur-sm',
+        'hover:shadow-2xl dark:hover:shadow-2xl hover:border-gray-300 dark:hover:border-slate-500 transition-all duration-300 transform-gpu',
+        'relative overflow-hidden',
         className
       )}
       {...animationProps}
       {...hoverProps}
       {...props}
     >
-      {/* 3D Effect Border */}
-      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/50 dark:from-white/5 to-transparent pointer-events-none" />
+      {/* Subtle overlay */}
+      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 dark:from-white/5 to-transparent pointer-events-none" />
 
       {/* Content */}
       <div className="relative z-10">
