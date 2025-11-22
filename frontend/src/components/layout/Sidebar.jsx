@@ -53,9 +53,9 @@ export default function Sidebar({ isOpen }) {
         className={cn(
           'fixed left-0 top-0 h-full text-white transition-all duration-300 z-40',
           'bg-gradient-to-b from-brand-900 via-brand-800 to-brand-900',
-          'dark:from-slate-900 dark:via-slate-800 dark:to-slate-900',
-          'backdrop-blur-xl border-r border-brand-600/20 dark:border-slate-700/50',
-          'shadow-2xl dark:shadow-dark-xl',
+          'dark:from-slate-800 dark:via-slate-800 dark:to-slate-900',
+          'backdrop-blur-xl border-r border-brand-600/20 dark:border-slate-600',
+          'shadow-2xl dark:shadow-xl',
           isOpen ? 'w-64 sm:w-72' : 'w-0 md:w-16 lg:w-20'
         )}
         initial={false}
@@ -124,7 +124,7 @@ export default function Sidebar({ isOpen }) {
                         'flex items-center px-2 sm:px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-300 relative overflow-hidden backdrop-blur-sm',
                         isActive
                           ? 'bg-gradient-to-r from-primary-500 to-emerald-600 text-white shadow-lg shadow-primary-500/40 dark:shadow-primary-500/30 border border-primary-400/30'
-                          : 'text-gray-300 dark:text-slate-400 hover:bg-white/10 dark:hover:bg-slate-700/50 hover:text-white border border-transparent hover:border-white/20 dark:hover:border-slate-600/50'
+                          : 'text-gray-300 dark:text-slate-300 hover:bg-white/10 dark:hover:bg-slate-600/50 hover:text-white border border-transparent hover:border-white/20 dark:hover:border-slate-500/50'
                       )}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}

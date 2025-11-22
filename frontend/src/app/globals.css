@@ -8,6 +8,8 @@
   --background-end-rgb: 241, 245, 249;
   --card-rgb: 255, 255, 255;
   --border-rgb: 226, 232, 240;
+  --toast-bg: #fff;
+  --toast-color: #374151;
 }
 
 .dark {
@@ -16,6 +18,8 @@
   --background-end-rgb: 15, 23, 42;
   --card-rgb: 30, 41, 59;
   --border-rgb: 51, 65, 85;
+  --toast-bg: #1e293b;
+  --toast-color: #f1f5f9;
 }
 
 body {
@@ -42,6 +46,125 @@ html {
   /* Dark mode base styles */
   .dark {
     color-scheme: dark;
+  }
+
+  /* Auto-apply dark mode text colors to common elements */
+  .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+    @apply text-white;
+  }
+
+  .dark p {
+    @apply text-slate-300;
+  }
+
+  .dark label {
+    @apply text-slate-300;
+  }
+
+  /* Fix text-gray-900 to be white in dark mode */
+  .dark .text-gray-900 {
+    @apply text-white;
+  }
+
+  .dark .text-gray-800 {
+    @apply text-slate-100;
+  }
+
+  .dark .text-gray-700 {
+    @apply text-slate-200;
+  }
+
+  .dark .text-gray-600 {
+    @apply text-slate-300;
+  }
+
+  .dark .text-gray-500 {
+    @apply text-slate-400;
+  }
+
+  .dark .text-gray-400 {
+    @apply text-slate-500;
+  }
+
+  /* Fix background colors in dark mode */
+  .dark .bg-gray-50 {
+    @apply bg-slate-800/50;
+  }
+
+  .dark .bg-gray-100 {
+    @apply bg-slate-800;
+  }
+
+  .dark .bg-gray-200 {
+    @apply bg-slate-700;
+  }
+
+  .dark .bg-white {
+    @apply bg-slate-800;
+  }
+
+  /* Fix borders in dark mode */
+  .dark .border-gray-200 {
+    @apply border-slate-700;
+  }
+
+  .dark .border-gray-300 {
+    @apply border-slate-600;
+  }
+
+  /* Fix hover states */
+  .dark .hover\:bg-gray-50:hover {
+    @apply bg-slate-700/50;
+  }
+
+  .dark .hover\:bg-gray-100:hover {
+    @apply bg-slate-700;
+  }
+
+  .dark .hover\:text-gray-900:hover {
+    @apply text-white;
+  }
+
+  /* Fix icon colors */
+  .dark .text-blue-600 {
+    @apply text-blue-400;
+  }
+
+  .dark .text-purple-600 {
+    @apply text-purple-400;
+  }
+
+  .dark .text-red-600 {
+    @apply text-red-400;
+  }
+
+  .dark .text-green-600 {
+    @apply text-green-400;
+  }
+
+  /* Fix background icon containers */
+  .dark .bg-blue-100 {
+    @apply bg-blue-500/20;
+  }
+
+  .dark .bg-purple-100 {
+    @apply bg-purple-500/20;
+  }
+
+  .dark .bg-red-100 {
+    @apply bg-red-500/20;
+  }
+
+  .dark .bg-green-100 {
+    @apply bg-green-500/20;
+  }
+
+  .dark .bg-yellow-100 {
+    @apply bg-yellow-500/20;
+  }
+
+  .dark .bg-primary-100 {
+    @apply bg-primary-500/20;
   }
 }
 
