@@ -60,8 +60,9 @@ export default function MastersPage() {
               {activeTab === tab.id && (
                 <motion.div
                   className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 to-primary-600 rounded-t-full shadow-lg shadow-primary-500/50"
-                  layoutId="activeTabIndicator"
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{ duration: 0.2 }}
                 />
               )}
             </motion.button>
