@@ -241,7 +241,7 @@ export default function StateCityMaster() {
                   </div>
                   <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">Select a State</h3>
                   <p className="text-xs sm:text-sm text-gray-500">
-                    Click on any state from the list {window.innerWidth >= 1024 ? 'on the left' : 'above'} to view its cities
+                    Click on any state from the list to view its cities
                   </p>
                 </div>
               </CardContent>
