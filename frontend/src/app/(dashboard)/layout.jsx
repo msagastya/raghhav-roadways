@@ -22,8 +22,24 @@ export default function DashboardLayout({ children }) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-gray-100">
+        <div className="flex flex-col items-center gap-4">
+          {/* Animated Logo */}
+          <div className="relative">
+            <div className="absolute inset-0 bg-primary-400/30 rounded-full blur-xl animate-pulse"></div>
+            <img
+              src="/logo.png"
+              alt="Loading"
+              className="w-20 h-20 object-contain rounded-xl shadow-lg relative z-10 animate-pulse"
+            />
+          </div>
+          {/* Loading Spinner */}
+          <div className="relative">
+            <div className="w-12 h-12 rounded-full border-4 border-primary-100"></div>
+            <div className="absolute top-0 left-0 w-12 h-12 rounded-full border-4 border-transparent border-t-primary-600 animate-spin"></div>
+          </div>
+          <p className="text-sm text-gray-500 font-medium animate-pulse">Loading...</p>
+        </div>
       </div>
     );
   }
