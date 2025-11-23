@@ -8,8 +8,17 @@ export default function Input({
   error,
   className,
   containerClassName,
+  autoComplete,
   ...props
 }) {
+  // Auto-detect autocomplete attribute based on input type/name
+  const getAutoComplete = () => {
+    if (autoComplete) return autoComplete;
+    if (props.type === 'password') return 'current-password';
+    if (props.name === 'username') return 'username';
+    if (props.name === 'email' || props.type === 'email') return 'email';
+    return undefined;
+  };
   return (
     <div className={cn('w-full', containerClassName)}>
       {label && (
@@ -34,6 +43,7 @@ export default function Input({
         )}
         whileFocus={{ scale: 1.01, y: -1 }}
         transition={{ duration: 0.2, type: 'spring', stiffness: 300 }}
+        autoComplete={getAutoComplete()}
         {...props}
       />
       {error && (
