@@ -101,16 +101,16 @@ export default function LoginPage() {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="w-full max-w-md"
+      className="w-full max-w-md mx-auto"
     >
-      {/* Decorative Elements */}
+      {/* Decorative Elements - Hidden on larger screens to reduce clutter */}
       <motion.div
-        className="absolute top-10 left-10 w-20 h-20 bg-primary-400/20 rounded-full blur-xl"
+        className="absolute top-10 left-10 w-16 h-16 md:w-20 md:h-20 lg:w-16 lg:h-16 bg-primary-400/20 rounded-full blur-xl"
         animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
         transition={{ duration: 4, repeat: Infinity }}
       />
       <motion.div
-        className="absolute bottom-10 right-10 w-32 h-32 bg-brand-400/20 rounded-full blur-xl"
+        className="absolute bottom-10 right-10 w-24 h-24 md:w-32 md:h-32 lg:w-24 lg:h-24 bg-brand-400/20 rounded-full blur-xl"
         animate={{ scale: [1.2, 1, 1.2], opacity: [0.5, 0.3, 0.5] }}
         transition={{ duration: 5, repeat: Infinity }}
       />
@@ -138,7 +138,7 @@ export default function LoginPage() {
               <img
                 src="/logo.png"
                 alt="Raghhav Roadways Logo"
-                className="w-32 h-32 sm:w-40 sm:h-40 object-contain rounded-2xl shadow-2xl relative z-10 border-2 border-white/50"
+                className="w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-32 lg:h-32 object-contain rounded-2xl shadow-2xl relative z-10 border-2 border-white/50"
               />
             </motion.div>
 
@@ -148,7 +148,7 @@ export default function LoginPage() {
               className="space-y-0 mt-4"
             >
               <motion.h1
-                className="text-4xl sm:text-5xl font-brand font-bold tracking-wider uppercase leading-tight"
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-4xl font-brand font-bold tracking-wider uppercase leading-tight"
                 style={{
                   background: 'linear-gradient(135deg, #1a4d2e 0%, #2d6b45 50%, #1a4d2e 100%)',
                   backgroundClip: 'text',
@@ -159,7 +159,7 @@ export default function LoginPage() {
                 RAGHHAV
               </motion.h1>
               <motion.h1
-                className="text-4xl sm:text-5xl font-brand font-bold tracking-wider uppercase leading-tight"
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-4xl font-brand font-bold tracking-wider uppercase leading-tight"
                 style={{
                   background: 'linear-gradient(135deg, #1a4d2e 0%, #2d6b45 50%, #1a4d2e 100%)',
                   backgroundClip: 'text',
