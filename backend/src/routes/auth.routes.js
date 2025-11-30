@@ -6,14 +6,17 @@ const { validate } = require('../middleware/validator');
 const {
   loginValidation,
   refreshTokenValidation,
+  signupValidation,
+  changePasswordValidation,
 } = require('../validations/auth.validation');
+const { authLimiter } = require('../middleware/rateLimiter');
 
 /**
  * @route   POST /api/v1/auth/login
  * @desc    Login user
  * @access  Public
  */
-router.post('/login', loginValidation, validate, authController.login);
+router.post('/login', authLimiter, loginValidation, validate, authController.login);
 
 /**
  * @route   POST /api/v1/auth/logout
@@ -46,13 +49,13 @@ router.get('/me', authenticateToken, authController.getProfile);
  * @desc    Change password
  * @access  Private
  */
-router.post('/change-password', authenticateToken, authController.changePassword);
+router.post('/change-password', authenticateToken, changePasswordValidation, validate, authController.changePassword);
 
 /**
  * @route   POST /api/v1/auth/signup
  * @desc    Sign up new user
  * @access  Public
  */
-router.post('/signup', authController.signup);
+router.post('/signup', authLimiter, signupValidation, validate, authController.signup);
 
 module.exports = router;

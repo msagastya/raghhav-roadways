@@ -1,6 +1,16 @@
 const app = require('./app');
 const logger = require('./utils/logger');
 const prisma = require('./config/database');
+const { validateEnv } = require('./config/envValidation');
+
+// Validate environment variables on startup
+try {
+  validateEnv();
+  logger.info('✅ Environment variables validated successfully');
+} catch (error) {
+  logger.error('❌ Environment validation failed:', error.message);
+  process.exit(1);
+}
 
 const PORT = process.env.PORT || 5000;
 

@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const compression = require('compression');
 require('dotenv').config();
 
 const routes = require('./routes');
@@ -11,29 +12,43 @@ const {
   notFound,
 } = require('./middleware/errorHandler');
 const logger = require('./utils/logger');
+const { apiLimiter } = require('./middleware/rateLimiter');
 
 const app = express();
 
 // Security middleware
 app.use(helmet());
 
+// Compression middleware - compress all responses
+app.use(compression());
+
+// Rate limiting middleware - apply to all requests
+app.use('/api/', apiLimiter);
+
 // CORS configuration
 const corsOptions = {
   origin: function (origin, callback) {
-    const allowedOrigins = [
-      'http://localhost:3000',
-      'https://raghhav-roadways.vercel.app',
-      'https://frontend-kr7820r9o-suyashs-projects-3acd31bf.vercel.app',
-      'https://frontend-gbsek5go5-suyashs-projects-3acd31bf.vercel.app',
-    ];
+    const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:3000').split(',').map(o => o.trim());
+
+    // In production, also allow the main Vercel domain
+    if (process.env.NODE_ENV === 'production') {
+      allowedOrigins.push('https://raghhav-roadways.vercel.app');
+    }
+
+    // In development, allow localhost and ngrok
+    if (process.env.NODE_ENV === 'development') {
+      allowedOrigins.push('http://localhost:3000');
+      // Allow ngrok in development only
+      if (origin && origin.includes('.ngrok')) {
+        return callback(null, true);
+      }
+    }
 
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
 
-    // Check if origin is allowed or matches ngrok/vercel pattern
-    if (allowedOrigins.indexOf(origin) !== -1 ||
-        origin.includes('.ngrok') ||
-        origin.includes('.vercel.app')) {
+    // Check if origin is in allowed list
+    if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));

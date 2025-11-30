@@ -13,6 +13,7 @@ const paymentRoutes = require('./payment.routes');
 const reportRoutes = require('./report.routes');
 const mastersRoutes = require('./masters.routes');
 const seedRoutes = require('./seed.routes');
+const backupRoutes = require('./backup.routes');
 
 // Health check route
 router.get('/health', (req, res) => {
@@ -35,6 +36,7 @@ router.use('/payments', paymentRoutes);
 router.use('/reports', reportRoutes);
 router.use('/masters', mastersRoutes);
 router.use('/seed', seedRoutes);
+router.use('/backup', backupRoutes);
 
 // API documentation route (you can expand this later)
 router.get('/', (req, res) => {
