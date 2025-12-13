@@ -36,19 +36,8 @@ function formatValue(value, config) {
 }
 
 export default function KPICards({ kpis = {} }) {
-  // Default KPIs if none provided
-  const defaultKPIs = {
-    onTimeDelivery: { value: 94.5, change: 2.3 },
-    totalRevenue: { value: 245000, change: 12.5 },
-    activeVehicles: { value: 18, change: 0 },
-    pendingDeliveries: { value: 23, change: -5 },
-    completedOrders: { value: 156, change: 8 },
-    totalParties: { value: 89, change: 3 },
-    pendingInvoices: { value: 12, change: -2 },
-    alerts: { value: 3, change: 1 },
-  };
-
-  const data = Object.keys(kpis).length > 0 ? kpis : defaultKPIs;
+  // No default fallback - use only real data from backend
+  const data = kpis;
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
@@ -75,9 +64,8 @@ export default function KPICards({ kpis = {} }) {
                     <Icon className={`w-5 h-5 ${colors.text}`} />
                   </div>
                   {change !== 0 && (
-                    <div className={`flex items-center gap-0.5 text-xs font-medium ${
-                      change > 0 ? 'text-green-600' : 'text-red-600'
-                    }`}>
+                    <div className={`flex items-center gap-0.5 text-xs font-medium ${change > 0 ? 'text-green-600' : 'text-red-600'
+                      }`}>
                       {change > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                       {Math.abs(change)}%
                     </div>

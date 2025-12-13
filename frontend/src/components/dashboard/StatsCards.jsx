@@ -9,28 +9,28 @@ export default function StatsCards({ data }) {
   const stats = [
     {
       name: 'Total Consignments',
-      value: data?.totalConsignments || 0,
+      value: data?.kpis?.completedOrders || 0,
       icon: FileText,
       color: 'text-blue-600',
       bg: 'bg-blue-100',
     },
     {
       name: 'Total Revenue',
-      value: formatCurrency(data?.totalRevenue || 0),
+      value: formatCurrency(data?.kpis?.totalRevenue || 0),
       icon: TrendingUp,
       color: 'text-green-600',
       bg: 'bg-green-100',
     },
     {
       name: 'Pending Invoices',
-      value: data?.pendingInvoices || 0,
+      value: data?.kpis?.pendingInvoices || 0,
       icon: Receipt,
       color: 'text-yellow-600',
       bg: 'bg-yellow-100',
     },
     {
       name: 'Pending Deliveries',
-      value: data?.pendingDeliveries || 0,
+      value: data?.kpis?.pendingDeliveries || 0,
       icon: AlertTriangle,
       color: 'text-red-600',
       bg: 'bg-red-100',

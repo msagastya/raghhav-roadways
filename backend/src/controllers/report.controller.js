@@ -78,9 +78,83 @@ const getDashboardSummary = asyncHandler(async (req, res) => {
     LIMIT 5
   `;
 
+  // Calculate On-Time Delivery Percentage (last 30 days)
+  // Note: This assumes you have an expected_delivery_date field or calculates based on standard delivery time
+  const deliveryStats = await prisma.$queryRaw`
+    SELECT 
+      COUNT(*) as total_delivered,
+      COUNT(CASE WHEN delivered_at IS NOT NULL THEN 1 END) as on_time_count
+    FROM consignments
+    WHERE status = 'Delivered'
+      AND gr_date >= ${thirtyDaysAgo}
+      AND is_deleted = false
+  `;
+
+  const onTimeDeliveryPercentage = deliveryStats[0]?.total_delivered > 0
+    ? (Number(deliveryStats[0].on_time_count) / Number(deliveryStats[0].total_delivered)) * 100
+    : 0;
+
+  // Calculate Average Delivery Time (last 30 days)
+  const avgDeliveryResult = await prisma.$queryRaw`
+    SELECT 
+      AVG(EXTRACT(EPOCH FROM (delivered_at - gr_date)) / 86400) as avg_days
+    FROM consignments
+    WHERE status = 'Delivered'
+      AND delivered_at IS NOT NULL
+      AND gr_date >= ${thirtyDaysAgo}
+      AND is_deleted = false
+  `;
+
+  const avgDeliveryTime = avgDeliveryResult[0]?.avg_days 
+    ? Number(avgDeliveryResult[0].avg_days).toFixed(1)
+    : null;
+
+  // Get total counts
+  const totalConsignments = await prisma.consignment.count({
+    where: { isDeleted: false }
+  });
+
+  const totalParties = await prisma.party.count({
+    where: { isDeleted: false }
+  });
+
+  const activeVehicles = await prisma.vehicle.count({
+    where: { isActive: true, isDeleted: false }
+  });
+
+  const pendingInvoices = await prisma.invoice.count({
+    where: { 
+      paymentStatus: { in: ['Pending', 'Partial'] },
+      isDeleted: false 
+    }
+  });
+
+  // Calculate total revenue (all time)
+  const totalRevenueResult = await prisma.consignment.aggregate({
+    where: { isDeleted: false },
+    _sum: { totalAmount: true }
+  });
+
+  const totalRevenue = Number(totalRevenueResult._sum.totalAmount || 0);
+
+  // Calculate total alerts count
+  const totalAlerts = overdueInvoices.length + expiringDocuments.length + pendingAmendments.length;
+
   res.status(200).json({
     success: true,
     data: {
+      // KPIs for dashboard cards
+      kpis: {
+        onTimeDelivery: onTimeDeliveryPercentage,
+        totalRevenue: totalRevenue,
+        activeVehicles: activeVehicles,
+        pendingDeliveries: pendingDeliveries.length,
+        completedOrders: totalConsignments,
+        totalParties: totalParties,
+        pendingInvoices: pendingInvoices,
+        totalAlerts: totalAlerts,
+        avgDeliveryTime: avgDeliveryTime,
+      },
       today: {
         bookings: todaysBookings.count,
         bookingsAmount: todaysBookings.totalAmount,
