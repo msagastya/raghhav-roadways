@@ -36,6 +36,7 @@
     "multer": "^2.0.0-rc.4",
     "number-to-words": "^1.2.4",
     "puppeteer": "^24.15.2",
+    "uuid": "^13.0.0",
     "winston": "^3.11.0"
   },
   "devDependencies": {

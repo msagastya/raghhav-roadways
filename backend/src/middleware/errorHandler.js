@@ -51,9 +51,17 @@ const errorHandler = (err, req, res, next) => {
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
   };
 
-  if (process.env.NODE_ENV === 'development') {
-    logger.error(err);
-  }
+  // Log the error with request context
+  logger.error(err.message, {
+    requestId: req.id,
+    statusCode: err.statusCode,
+    stack: err.stack,
+    isOperational: err.isOperational,
+    http: {
+      method: req.method,
+      url: req.originalUrl,
+    }
+  });
 
   res.status(statusCode).json(response);
 };

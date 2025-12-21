@@ -1,44 +1,42 @@
 const winston = require('winston');
-const path = require('path');
 
-// Define log format
-const logFormat = winston.format.combine(
-  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-  winston.format.errors({ stack: true }),
-  winston.format.splat(),
-  winston.format.json()
+const { combine, timestamp, json, printf, colorize, errors } = winston.format;
+
+// Format for development logs
+const devFormat = combine(
+  colorize(),
+  timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+  errors({ stack: true }),
+  printf((info) => {
+    const { level, message, timestamp, stack, ...meta } = info;
+    const metaString = Object.keys(meta).length > 0 ? JSON.stringify(meta, null, 2) : '';
+
+    let log = `${timestamp} ${level}: ${message}`;
+    if (stack) {
+      log += `\n${stack}`;
+    }
+    if (metaString) {
+      log += `\n${metaString}`;
+    }
+    return log;
+  })
+);
+
+// Format for production logs (JSON)
+const prodFormat = combine(
+  timestamp(),
+  errors({ stack: true }),
+  json()
 );
 
 // Create logger instance
 const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || 'info',
-  format: logFormat,
+  format: process.env.NODE_ENV === 'production' ? prodFormat : devFormat,
   defaultMeta: { service: 'raghhav-roadways-api' },
   transports: [
-    // Write all logs to console
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.printf(
-          (info) => `${info.timestamp} ${info.level}: ${info.message}`
-        )
-      ),
-    }),
-    // Write all logs with level 'error' to error.log
-    new winston.transports.File({
-      filename: path.join(__dirname, '../../logs/error.log'),
-      level: 'error',
-    }),
-    // Write all logs to combined.log
-    new winston.transports.File({
-      filename: path.join(__dirname, '../../logs/combined.log'),
-    }),
+    new winston.transports.Console(),
   ],
 });
-
-// If we're in production, don't log to console
-if (process.env.NODE_ENV === 'production') {
-  logger.remove(logger.transports[0]);
-}
 
 module.exports = logger;
