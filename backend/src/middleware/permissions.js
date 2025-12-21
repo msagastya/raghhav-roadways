@@ -83,7 +83,7 @@ const checkRole = (allowedRoles) => {
 /**
  * Check if user is Super Admin
  */
-const isSuperAdmin = checkRole('Super Admin');
+const isSuperAdmin = () => checkRole('Super Admin');
 
 module.exports = {
   checkPermission,
