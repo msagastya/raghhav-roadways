@@ -10,7 +10,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 5001
+        value: 5000
       - key: API_VERSION
         value: v1
       - key: DATABASE_URL

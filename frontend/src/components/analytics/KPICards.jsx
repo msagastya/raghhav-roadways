@@ -19,14 +19,14 @@ const KPI_CONFIG = {
 };
 
 const colorClasses = {
-  blue: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-600 dark:text-blue-400', glow: 'shadow-blue-500/20' },
-  green: { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-600 dark:text-green-400', glow: 'shadow-green-500/20' },
-  purple: { bg: 'bg-purple-100 dark:bg-purple-900/30', text: 'text-purple-600 dark:text-purple-400', glow: 'shadow-purple-500/20' },
-  yellow: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-600 dark:text-yellow-400', glow: 'shadow-yellow-500/20' },
-  emerald: { bg: 'bg-emerald-100 dark:bg-emerald-900/30', text: 'text-emerald-600 dark:text-emerald-400', glow: 'shadow-emerald-500/20' },
-  indigo: { bg: 'bg-indigo-100 dark:bg-indigo-900/30', text: 'text-indigo-600 dark:text-indigo-400', glow: 'shadow-indigo-500/20' },
-  orange: { bg: 'bg-orange-100 dark:bg-orange-900/30', text: 'text-orange-600 dark:text-orange-400', glow: 'shadow-orange-500/20' },
-  red: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-600 dark:text-red-400', glow: 'shadow-red-500/20' },
+  blue: { bg: 'bg-blue-500/15 dark:bg-blue-400/10 backdrop-blur-sm border border-blue-300/20', text: 'text-blue-600 dark:text-blue-400', glow: 'shadow-blue-500/15' },
+  green: { bg: 'bg-green-500/15 dark:bg-green-400/10 backdrop-blur-sm border border-green-300/20', text: 'text-green-600 dark:text-green-400', glow: 'shadow-green-500/15' },
+  purple: { bg: 'bg-purple-500/15 dark:bg-purple-400/10 backdrop-blur-sm border border-purple-300/20', text: 'text-purple-600 dark:text-purple-400', glow: 'shadow-purple-500/15' },
+  yellow: { bg: 'bg-yellow-500/15 dark:bg-yellow-400/10 backdrop-blur-sm border border-yellow-300/20', text: 'text-yellow-600 dark:text-yellow-400', glow: 'shadow-yellow-500/15' },
+  emerald: { bg: 'bg-emerald-500/15 dark:bg-emerald-400/10 backdrop-blur-sm border border-emerald-300/20', text: 'text-emerald-600 dark:text-emerald-400', glow: 'shadow-emerald-500/15' },
+  indigo: { bg: 'bg-indigo-500/15 dark:bg-indigo-400/10 backdrop-blur-sm border border-indigo-300/20', text: 'text-indigo-600 dark:text-indigo-400', glow: 'shadow-indigo-500/15' },
+  orange: { bg: 'bg-orange-500/15 dark:bg-orange-400/10 backdrop-blur-sm border border-orange-300/20', text: 'text-orange-600 dark:text-orange-400', glow: 'shadow-orange-500/15' },
+  red: { bg: 'bg-red-500/15 dark:bg-red-400/10 backdrop-blur-sm border border-red-300/20', text: 'text-red-600 dark:text-red-400', glow: 'shadow-red-500/15' },
 };
 
 function formatValue(value, config) {

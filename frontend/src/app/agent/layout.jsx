@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import useAgentAuth from '@/hooks/useAgentAuth';
@@ -56,23 +56,24 @@ const navItems = [
 ];
 
 export default function AgentDashboardLayout({ children }) {
-    const router = useRouter();
     const pathname = usePathname();
     const { agent, isAuthenticated, isLoading, logout } = useAgentAuth();
 
+    // Don't show layout for login/register pages — check before auth redirects
+    const isPublicRoute = pathname === '/agent/login' || pathname === '/agent/register';
+
     useEffect(() => {
-        if (!isLoading && !isAuthenticated) {
-            router.push('/agent/login');
+        if (!isPublicRoute && !isLoading && !isAuthenticated) {
+            window.location.href = '/agent/login';
         }
-    }, [isAuthenticated, isLoading, router]);
+    }, [isPublicRoute, isAuthenticated, isLoading]);
 
     const handleLogout = () => {
         logout();
-        router.push('/agent/login');
+        window.location.href = '/agent/login';
     };
 
-    // Don't show layout for login/register pages
-    if (pathname === '/agent/login' || pathname === '/agent/register') {
+    if (isPublicRoute) {
         return children;
     }
 

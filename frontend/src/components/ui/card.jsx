@@ -23,8 +23,8 @@ export function Card({ children, className, animate = true, hover3d = true, ...p
   return (
     <Component
       className={cn(
-        'bg-gradient-to-br from-white to-gray-50/50 rounded-xl shadow-lg border border-gray-200/50 backdrop-blur-sm',
-        'hover:shadow-2xl hover:border-gray-300/50 transition-all duration-300 transform-gpu',
+        'glass-card rounded-xl',
+        'hover:shadow-xl transition-all duration-300 transform-gpu',
         'relative overflow-hidden',
         className
       )}
@@ -32,8 +32,8 @@ export function Card({ children, className, animate = true, hover3d = true, ...p
       {...hoverProps}
       {...props}
     >
-      {/* 3D Effect Border */}
-      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/50 to-transparent pointer-events-none" />
+      {/* Glass Shine Effect */}
+      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/30 to-transparent pointer-events-none" />
 
       {/* Content */}
       <div className="relative z-10">
@@ -46,7 +46,7 @@ export function Card({ children, className, animate = true, hover3d = true, ...p
 export function CardHeader({ children, className, ...props }) {
   return (
     <div
-      className={cn('px-4 sm:px-6 py-4 sm:py-5 border-b border-gray-200/70', className)}
+      className={cn('px-4 sm:px-6 py-4 sm:py-5 border-b border-white/20 dark:border-white/10', className)}
       {...props}
     >
       {children}
@@ -65,7 +65,7 @@ export function CardContent({ children, className, ...props }) {
 export function CardFooter({ children, className, ...props }) {
   return (
     <div
-      className={cn('px-4 sm:px-6 py-4 sm:py-5 border-t border-gray-200/70', className)}
+      className={cn('px-4 sm:px-6 py-4 sm:py-5 border-t border-white/20 dark:border-white/10', className)}
       {...props}
     >
       {children}

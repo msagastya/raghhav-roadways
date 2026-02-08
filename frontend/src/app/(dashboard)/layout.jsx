@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Sidebar from '../../components/layout/Sidebar';
 import Header from '../../components/layout/Header';
 import PageTransition from '../../components/layout/PageTransition';
@@ -10,15 +9,14 @@ import useUIStore from '../../store/uiStore';
 import { cn } from '../../lib/utils';
 
 export default function DashboardLayout({ children }) {
-  const router = useRouter();
   const { isAuthenticated, isLoading } = useAuth();
   const { sidebarOpen } = useUIStore();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.push('/login');
+      window.location.href = '/login';
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, isLoading]);
 
   if (isLoading) {
     return (
@@ -49,12 +47,27 @@ export default function DashboardLayout({ children }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100/50 to-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-gray-50 to-slate-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 relative">
+      {/* Full-screen Logo Watermark Background */}
+      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <img
+            src="/logo.png"
+            alt=""
+            className="w-[60vw] h-[60vw] max-w-[700px] max-h-[700px] object-contain opacity-[0.04] dark:opacity-[0.03] select-none"
+            draggable={false}
+          />
+        </div>
+        {/* Subtle gradient wash */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-500/[0.02] via-transparent to-primary-600/[0.02]" />
+      </div>
+
       <Sidebar isOpen={sidebarOpen} />
       <div
         className={cn(
-          'transition-all duration-300 min-h-screen',
-          sidebarOpen ? 'sm:ml-64 lg:ml-72' : 'md:ml-16 lg:ml-20'
+          'transition-all duration-300 min-h-screen relative z-10',
+          // On desktop, always use collapsed sidebar margin (sidebar overlays on hover)
+          'md:ml-16 lg:ml-20'
         )}
       >
         <Header />

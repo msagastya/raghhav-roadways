@@ -12,28 +12,28 @@ export default function StatsCards({ data }) {
       value: data?.kpis?.completedOrders || 0,
       icon: FileText,
       color: 'text-blue-600',
-      bg: 'bg-blue-100',
+      bg: 'bg-blue-500/15 border border-blue-300/20',
     },
     {
       name: 'Total Revenue',
       value: formatCurrency(data?.kpis?.totalRevenue || 0),
       icon: TrendingUp,
       color: 'text-green-600',
-      bg: 'bg-green-100',
+      bg: 'bg-green-500/15 border border-green-300/20',
     },
     {
       name: 'Pending Invoices',
       value: data?.kpis?.pendingInvoices || 0,
       icon: Receipt,
       color: 'text-yellow-600',
-      bg: 'bg-yellow-100',
+      bg: 'bg-yellow-500/15 border border-yellow-300/20',
     },
     {
       name: 'Pending Deliveries',
       value: data?.kpis?.pendingDeliveries || 0,
       icon: AlertTriangle,
       color: 'text-red-600',
-      bg: 'bg-red-100',
+      bg: 'bg-red-500/15 border border-red-300/20',
     },
   ];
 
@@ -67,9 +67,9 @@ export default function StatsCards({ data }) {
 
                 <div className="relative z-10 flex items-start sm:items-center justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs sm:text-sm font-semibold text-gray-600 truncate">{stat.name}</p>
+                    <p className="text-xs sm:text-sm font-semibold text-gray-600 dark:text-gray-400 truncate">{stat.name}</p>
                     <motion.p
-                      className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mt-1 sm:mt-2 drop-shadow-sm"
+                      className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mt-1 sm:mt-2 drop-shadow-sm"
                       initial={{ scale: 0, rotate: -10 }}
                       animate={{ scale: 1, rotate: 0 }}
                       transition={{

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { clearAuthTokens } from './auth';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
 
@@ -40,14 +41,16 @@ api.interceptors.response.use(
           refreshToken,
         });
 
-        const { accessToken } = response.data.data;
+        const { accessToken, refreshToken: newRefreshToken } = response.data.data;
         localStorage.setItem('accessToken', accessToken);
+        if (newRefreshToken) {
+          localStorage.setItem('refreshToken', newRefreshToken);
+        }
 
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return api(originalRequest);
       } catch (refreshError) {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
+        clearAuthTokens();
         window.location.href = '/login';
         return Promise.reject(refreshError);
       }

@@ -6,8 +6,10 @@ const agentRegisterValidation = [
         .withMessage('Please provide a valid email')
         .normalizeEmail(),
     body('password')
-        .isLength({ min: 6 })
-        .withMessage('Password must be at least 6 characters'),
+        .isLength({ min: 8 })
+        .withMessage('Password must be at least 8 characters')
+        .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+        .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'),
     body('fullName')
         .trim()
         .notEmpty()
@@ -58,8 +60,25 @@ const agentChangePasswordValidation = [
         .notEmpty()
         .withMessage('Current password is required'),
     body('newPassword')
-        .isLength({ min: 6 })
-        .withMessage('New password must be at least 6 characters'),
+        .isLength({ min: 8 })
+        .withMessage('New password must be at least 8 characters')
+        .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+        .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character')
+        .custom((value, { req }) => {
+            if (value === req.body.oldPassword) {
+                throw new Error('New password must be different from current password');
+            }
+            return true;
+        }),
+    body('confirmPassword')
+        .notEmpty()
+        .withMessage('Please confirm your new password')
+        .custom((value, { req }) => {
+            if (value !== req.body.newPassword) {
+                throw new Error('Passwords do not match');
+            }
+            return true;
+        }),
 ];
 
 const agentProfileUpdateValidation = [

@@ -31,7 +31,7 @@ export default function AgentLoginPage() {
             setTokens(accessToken, refreshToken);
             setAgent(agent);
 
-            router.push('/agent');
+            window.location.href = '/agent';
         } catch (err) {
             setError(err.response?.data?.message || 'Login failed. Please try again.');
         } finally {

@@ -25,6 +25,8 @@ const useAuthStore = create((set) => ({
     if (savedUser) {
       set({ user: savedUser, isAuthenticated: true, isLoading: false });
     } else {
+      // Clear any stale tokens/cookies so middleware doesn't block login redirect
+      clearAuthTokens();
       set({ isLoading: false });
     }
   },

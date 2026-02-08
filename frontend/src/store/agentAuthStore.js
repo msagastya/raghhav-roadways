@@ -63,6 +63,8 @@ const useAgentAuthStore = create((set) => ({
         if (token && savedAgent) {
             set({ agent: savedAgent, isAuthenticated: true, isLoading: false });
         } else {
+            // Clear any stale tokens to avoid auth mismatches
+            clearAgentTokens();
             set({ isLoading: false });
         }
     },

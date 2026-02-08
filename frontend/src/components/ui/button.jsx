@@ -35,11 +35,11 @@ export default function Button({
   const baseStyles = 'relative overflow-hidden inline-flex items-center justify-center rounded-lg font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none transform-gpu';
 
   const variants = {
-    primary: 'bg-gradient-to-br from-primary-500 to-primary-700 text-white shadow-lg shadow-primary-500/50 hover:shadow-xl hover:shadow-primary-500/60 hover:-translate-y-0.5 active:translate-y-0 focus:ring-primary-500',
-    secondary: 'bg-gradient-to-br from-gray-100 to-gray-300 text-gray-900 shadow-md shadow-gray-400/50 hover:shadow-lg hover:shadow-gray-400/60 hover:-translate-y-0.5 active:translate-y-0 focus:ring-gray-500',
-    outline: 'border-2 border-gray-300 bg-white text-gray-700 shadow-md hover:border-gray-400 hover:bg-gray-50 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 focus:ring-gray-500',
-    danger: 'bg-gradient-to-br from-red-500 to-red-700 text-white shadow-lg shadow-red-500/50 hover:shadow-xl hover:shadow-red-500/60 hover:-translate-y-0.5 active:translate-y-0 focus:ring-red-500',
-    ghost: 'text-gray-700 hover:bg-gray-100 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 focus:ring-gray-500',
+    primary: 'bg-gradient-to-br from-primary-500 to-primary-700 text-white shadow-lg shadow-primary-500/30 hover:shadow-xl hover:shadow-primary-500/40 hover:-translate-y-0.5 active:translate-y-0 focus:ring-primary-500 border-2 border-primary-400/30',
+    secondary: 'bg-white/30 dark:bg-white/10 backdrop-blur-md text-gray-900 dark:text-gray-100 border-2 border-white/25 dark:border-white/10 hover:bg-white/45 dark:hover:bg-white/20 hover:-translate-y-0.5 active:translate-y-0 focus:ring-gray-500',
+    outline: 'border-2 border-white/30 dark:border-white/15 bg-white/20 dark:bg-white/5 backdrop-blur-md text-gray-700 dark:text-gray-300 hover:border-white/50 dark:hover:border-white/25 hover:bg-white/35 dark:hover:bg-white/15 hover:-translate-y-0.5 active:translate-y-0 focus:ring-gray-500',
+    danger: 'bg-gradient-to-br from-red-500 to-red-700 text-white shadow-lg shadow-red-500/30 hover:shadow-xl hover:shadow-red-500/40 hover:-translate-y-0.5 active:translate-y-0 focus:ring-red-500 border-2 border-red-400/30',
+    ghost: 'text-gray-700 dark:text-gray-300 hover:bg-white/25 dark:hover:bg-white/10 hover:-translate-y-0.5 active:translate-y-0 focus:ring-gray-500',
   };
 
   const sizes = {

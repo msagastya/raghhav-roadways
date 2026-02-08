@@ -88,7 +88,8 @@ export default function LoginPage() {
       setUser(user);
 
       showSuccess('Login successful!');
-      router.push('/');
+      // Use full navigation so the middleware sees the new cookies
+      window.location.href = '/';
     } catch (error) {
       showError(getErrorMessage(error));
     } finally {

@@ -43,8 +43,8 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md', f
             {/* Animated Modal with 3D Effect */}
             <motion.div
               className={cn(
-                'relative bg-gradient-to-br from-white via-white to-gray-50/50 w-full',
-                'rounded-t-3xl sm:rounded-2xl shadow-2xl border-2 border-gray-200/50',
+                'relative glass-modal w-full',
+                'rounded-t-3xl sm:rounded-2xl',
                 'transform-gpu overflow-hidden',
                 sizes[size]
               )}
@@ -53,18 +53,18 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md', f
               animate="visible"
               exit="exit"
             >
-              {/* 3D Effect Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/60 via-transparent to-transparent pointer-events-none" />
+              {/* Glass Shine Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-transparent pointer-events-none" />
 
               {/* Shine Effect */}
               <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent pointer-events-none" />
 
               {/* Header */}
-              <div className="relative z-10 flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5 border-b border-gray-200/70 bg-gradient-to-r from-primary-50/30 to-transparent">
+              <div className="relative z-10 flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5 border-b border-white/20 dark:border-white/10 bg-white/10">
                 <h3 className="text-base sm:text-lg lg:text-xl font-bold text-gray-900 drop-shadow-sm">{title}</h3>
                 <motion.button
                   onClick={onClose}
-                  className="text-gray-400 hover:text-gray-600 focus:outline-none rounded-full p-2 hover:bg-white/80 transition-all shadow-md hover:shadow-lg"
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none rounded-full p-2 hover:bg-white/30 dark:hover:bg-white/10 transition-all"
                   whileHover={{ scale: 1.15, rotate: 90 }}
                   whileTap={{ scale: 0.9 }}
                 >
@@ -79,7 +79,7 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md', f
 
               {/* Footer */}
               {footer && (
-                <div className="relative z-10 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-200/70 bg-gray-50/30">
+                <div className="relative z-10 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 border-t border-white/20 dark:border-white/10 bg-white/10">
                   {footer}
                 </div>
               )}

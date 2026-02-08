@@ -1,4 +1,5 @@
 export function setAuthTokens(accessToken, refreshToken) {
+  if (typeof window === 'undefined') return;
   localStorage.setItem('accessToken', accessToken);
   if (refreshToken) {
     localStorage.setItem('refreshToken', refreshToken);
@@ -16,14 +17,17 @@ export function setAuthTokens(accessToken, refreshToken) {
 }
 
 export function getAccessToken() {
+  if (typeof window === 'undefined') return null;
   return localStorage.getItem('accessToken');
 }
 
 export function getRefreshToken() {
+  if (typeof window === 'undefined') return null;
   return localStorage.getItem('refreshToken');
 }
 
 export function clearAuthTokens() {
+  if (typeof window === 'undefined') return;
   localStorage.removeItem('accessToken');
   localStorage.removeItem('refreshToken');
   localStorage.removeItem('user');
@@ -34,10 +38,12 @@ export function clearAuthTokens() {
 }
 
 export function setUser(user) {
+  if (typeof window === 'undefined') return;
   localStorage.setItem('user', JSON.stringify(user));
 }
 
 export function getUser() {
+  if (typeof window === 'undefined') return null;
   const user = localStorage.getItem('user');
   return user ? JSON.parse(user) : null;
 }

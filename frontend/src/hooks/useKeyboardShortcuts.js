@@ -73,7 +73,7 @@ export default function useKeyboardShortcuts({ onSearch, onToggleTheme } = {}) {
     // Go forward (Alt + Right Arrow)
     if (event.altKey && event.key === 'ArrowRight') {
       event.preventDefault();
-      router.forward();
+      window.history.forward();
       return;
     }
 

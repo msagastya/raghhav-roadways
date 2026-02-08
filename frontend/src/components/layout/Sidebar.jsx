@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -33,13 +34,19 @@ const navigation = [
 export default function Sidebar({ isOpen }) {
   const pathname = usePathname();
   const { setSidebarOpen } = useUIStore();
+  const [hovered, setHovered] = useState(false);
+
+  // On desktop: sidebar expands on hover, collapses when not hovered
+  // On mobile: controlled by isOpen (hamburger menu)
+  const expanded = isOpen || hovered;
 
   return (
     <>
+      {/* Mobile overlay */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 md:hidden"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-30 md:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -51,21 +58,23 @@ export default function Sidebar({ isOpen }) {
 
       <motion.div
         className={cn(
-          'fixed left-0 top-0 h-full text-white transition-all duration-300 z-40 shadow-2xl',
-          'bg-gradient-to-b from-brand-900/95 via-brand-800/90 to-brand-900/95 backdrop-blur-xl border-r border-brand-600/20',
-          isOpen ? 'w-64 sm:w-72' : 'w-0 md:w-16 lg:w-20'
+          'fixed left-0 top-0 h-full text-white z-40',
+          'glass-sidebar transition-all duration-300 ease-in-out',
+          // Mobile: hidden when closed, full when open
+          // Desktop: always visible — collapsed (icon-only) or expanded (hover)
+          expanded ? 'w-64 sm:w-72' : 'w-0 md:w-16 lg:w-20'
         )}
         initial={false}
         animate={{ x: 0 }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
       >
         <div className="flex flex-col h-full overflow-hidden">
-          <motion.div
-            className={`flex items-center justify-between px-3 sm:px-4 lg:px-6 border-b border-brand-600/20 bg-gradient-to-r from-brand-700/30 to-transparent ${isOpen ? 'h-32 sm:h-36 flex-col py-4' : 'h-16 sm:h-20'}`}
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
+          {/* Header / Logo */}
+          <div
+            className={`flex items-center justify-between px-3 sm:px-4 lg:px-6 border-b border-white/10 bg-white/5 transition-all duration-300 ${expanded ? 'h-32 sm:h-36 flex-col py-4' : 'h-16 sm:h-20'}`}
           >
-            <div className={`flex ${isOpen ? 'flex-col items-center w-full' : 'items-center'} gap-2`}>
+            <div className={`flex ${expanded ? 'flex-col items-center w-full' : 'items-center justify-center w-full'} gap-2`}>
               <motion.div
                 className="relative"
                 whileHover={{ scale: 1.1 }}
@@ -74,10 +83,13 @@ export default function Sidebar({ isOpen }) {
                 <img
                   src="/logo.png"
                   alt="Raghhav Roadways"
-                  className={isOpen ? "w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-lg rounded-xl" : "w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg rounded-lg"}
+                  className={cn(
+                    'object-contain drop-shadow-lg transition-all duration-300',
+                    expanded ? 'w-16 h-16 sm:w-20 sm:h-20 rounded-xl' : 'w-10 h-10 sm:w-12 sm:h-12 rounded-lg'
+                  )}
                 />
               </motion.div>
-              {isOpen && (
+              {expanded && (
                 <motion.div
                   className="flex flex-col items-center space-y-0"
                   initial={{ opacity: 0, y: -10 }}
@@ -93,7 +105,7 @@ export default function Sidebar({ isOpen }) {
                 </motion.div>
               )}
             </div>
-            {isOpen && (
+            {expanded && (
               <motion.button
                 className="md:hidden p-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
                 onClick={() => setSidebarOpen(false)}
@@ -106,8 +118,9 @@ export default function Sidebar({ isOpen }) {
                 <X className="w-5 h-5 text-white" />
               </motion.button>
             )}
-          </motion.div>
+          </div>
 
+          {/* Navigation */}
           <nav className="flex-1 overflow-y-auto py-4 sm:py-6 custom-scrollbar">
             <div className="space-y-1 px-2 sm:px-3">
               {navigation.map((item, index) => {
@@ -118,17 +131,18 @@ export default function Sidebar({ isOpen }) {
                   <Link key={item.name} href={item.href}>
                     <motion.div
                       className={cn(
-                        'flex items-center px-2 sm:px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200 relative overflow-hidden backdrop-blur-sm',
+                        'flex items-center py-2 sm:py-2.5 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200 relative overflow-hidden',
+                        expanded ? 'px-2 sm:px-3' : 'px-0 justify-center',
                         isActive
-                          ? 'bg-gradient-to-r from-primary-600/90 to-primary-700/90 text-white shadow-lg shadow-primary-600/30 border border-primary-400/30'
-                          : 'text-gray-300 hover:bg-white/10 hover:text-white border border-transparent hover:border-white/20'
+                          ? 'bg-white/15 text-white shadow-lg shadow-primary-600/20 border-2 border-primary-400/30 backdrop-blur-sm'
+                          : 'text-gray-300 hover:bg-white/10 hover:text-white border-2 border-transparent hover:border-white/15'
                       )}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.05 }}
-                      whileHover={{ scale: isOpen ? 1.03 : 1.05, x: isOpen ? 6 : 0 }}
+                      whileHover={{ scale: expanded ? 1.03 : 1.1, x: expanded ? 6 : 0 }}
                       whileTap={{ scale: 0.98 }}
-                      title={!isOpen ? item.name : undefined}
+                      title={!expanded ? item.name : undefined}
                     >
                       {isActive && (
                         <motion.div
@@ -140,7 +154,7 @@ export default function Sidebar({ isOpen }) {
                       )}
 
                       <Icon className="relative z-10 w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-                      {isOpen && (
+                      {expanded && (
                         <motion.span
                           className="relative z-10 ml-2 sm:ml-3 whitespace-nowrap"
                           initial={{ opacity: 0, x: -10 }}
@@ -150,7 +164,7 @@ export default function Sidebar({ isOpen }) {
                           {item.name}
                         </motion.span>
                       )}
-                      {isActive && isOpen && (
+                      {isActive && expanded && (
                         <motion.div
                           className="ml-auto w-1 h-5 sm:h-6 bg-white rounded-full shadow-lg shadow-white/50"
                           layoutId="activeIndicator"
@@ -165,8 +179,9 @@ export default function Sidebar({ isOpen }) {
             </div>
           </nav>
 
-          <div className="border-t border-white/10 p-3 sm:p-4 bg-gradient-to-t from-white/5 to-transparent backdrop-blur-sm">
-            {isOpen ? (
+          {/* Footer */}
+          <div className="border-t border-white/10 p-3 sm:p-4 bg-white/5">
+            {expanded ? (
               <p className="text-xs text-gray-400 text-center">v1.0.0</p>
             ) : (
               <div className="h-2"></div>

@@ -44,8 +44,8 @@ export default function DashboardPage() {
     return (
       <div className="space-y-6">
         <div>
-          <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-          <div className="h-4 w-96 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mt-2"></div>
+          <div className="h-8 w-48 bg-white/25 dark:bg-white/10 rounded animate-pulse"></div>
+          <div className="h-4 w-96 bg-white/25 dark:bg-white/10 rounded animate-pulse mt-2"></div>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
@@ -128,7 +128,7 @@ export default function DashboardPage() {
         className="px-1"
       >
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-xl">
+          <div className="p-2 bg-primary-500/15 dark:bg-primary-400/10 backdrop-blur-sm rounded-xl border border-primary-300/20">
             <Zap className="w-6 h-6 text-primary-600 dark:text-primary-400" />
           </div>
           <div>
@@ -185,7 +185,7 @@ export default function DashboardPage() {
                   {dashboardData.recentActivity.map((item, index) => (
                     <motion.div
                       key={index}
-                      className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                      className="flex items-center gap-3 p-3 rounded-lg bg-white/20 dark:bg-white/5 hover:bg-white/35 dark:hover:bg-white/10 border border-white/15 dark:border-white/5 transition-colors"
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.5 + index * 0.1 }}
@@ -236,11 +236,11 @@ export default function DashboardPage() {
               {alerts.length > 0 ? (
                 <div className="space-y-3">
                   {alerts.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                    <div key={index} className="flex items-center justify-between p-2 rounded-lg hover:bg-white/20 dark:hover:bg-white/10 transition-colors">
                       <span className="text-sm text-gray-700 dark:text-gray-300 flex-1">{item.task}</span>
-                      <span className={`text-xs px-2 py-1 rounded-full font-medium ml-2 ${item.priority === 'high' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
-                          item.priority === 'medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                            'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                      <span className={`text-xs px-2 py-1 rounded-full font-medium ml-2 backdrop-blur-sm ${item.priority === 'high' ? 'bg-red-500/15 text-red-700 dark:text-red-400 border border-red-300/20' :
+                          item.priority === 'medium' ? 'bg-yellow-500/15 text-yellow-700 dark:text-yellow-400 border border-yellow-300/20' :
+                            'bg-green-500/15 text-green-700 dark:text-green-400 border border-green-300/20'
                         }`}>
                         {item.priority}
                       </span>
@@ -289,7 +289,7 @@ export default function DashboardPage() {
                   return (
                     <motion.div
                       key={stat.label}
-                      className="text-center p-3 rounded-lg bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-800/50 border border-gray-100 dark:border-gray-700"
+                      className="text-center p-3 rounded-lg bg-white/20 dark:bg-white/5 backdrop-blur-sm border-2 border-white/20 dark:border-white/10"
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: 0.7 + index * 0.1 }}
@@ -314,8 +314,8 @@ export default function DashboardPage() {
         transition={{ delay: 1 }}
         className="text-center text-xs text-gray-400 dark:text-gray-500"
       >
-        Press <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded font-mono">Ctrl+K</kbd> for command palette •
-        <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded font-mono ml-1">Ctrl+D</kbd> for dark mode
+        Press <kbd className="px-1.5 py-0.5 bg-white/25 dark:bg-white/10 border border-white/20 dark:border-white/10 rounded font-mono">Ctrl+K</kbd> for command palette •
+        <kbd className="px-1.5 py-0.5 bg-white/25 dark:bg-white/10 border border-white/20 dark:border-white/10 rounded font-mono ml-1">Ctrl+D</kbd> for dark mode
       </motion.div>
     </div>
   );
