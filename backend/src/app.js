@@ -3,6 +3,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const compression = require('compression');
+const cookieParser = require('cookie-parser');
 require('dotenv').config();
 
 const routes = require('./routes');
@@ -14,11 +15,18 @@ const {
 const logger = require('./utils/logger');
 const { apiLimiter } = require('./middleware/rateLimiter');
 const requestId = require('./middleware/requestId');
+const csrfProtection = require('./middleware/csrf');
+const inputSanitization = require('./middleware/inputSanitization');
+const { checkAccountLockout } = require('./middleware/loginRateLimiter');
+const requestTimeout = require('./middleware/requestTimeout');
 
 const app = express();
 
 // Add Request ID to all requests
 app.use(requestId);
+
+// Add request timeout protection
+app.use(requestTimeout);
 
 // Security middleware
 app.use(helmet());
@@ -75,6 +83,15 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Cookie parser middleware (required for CSRF and httpOnly cookies)
+app.use(cookieParser());
+
+// Input sanitization middleware (prevents XSS attacks)
+app.use(inputSanitization);
+
+// Account lockout middleware (prevents brute force)
+app.use(checkAccountLockout);
+
 // Structured HTTP Request Logger
 app.use((req, res, next) => {
   // Log incoming request
@@ -102,6 +119,9 @@ app.use((req, res, next) => {
 
   next();
 });
+
+// CSRF protection middleware
+app.use(csrfProtection);
 
 // API routes
 app.use('/api/v1', routes);

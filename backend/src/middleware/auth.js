@@ -4,12 +4,18 @@ const prisma = require('../config/database');
 
 /**
  * Authenticate JWT token
+ * SECURITY: First tries httpOnly cookie (primary), then Authorization header (backup)
  */
 const authenticateToken = async (req, res, next) => {
   try {
-    // Get token from header
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+    // Try to get token from httpOnly cookie first (more secure)
+    let token = req.cookies?.accessToken;
+
+    // Fallback to Authorization header for backward compatibility and API tools
+    if (!token) {
+      const authHeader = req.headers['authorization'];
+      token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+    }
 
     if (!token) {
       throw new ApiError(401, 'Access token is required');
@@ -66,11 +72,18 @@ const authenticateToken = async (req, res, next) => {
 
 /**
  * Optional authentication (doesn't fail if no token)
+ * SECURITY: Checks httpOnly cookie first, then Authorization header
  */
 const optionalAuth = async (req, res, next) => {
   try {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    // Try to get token from httpOnly cookie first
+    let token = req.cookies?.accessToken;
+
+    // Fallback to Authorization header
+    if (!token) {
+      const authHeader = req.headers['authorization'];
+      token = authHeader && authHeader.split(' ')[1];
+    }
 
     if (token) {
       const decoded = verifyAccessToken(token);
@@ -114,15 +127,35 @@ const optionalAuth = async (req, res, next) => {
 };
 
 /**
- * Authorize based on permission
+ * Authorize based on permission(s)
+ * @param {string|string[]|function} requiredPermission - Single permission, array of permissions, or check function
  */
-const authorize = (permission) => {
+const authorize = (requiredPermission) => {
   return (req, res, next) => {
     if (!req.user) {
       return next(new ApiError(401, 'Unauthorized'));
     }
 
-    if (!req.user.permissions.includes(permission)) {
+    // Handle function-based authorization
+    if (typeof requiredPermission === 'function') {
+      if (!requiredPermission(req.user)) {
+        return next(new ApiError(403, 'Insufficient permissions'));
+      }
+      return next();
+    }
+
+    // Handle array of required permissions (user must have at least one)
+    const requiredPerms = Array.isArray(requiredPermission)
+      ? requiredPermission
+      : [requiredPermission];
+
+    // Check if user has any of the required permissions
+    const hasPermission = requiredPerms.some((perm) => {
+      // Support both role names and permission codes
+      return req.user.permissions.includes(perm) || req.user.roleName === perm;
+    });
+
+    if (!hasPermission) {
       return next(new ApiError(403, 'Insufficient permissions'));
     }
 

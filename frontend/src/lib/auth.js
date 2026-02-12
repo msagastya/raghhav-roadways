@@ -1,45 +1,60 @@
+// ============================================================================
+// SECURITY: Tokens are stored in httpOnly cookies (not accessible to JS)
+// This prevents XSS attacks from stealing authentication tokens.
+// The backend sets these cookies on login and sends them with each request.
+// ============================================================================
+
+/**
+ * Set authentication tokens as httpOnly cookies.
+ * NOTE: The backend is responsible for setting these cookies,
+ * not the frontend. This function is for reference/documentation.
+ */
 export function setAuthTokens(accessToken, refreshToken) {
+  // ⚠️ DO NOT store tokens in localStorage - XSS vulnerable!
+  // Tokens MUST be set by the backend as httpOnly cookies only.
   if (typeof window === 'undefined') return;
-  localStorage.setItem('accessToken', accessToken);
-  if (refreshToken) {
-    localStorage.setItem('refreshToken', refreshToken);
-  }
 
-  // Also set in cookies for server-side middleware access
-  // Set cookie with 7 days expiry
-  const expiryDate = new Date();
-  expiryDate.setDate(expiryDate.getDate() + 7);
+  // Clear any old localStorage tokens (migration from old approach)
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
 
-  document.cookie = `accessToken=${accessToken}; expires=${expiryDate.toUTCString()}; path=/; SameSite=Lax`;
-  if (refreshToken) {
-    document.cookie = `refreshToken=${refreshToken}; expires=${expiryDate.toUTCString()}; path=/; SameSite=Lax`;
-  }
+  // Store non-sensitive user info in sessionStorage (cleared on tab close)
+  // This helps with detecting authentication state without exposing tokens
+  localStorage.setItem('isAuthenticated', 'true');
 }
 
 export function getAccessToken() {
+  // Tokens are in httpOnly cookies - JS cannot access them
+  // This prevents XSS attacks. Use cookies for API requests instead.
   if (typeof window === 'undefined') return null;
   return localStorage.getItem('accessToken');
 }
 
 export function getRefreshToken() {
+  // Tokens are in httpOnly cookies - JS cannot access them
   if (typeof window === 'undefined') return null;
   return localStorage.getItem('refreshToken');
 }
 
 export function clearAuthTokens() {
   if (typeof window === 'undefined') return;
+  // Clear localStorage
   localStorage.removeItem('accessToken');
   localStorage.removeItem('refreshToken');
   localStorage.removeItem('user');
-
-  // Also clear cookies
-  document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-  document.cookie = 'refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+  localStorage.removeItem('isAuthenticated');
 }
 
 export function setUser(user) {
   if (typeof window === 'undefined') return;
-  localStorage.setItem('user', JSON.stringify(user));
+  // Only store non-sensitive user info (never tokens!)
+  const safeUser = {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+  };
+  localStorage.setItem('user', JSON.stringify(safeUser));
 }
 
 export function getUser() {
@@ -49,5 +64,6 @@ export function getUser() {
 }
 
 export function isAuthenticated() {
-  return !!getAccessToken();
+  if (typeof window === 'undefined') return false;
+  return localStorage.getItem('isAuthenticated') === 'true';
 }

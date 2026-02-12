@@ -1,23 +1,60 @@
 const authService = require('../services/auth.service');
-const { asyncHandler } = require('../middleware/errorHandler');
+const { asyncHandler, ApiError } = require('../middleware/errorHandler');
 const logger = require('../utils/logger');
+const { recordFailedLogin, recordSuccessfulLogin } = require('../middleware/loginRateLimiter');
 
 /**
  * Login user
  * POST /api/v1/auth/login
+ * SECURITY: Sets httpOnly cookies for tokens (not accessible to JavaScript)
  */
-const login = asyncHandler(async (req, res) => {
+const login = asyncHandler(async (req, res, next) => {
   const { username, password } = req.body;
 
-  const result = await authService.login(username, password);
+  try {
+    const result = await authService.login(username, password);
 
-  logger.info(`User ${username} logged in successfully`);
+    // Record successful login (clears failed attempt counter)
+    recordSuccessfulLogin(username);
 
-  res.status(200).json({
-    success: true,
-    message: 'Login successful',
-    data: result,
-  });
+    // SECURITY: Set tokens as httpOnly cookies to prevent XSS token theft
+    // httpOnly prevents JavaScript from accessing the token
+    // Secure flag ensures cookies only sent over HTTPS in production
+    // SameSite=Strict prevents CSRF attacks
+    const cookieOptions = {
+      httpOnly: true, // Prevent JavaScript from accessing tokens
+      secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+      sameSite: 'strict', // Prevent CSRF
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days for access token
+      path: '/',
+    };
+
+    res.cookie('accessToken', result.accessToken, cookieOptions);
+
+    // Refresh token with longer expiry
+    res.cookie('refreshToken', result.refreshToken, {
+      ...cookieOptions,
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    });
+
+    logger.info(`User ${username} logged in successfully`);
+
+    // Send user info (but NOT tokens) in response body
+    res.status(200).json({
+      success: true,
+      message: 'Login successful',
+      data: {
+        user: result.user,
+        // Tokens are now in httpOnly cookies, not in response body
+      },
+    });
+  } catch (error) {
+    // Record failed login attempt (increments counter, may lock account)
+    if (username) {
+      recordFailedLogin(username);
+    }
+    next(error);
+  }
 });
 
 /**
@@ -25,8 +62,9 @@ const login = asyncHandler(async (req, res) => {
  * POST /api/v1/auth/logout
  */
 const logout = asyncHandler(async (req, res) => {
-  // In a stateless JWT system, logout is handled on the client side
-  // by removing the token. This endpoint is for logging purposes.
+  // Clear authentication cookies
+  res.clearCookie('accessToken', { path: '/', httpOnly: true });
+  res.clearCookie('refreshToken', { path: '/', httpOnly: true });
 
   logger.info(`User ${req.user.username} logged out`);
 
@@ -39,16 +77,35 @@ const logout = asyncHandler(async (req, res) => {
 /**
  * Refresh access token
  * POST /api/v1/auth/refresh
+ * SECURITY: Gets refreshToken from httpOnly cookie, returns new accessToken in cookie
  */
 const refreshToken = asyncHandler(async (req, res) => {
-  const { refreshToken } = req.body;
+  // Get refresh token from cookie (more secure than from body)
+  const refreshTokenFromCookie = req.cookies.refreshToken;
 
-  const result = await authService.refreshAccessToken(refreshToken);
+  if (!refreshTokenFromCookie) {
+    throw new ApiError(401, 'Refresh token not found');
+  }
+
+  const result = await authService.refreshAccessToken(refreshTokenFromCookie);
+
+  // Set new access token as httpOnly cookie
+  const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    path: '/',
+  };
+
+  res.cookie('accessToken', result.accessToken, cookieOptions);
 
   res.status(200).json({
     success: true,
     message: 'Token refreshed successfully',
-    data: result,
+    data: {
+      // Don't send tokens in response body - they're in cookies
+    },
   });
 });
 

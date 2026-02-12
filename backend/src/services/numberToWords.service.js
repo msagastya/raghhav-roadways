@@ -1,4 +1,5 @@
 const { numberToWords } = require('number-to-words');
+const logger = require('../config/logger');
 
 /**
  * Convert amount to words (Indian Rupees format)
@@ -40,7 +41,7 @@ const convertAmountToWords = (amount) => {
 
     return words;
   } catch (error) {
-    console.error('Error converting amount to words:', error);
+    logger.error('Error converting amount to words', { error: error.message });
     return 'Amount conversion error';
   }
 };

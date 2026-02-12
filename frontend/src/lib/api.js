@@ -3,21 +3,22 @@ import { clearAuthTokens } from './auth';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
 
-// Create axios instance
+// Create axios instance with httpOnly cookie support
 const api = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
+  // SECURITY: Include credentials so httpOnly cookies are sent with requests
+  // This is necessary for cookie-based authentication
+  withCredentials: true,
 });
 
-// Request interceptor to add auth token
+// Request interceptor for logging/debugging
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    // Tokens are in httpOnly cookies - automatically sent by browser
+    // Do NOT manually add Authorization header from localStorage (security risk)
     return config;
   },
   (error) => {
@@ -25,33 +26,31 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor to handle errors
+// Response interceptor to handle auth errors
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // If 401 and not already retried, try to refresh token
+    // If 401 (unauthorized), try to refresh token
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
-        const refreshToken = localStorage.getItem('refreshToken');
-        const response = await axios.post(`${API_URL}/auth/refresh`, {
-          refreshToken,
+        // Refresh endpoint will set new cookies automatically
+        const response = await axios.post(`${API_URL}/auth/refresh`, {}, {
+          withCredentials: true, // Send existing refresh token cookie
         });
 
-        const { accessToken, refreshToken: newRefreshToken } = response.data.data;
-        localStorage.setItem('accessToken', accessToken);
-        if (newRefreshToken) {
-          localStorage.setItem('refreshToken', newRefreshToken);
-        }
-
-        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        // Backend sets new accessToken cookie automatically
+        // Retry original request with new token
         return api(originalRequest);
       } catch (refreshError) {
+        // Refresh failed - clear auth state and redirect to login
         clearAuthTokens();
-        window.location.href = '/login';
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        }
         return Promise.reject(refreshError);
       }
     }
