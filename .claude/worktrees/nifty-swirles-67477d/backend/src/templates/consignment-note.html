@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consignment Note - {{grNumber}}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 11px;
+            color: #000;
+            padding: 10px;
+        }
+
+        .container {
+            border: 2px solid #000;
+            padding: 10px;
+        }
+
+        /* Header Section */
+        .header {
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .company-logo {
+            width: 60px;
+            height: 60px;
+            display: inline-block;
+        }
+
+        .company-info {
+            flex: 1;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .company-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #c41e3a;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        .company-details {
+            font-size: 9px;
+            line-height: 1.4;
+            margin-top: 5px;
+        }
+
+        .gr-info {
+            text-align: right;
+        }
+
+        .gr-number {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+
+        .jurisdiction {
+            font-size: 9px;
+            text-align: right;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        /* Main Content */
+        .content {
+            margin-top: 10px;
+        }
+
+        .section {
+            border: 1px solid #000;
+            margin-bottom: 10px;
+            padding: 8px;
+        }
+
+        .section-title {
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 5px;
+            color: #c41e3a;
+        }
+
+        .two-column {
+            display: flex;
+            gap: 10px;
+        }
+
+        .column {
+            flex: 1;
+        }
+
+        .field {
+            margin-bottom: 8px;
+        }
+
+        .field-label {
+            font-weight: bold;
+            font-size: 10px;
+            display: inline-block;
+            width: 120px;
+        }
+
+        .field-value {
+            display: inline-block;
+            border-bottom: 1px dotted #333;
+            min-width: 200px;
+            padding-left: 5px;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        table, th, td {
+            border: 1px solid #000;
+        }
+
+        th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+            padding: 6px;
+            text-align: center;
+            font-size: 10px;
+        }
+
+        td {
+            padding: 6px;
+            font-size: 10px;
+        }
+
+        .amount-section {
+            margin-top: 10px;
+            border: 1px solid #000;
+            padding: 8px;
+        }
+
+        .amount-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .amount-label {
+            font-weight: bold;
+        }
+
+        .total-row {
+            border-top: 2px solid #000;
+            padding-top: 5px;
+            margin-top: 5px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .amount-words {
+            margin-top: 8px;
+            font-style: italic;
+            background-color: #f9f9f9;
+            padding: 5px;
+            border-left: 3px solid #c41e3a;
+        }
+
+        /* Notice Section */
+        .notice {
+            border: 1px solid #000;
+            padding: 8px;
+            margin-top: 10px;
+            font-size: 8px;
+            line-height: 1.4;
+            background-color: #f9f9f9;
+        }
+
+        .notice-title {
+            font-weight: bold;
+            font-size: 9px;
+            margin-bottom: 5px;
+            text-decoration: underline;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .signature-section {
+            text-align: center;
+            flex: 1;
+        }
+
+        .signature-line {
+            border-top: 1px solid #000;
+            margin-top: 40px;
+            padding-top: 5px;
+            font-size: 10px;
+        }
+
+        .page-break {
+            page-break-after: always;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="company-logo">
+                <!-- Logo placeholder - you can add actual logo image here -->
+                <svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="60" height="60" fill="#c41e3a"/>
+                    <text x="30" y="35" font-family="Arial" font-size="24" fill="#fff" text-anchor="middle" font-weight="bold">RR</text>
+                </svg>
+            </div>
+            
+            <div class="company-info">
+                <div class="company-name">{{company.NAME}}</div>
+                <div class="company-details">
+                    GSTIN: {{company.GSTIN}}<br/>
+                    {{company.ADDRESS}}<br/>
+                    📞 {{company.PHONE}} | ✉ {{company.EMAIL}}
+                </div>
+                <div class="jurisdiction">Subject to Surat Jurisdiction Only</div>
+            </div>
+            
+            <div class="gr-info">
+                <div class="gr-number">Consignment Note</div>
+                <div class="gr-number">No. {{grNumber}}</div>
+                <div>Flat No. {{consignmentNo}}</div>
+                <div>Date: {{grDate}}</div>
+            </div>
+        </div>
+
+        <!-- Party Details -->
+        <div class="two-column">
+            <div class="column section">
+                <div class="section-title">AT OWNER'S RISK/CARRIER'S RISK</div>
+                <div class="field">
+                    <span class="field-label">Company:</span>
+                    <span class="field-value">{{consignor.name}}</span>
+                </div>
+                <div class="field">
+                    <span class="field-label">GSTIN NO:</span>
+                    <span class="field-value">{{consignor.gstin}}</span>
+                </div>
+                <div class="field">
+                    <span class="field-label">Address:</span>
+                    <span class="field-value">{{consignor.address}}</span>
+                </div>
+                <div class="field">
+                    <span class="field-label">Mobile:</span>
+                    <span class="field-value">{{consignor.mobile}}</span>
+                </div>
+            </div>
+
+            <div class="column section">
+                <div class="section-title">CONSIGNEE</div>
+                <div class="field">
+                    <span class="field-label">Name:</span>
+                    <span class="field-value">{{consignee.name}}</span>
+                </div>
+                <div class="field">
+                    <span class="field-label">GSTIN NO:</span>
+                    <span class="field-value">{{consignee.gstin}}</span>
+                </div>
+                <div class="field">
+                    <span class="field-label">Address:</span>
+                    <span class="field-value">{{consignee.address}}</span>
+                </div>
+                <div class="field">
+                    <span class="field-label">Mobile:</span>
+                    <span class="field-value">{{consignee.mobile}}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shipment Details -->
+        <div class="section">
+            <div class="section-title">SHIPMENT DETAILS</div>
+            <div class="two-column">
+                <div class="column">
+                    <div class="field">
+                        <span class="field-label">From:</span>
+                        <span class="field-value">{{fromLocation}}</span>
+                    </div>
+                    <div class="field">
+                        <span class="field-label">To:</span>
+                        <span class="field-value">{{toLocation}}</span>
+                    </div>
+                    <div class="field">
+                        <span class="field-label">Issuing Branch:</span>
+                        <span class="field-value">{{issuingBranch}}</span>
+                    </div>
+                    <div class="field">
+                        <span class="field-label">Delivery Office:</span>
+                        <span class="field-value">{{deliveryOffice}}</span>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="field">
+                        <span class="field-label">Date:</span>
+                        <span class="field-value">{{grDate}}</span>
+                    </div>
+                    <div class="field">
+                        <span class="field-label">Truck No.:</span>
+                        <span class="field-value">{{vehicleNumber}}</span>
+                    </div>
+                    <div class="field">
+                        <span class="field-label">No. of Packages:</span>
+                        <span class="field-value">{{noOfPackages}}</span>
+                    </div>
+                    <div class="field">
+                        <span class="field-label">At Risk:</span>
+                        <span class="field-value">{{atRisk}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Load Details -->
+        <div class="section">
+            <div class="section-title">LOAD DETAILS</div>
+            <div class="field">
+                <span class="field-label">Description (Said to Contain):</span>
+                <span class="field-value">{{description}}</span>
+            </div>
+            <div class="two-column">
+                <div class="column">
+                    <div class="field">
+                        <span class="field-label">Type of Vehicle:</span>
+                        <span class="field-value">{{vehicleType}}</span>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="field">
+                        <span class="field-label">Actual Weight:</span>
+                        <span class="field-value">{{actualWeight}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Financial Details -->
+        <div class="amount-section">
+            <div class="section-title">CHARGES</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Type of Vehicle</th>
+                        <th>Other Charges</th>
+                        <th>Surcharge</th>
+                        <th>Freight</th>
+                        <th>WEIGHT</th>
+                        <th>RATE</th>
+                        <th>Rs. AMOUNT</th>
+                        <th>P</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{vehicleType}}</td>
+                        <td style="text-align: right;">{{otherCharges}}</td>
+                        <td style="text-align: right;">{{surcharge}}</td>
+                        <td style="text-align: right;">{{freightAmount}}</td>
+                        <td style="text-align: center;">{{actualWeight}}</td>
+                        <td style="text-align: center;">{{rateType}}</td>
+                        <td style="text-align: right; font-weight: bold;">{{totalAmount}}</td>
+                        <td style="text-align: center;">{{paymentMode}}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="margin-top: 10px;">
+                <div class="amount-row">
+                    <span class="amount-label">GR Charge:</span>
+                    <span>₹ {{grCharge}}</span>
+                </div>
+                <div class="amount-row total-row">
+                    <span class="amount-label">TOTAL:</span>
+                    <span>₹ {{totalAmount}}</span>
+                </div>
+                <div class="amount-words">
+                    <strong>RUPEES:</strong> {{amountInWords}}
+                </div>
+            </div>
+        </div>
+
+        <!-- Notice -->
+        <div class="notice">
+            <div class="notice-title">NOTICE</div>
+            <p>
+                This consignment is carried at the risk indicated above. The consignee or the carrier as the case may be, is not responsible for leakage & breakage.
+                Demurrage will be charged at Rs. 150/- per day after 24 hours. In case of any dispute, Surat jurisdiction will apply.
+                The carrier is not responsible for Acts of God, riots, strikes, or any form of civil unrest.
+                This document is valid subject to realization of cheque in case of cheque payment.
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="signature-section">
+                <div class="signature-line">
+                    Consignor's Signature
+                </div>
+            </div>
+            <div class="signature-section">
+                <div class="signature-line">
+                    Driver's Signature
+                </div>
+            </div>
+            <div class="signature-section">
+                <div class="signature-line">
+                    For Raghhav Roadways<br/>
+                    Authorised Signatory
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

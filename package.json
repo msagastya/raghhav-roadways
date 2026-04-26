@@ -1,5 +1,27 @@
 {
-  "dependencies": {
-    "react-datepicker": "^8.10.0"
-  }
+  "name": "raghhav-roadways",
+  "version": "1.0.0",
+  "description": "Raghhav Roadways - Transport Management System",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run start:all",
+    "start:all": "bash start-all.sh",
+    "start:backend": "cd backend && npm run dev",
+    "start:frontend": "cd frontend && npm run dev",
+    "build": "npm run build:frontend",
+    "build:frontend": "cd frontend && npm run build",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "test": "cd backend && npm test",
+    "seed": "cd backend && npm run prisma:seed",
+    "migrate": "cd backend && npm run prisma:migrate"
+  },
+  "keywords": [
+    "transport",
+    "logistics",
+    "management",
+    "system"
+  ],
+  "author": "Raghhav Roadways",
+  "license": "MIT",
+  "dependencies": {}
 }

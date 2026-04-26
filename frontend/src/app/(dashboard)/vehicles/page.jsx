@@ -2,154 +2,81 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { Edit, Trash2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Truck, AlertTriangle } from 'lucide-react';
 import { vehicleAPI } from '../../../lib/api';
-import { Card, CardContent } from '../../../components/ui/card';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../../components/ui/table';
-import { TableSkeleton } from '../../../components/ui/skeleton';
-import Badge from '../../../components/ui/badge';
+import PageHeader from '../../../components/ui/page-header';
+import FilterBar from '../../../components/ui/filter-bar';
+import DataTable from '../../../components/ui/data-table';
+import GlassPanel from '../../../components/ui/glass-panel';
+import Button from '../../../components/ui/button';
 import useToast from '../../../hooks/useToast';
-import { getErrorMessage } from '../../../lib/utils';
+import { formatDate, getErrorMessage } from '../../../lib/utils';
 
 export default function VehiclesPage() {
   const router = useRouter();
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { showError, showSuccess } = useToast();
+  const [search, setSearch] = useState('');
+  const [stats, setStats] = useState({ total: 0, owned: 0, expiring: 0 });
+  const { showError } = useToast();
 
   useEffect(() => {
+    const fetchVehicles = async () => {
+      try {
+        const response = await vehicleAPI.getAll({ limit: 100 });
+        const data = response.data?.data?.data || [];
+        setVehicles(data);
+        setStats({
+          total: data.length,
+          owned: data.filter((v) => v.ownerType === 'OWNED').length,
+          expiring: data.filter((v) => v.documentsExpiringDays <= 30).length,
+        });
+      } catch (error) {
+        showError(getErrorMessage(error));
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchVehicles();
   }, []);
 
-  const fetchVehicles = async () => {
-    try {
-      const response = await vehicleAPI.getAll({ limit: 100 });
-      setVehicles(response.data?.data?.vehicles || []);
-    } catch (error) {
-      showError(getErrorMessage(error));
-      setVehicles([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const expiringDocs = vehicles.filter((v) => v.documentsExpiringDays <= 30);
 
-  const handleEdit = (vehicle) => {
-    router.push(`/vehicles/edit/${vehicle.id}`);
-  };
-
-  const handleDelete = async (vehicle) => {
-    if (!window.confirm(`Are you sure you want to delete vehicle ${vehicle.vehicleNo}?`)) {
-      return;
-    }
-
-    try {
-      await vehicleAPI.delete(vehicle.id);
-      showSuccess('Vehicle deleted successfully');
-      fetchVehicles();
-    } catch (error) {
-      showError(getErrorMessage(error));
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <div className="space-y-2">
-            <div className="h-8 w-32 bg-gray-200 rounded animate-pulse"></div>
-            <div className="h-4 w-48 bg-gray-200 rounded animate-pulse"></div>
-          </div>
-          <div className="h-10 w-32 bg-gray-200 rounded animate-pulse"></div>
-        </div>
-        <Card animate={false}>
-          <CardContent className="p-6">
-            <TableSkeleton rows={10} columns={6} />
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  const columns = [
+    { accessor: 'vehicleNumber', label: 'Vehicle#', render: (v) => <span className="font-mono font-bold">{v}</span> },
+    { accessor: 'vehicleType', label: 'Type', render: (v) => <span className="text-xs">{v}</span> },
+    { accessor: 'ownerName', label: 'Owner', render: (v) => <span className="text-xs">{v}</span> },
+    { accessor: 'rcExpiryDate', label: 'RC Expiry', render: (v) => <span className="text-xs">{formatDate(v, 'dd/MMM/yy')}</span> },
+    { accessor: 'insuranceExpiryDate', label: 'Insurance', render: (v) => <span className="text-xs">{formatDate(v, 'dd/MMM/yy')}</span> },
+  ];
 
   return (
     <div className="space-y-6">
-      <motion.div
-        className="flex justify-between items-center"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-      >
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Vehicles</h1>
-          <p className="text-gray-600 mt-1">Manage all vehicle records</p>
-        </div>
-      </motion.div>
+      {expiringDocs.length > 0 && (
+        <GlassPanel tier={2} className="p-4 bg-yellow-500/10 border-yellow-500/30">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
+            <p className="text-sm text-yellow-800 dark:text-yellow-200">
+              <strong>{expiringDocs.length}</strong> vehicles have documents expiring within 30 days
+            </p>
+          </div>
+        </GlassPanel>
+      )}
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.1 }}
-      >
-        <Card animate={false}>
-          <CardContent className="p-6">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Vehicle Number</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Owner Type</TableHead>
-                  <TableHead>Owner Name</TableHead>
-                  <TableHead>Driver Name</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {vehicles.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center text-gray-500 py-8">
-                      No vehicles found
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  vehicles.map((vehicle, index) => (
-                    <TableRow key={vehicle.id} animate={true} index={index}>
-                      <TableCell className="font-medium">{vehicle.vehicleNo}</TableCell>
-                      <TableCell>{vehicle.vehicleType || '-'}</TableCell>
-                      <TableCell>{vehicle.ownerType}</TableCell>
-                      <TableCell>{vehicle.ownerName || '-'}</TableCell>
-                      <TableCell>{vehicle.driverName || '-'}</TableCell>
-                      <TableCell>
-                        <Badge variant={vehicle.isActive ? 'success' : 'danger'}>
-                          {vehicle.isActive ? 'Active' : 'Inactive'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <button
-                            onClick={() => handleEdit(vehicle)}
-                            className="p-1.5 sm:p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
-                            title="Edit vehicle"
-                          >
-                            <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(vehicle)}
-                            className="p-1.5 sm:p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
-                            title="Delete vehicle"
-                          >
-                            <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                          </button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      </motion.div>
+      <PageHeader
+        title="Fleet Command"
+        subtitle="Manage vehicles and fleet"
+        icon={Truck}
+        stats={[
+          { label: 'Total', value: stats.total },
+          { label: 'Owned', value: stats.owned },
+          { label: 'Expiring Soon', value: stats.expiring },
+        ]}
+        actionLabel="Register Vehicle"
+        onAction={() => router.push('/vehicles/new')}
+      />
+      <FilterBar placeholder="Search vehicle#, owner..." onSearch={setSearch} activeFilterCount={search ? 1 : 0} />
+      <DataTable columns={columns} data={vehicles.filter((v) => v.vehicleNumber?.includes(search) || v.ownerName?.includes(search))} loading={loading} />
     </div>
   );
 }

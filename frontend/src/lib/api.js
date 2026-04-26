@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { clearAuthTokens } from './auth';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:2026/api/v1';
 
 // Create axios instance with httpOnly cookie support
 const api = axios.create({
@@ -33,12 +33,17 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     // If 401 (unauthorized), try to refresh token
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // SKIP refresh for auth endpoints (login, signup, refresh) — they don't need token refresh
+    const isAuthEndpoint = originalRequest?.url?.includes('/auth/login') ||
+      originalRequest?.url?.includes('/auth/signup') ||
+      originalRequest?.url?.includes('/auth/refresh');
+
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       originalRequest._retry = true;
 
       try {
         // Refresh endpoint will set new cookies automatically
-        const response = await axios.post(`${API_URL}/auth/refresh`, {}, {
+        await axios.post(`${API_URL}/auth/refresh`, {}, {
           withCredentials: true, // Send existing refresh token cookie
         });
 
@@ -52,6 +57,21 @@ api.interceptors.response.use(
           window.location.href = '/login';
         }
         return Promise.reject(refreshError);
+      }
+    }
+
+    // Handle specific HTTP status codes
+    if (error.response) {
+      switch (error.response.status) {
+        case 403:
+          error.userMessage = 'You do not have permission to perform this action';
+          break;
+        case 413:
+          error.userMessage = 'File is too large. Please reduce the file size and try again';
+          break;
+        case 429:
+          error.userMessage = 'Too many requests. Please wait a moment and try again';
+          break;
       }
     }
 

@@ -4,14 +4,13 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Plus, Search, Edit, Trash2 } from 'lucide-react';
+import { Plus, Edit, Trash2, MapPin, Truck } from 'lucide-react';
 import { consignmentAPI } from '../../../lib/api';
-import { Card, CardContent } from '../../../components/ui/card';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../../components/ui/table';
-import { TableSkeleton } from '../../../components/ui/skeleton';
+import PageHeader from '../../../components/ui/page-header';
+import FilterBar from '../../../components/ui/filter-bar';
+import DataTable from '../../../components/ui/data-table';
+import StatusBadge from '../../../components/ui/status-badge';
 import Button from '../../../components/ui/button';
-import Input from '../../../components/ui/input';
-import Badge from '../../../components/ui/badge';
 import useToast from '../../../hooks/useToast';
 import { formatDate, formatCurrency, getErrorMessage } from '../../../lib/utils';
 
@@ -20,6 +19,7 @@ export default function ConsignmentsPage() {
   const [consignments, setConsignments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [stats, setStats] = useState({ total: 0, booked: 0, transit: 0, delivered: 0 });
   const { showError, showSuccess } = useToast();
 
   useEffect(() => {
@@ -28,8 +28,18 @@ export default function ConsignmentsPage() {
 
   const fetchConsignments = async () => {
     try {
-      const response = await consignmentAPI.getAll({ limit: 50 });
-      setConsignments(response.data?.data?.consignments || []);
+      setLoading(true);
+      const response = await consignmentAPI.getAll({ limit: 100 });
+      const data = response.data?.data?.data || [];
+      setConsignments(data);
+
+      // Calculate stats
+      setStats({
+        total: data.length,
+        booked: data.filter((c) => c.status === 'BOOKED').length,
+        transit: data.filter((c) => c.status === 'IN_TRANSIT').length,
+        delivered: data.filter((c) => c.status === 'DELIVERED').length,
+      });
     } catch (error) {
       showError(getErrorMessage(error));
       setConsignments([]);
@@ -38,18 +48,12 @@ export default function ConsignmentsPage() {
     }
   };
 
-  const handleEdit = (consignment) => {
-    router.push(`/consignments/edit/${consignment.id}`);
-  };
-
   const handleDelete = async (consignment) => {
-    if (!window.confirm(`Are you sure you want to delete consignment ${consignment.grNumber}?`)) {
-      return;
-    }
+    if (!window.confirm(`Delete GR #${consignment.grNumber}?`)) return;
 
     try {
       await consignmentAPI.delete(consignment.id);
-      showSuccess('Consignment deleted successfully');
+      showSuccess('Deleted');
       fetchConsignments();
     } catch (error) {
       showError(getErrorMessage(error));
@@ -58,128 +62,158 @@ export default function ConsignmentsPage() {
 
   const filteredConsignments = (consignments || []).filter((c) =>
     c?.grNumber?.toLowerCase().includes(search.toLowerCase()) ||
-    c?.vehicleNumber?.toLowerCase().includes(search.toLowerCase())
+    c?.vehicleNumber?.toLowerCase().includes(search.toLowerCase()) ||
+    c?.fromLocation?.toLowerCase().includes(search.toLowerCase()) ||
+    c?.toLocation?.toLowerCase().includes(search.toLowerCase())
   );
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <div className="space-y-2">
-            <div className="h-8 w-48 bg-gray-200 rounded animate-pulse"></div>
-            <div className="h-4 w-64 bg-gray-200 rounded animate-pulse"></div>
-          </div>
-          <div className="h-10 w-40 bg-gray-200 rounded animate-pulse"></div>
+  const columns = [
+    {
+      accessor: 'grNumber',
+      label: 'GR#',
+      render: (value) => (
+        <span className="font-mono font-bold text-primary-600 dark:text-primary-400">{value}</span>
+      ),
+    },
+    {
+      accessor: 'consignmentDate',
+      label: 'Date',
+      render: (value) => formatDate(value, 'dd/MMM'),
+    },
+    {
+      accessor: 'route',
+      label: 'Route',
+      render: (value, row) => (
+        <div className="flex items-center gap-1 text-xs">
+          <span>{row.fromLocation}</span>
+          <span className="text-gray-400 dark:text-white/40">&rarr;</span>
+          <span>{row.toLocation}</span>
         </div>
-        <Card animate={false}>
-          <CardContent className="p-6">
-            <div className="mb-4">
-              <div className="h-10 max-w-md bg-gray-200 rounded animate-pulse"></div>
-            </div>
-            <TableSkeleton rows={10} columns={6} />
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+      ),
+    },
+    {
+      accessor: 'vehicleNumber',
+      label: 'Vehicle',
+      render: (value) => <span className="text-xs">{value}</span>,
+    },
+    {
+      accessor: 'consignorName',
+      label: 'Party',
+      render: (value) => <span className="text-xs truncate">{value}</span>,
+    },
+    {
+      accessor: 'amount',
+      label: 'Amount',
+      render: (value) => <span className="font-mono text-xs">{formatCurrency(value)}</span>,
+    },
+    {
+      accessor: 'status',
+      label: 'Status',
+      render: (value) => (
+        <StatusBadge status={value?.toLowerCase() || 'booked'} size="xs" />
+      ),
+    },
+  ];
 
   return (
     <div className="space-y-6">
-      <motion.div
-        className="flex justify-between items-center"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-      >
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Consignments</h1>
-          <p className="text-gray-600 mt-1">Manage all consignment records</p>
-        </div>
-        <Link href="/consignments/new">
-          <Button className="flex items-center gap-2">
-            <Plus className="w-4 h-4" />
-            New Consignment
-          </Button>
-        </Link>
-      </motion.div>
+      {/* Page Header */}
+      <PageHeader
+        title="Shipment Tracker"
+        subtitle="Track and manage all consignments"
+        icon={MapPin}
+        stats={[
+          { label: 'Total', value: stats.total },
+          { label: 'Booked', value: stats.booked },
+          { label: 'Transit', value: stats.transit },
+          { label: 'Delivered', value: stats.delivered },
+        ]}
+        action={<Plus className="w-4 h-4" />}
+        actionLabel="New Consignment"
+        onAction={() => router.push('/consignments/new')}
+      />
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.1 }}
-      >
-        <Card animate={false}>
-          <CardContent className="p-6">
-            <motion.div
-              className="mb-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-            >
-              <Input
-                placeholder="Search by GR Number or Vehicle Number..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="max-w-md"
-              />
-            </motion.div>
+      {/* Filter Bar */}
+      <FilterBar
+        placeholder="Search GR#, vehicle, location..."
+        onSearch={setSearch}
+        activeFilterCount={search ? 1 : 0}
+        filters={[
+          {
+            key: 'status',
+            label: 'Status',
+            type: 'select',
+            options: [
+              { label: 'Booked', value: 'BOOKED' },
+              { label: 'In Transit', value: 'IN_TRANSIT' },
+              { label: 'Delivered', value: 'DELIVERED' },
+            ],
+            onChange: (value) => {
+              // Handle filter change
+            },
+          },
+          {
+            key: 'dateFrom',
+            label: 'From Date',
+            type: 'date',
+          },
+          {
+            key: 'dateTo',
+            label: 'To Date',
+            type: 'date',
+          },
+        ]}
+      />
 
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>GR Number</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Vehicle No</TableHead>
-                  <TableHead>From - To</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredConsignments.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center text-gray-500 py-8">
-                      No consignments found
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  filteredConsignments.map((consignment, index) => (
-                    <TableRow key={consignment.id} animate={true} index={index}>
-                      <TableCell className="font-medium">{consignment.grNumber}</TableCell>
-                      <TableCell>{formatDate(consignment.grDate)}</TableCell>
-                      <TableCell>{consignment.vehicleNumber}</TableCell>
-                      <TableCell>{consignment.fromLocation} - {consignment.toLocation}</TableCell>
-                      <TableCell>{formatCurrency(consignment.totalAmount)}</TableCell>
-                      <TableCell>
-                        <Badge variant={consignment.status}>{consignment.status}</Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <button
-                            onClick={() => handleEdit(consignment)}
-                            className="p-1.5 sm:p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
-                            title="Edit consignment"
-                          >
-                            <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(consignment)}
-                            className="p-1.5 sm:p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
-                            title="Delete consignment"
-                          >
-                            <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                          </button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      </motion.div>
+      {/* Data Table */}
+      <DataTable
+        columns={columns}
+        data={filteredConsignments}
+        loading={loading}
+        expandable={true}
+        renderExpandedRow={(row) => (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+              <p className="text-xs text-gray-500 dark:text-white/60 mb-1">Consignee</p>
+              <p className="text-sm text-gray-900 dark:text-white">{row.consigneeName}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 dark:text-white/60 mb-1">Weight</p>
+              <p className="text-sm text-gray-900 dark:text-white">{row.weight} {row.weightUnit}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 dark:text-white/60 mb-1">Description</p>
+              <p className="text-sm text-gray-900 dark:text-white truncate">{row.description}</p>
+            </div>
+            <div className="flex gap-2">
+              <Link href={`/consignments/${row.id}/edit`}>
+                <Button variant="secondary" size="sm" className="w-full">
+                  <Edit className="w-3 h-3" />
+                  Edit
+                </Button>
+              </Link>
+              <button
+                onClick={() => handleDelete(row)}
+                className="flex-1 px-2 py-1 text-xs rounded-lg bg-red-500/20 text-red-300 hover:bg-red-500/30 transition-colors"
+              >
+                <Trash2 className="w-3 h-3 inline mr-1" />
+                Delete
+              </button>
+            </div>
+          </div>
+        )}
+        emptyState={
+          <div className="text-center py-8">
+            <Truck className="w-12 h-12 text-gray-300 dark:text-white/10 mx-auto mb-3" />
+            <p className="text-gray-500 dark:text-white/60">No consignments found</p>
+            <Link href="/consignments/new">
+              <Button className="mt-4" size="sm">
+                Create First Consignment
+              </Button>
+            </Link>
+          </div>
+        }
+      />
     </div>
   );
 }

@@ -118,7 +118,7 @@ export default function RolesPage() {
       <div className="p-6">
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600 mx-auto"></div>
-          <p className="text-gray-500 mt-4">Loading roles and permissions...</p>
+          <p className="text-gray-500 dark:text-white/60 mt-4">Loading roles and permissions...</p>
         </div>
       </div>
     );
@@ -127,8 +127,8 @@ export default function RolesPage() {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Role Management</h1>
-        <p className="text-gray-600 mt-1">Configure permissions for each role</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Role Management</h1>
+        <p className="text-gray-600 dark:text-white/60 mt-1">Configure permissions for each role</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -136,23 +136,23 @@ export default function RolesPage() {
         <div className="lg:col-span-1">
           <Card>
             <CardHeader>
-              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 <Shield className="w-5 h-5" />
                 Roles
               </h3>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="divide-y divide-gray-200">
+              <div className="divide-y divide-gray-200 dark:divide-white/10">
                 {roles.map((role) => (
                   <button
                     key={role.id}
                     onClick={() => selectRole(role)}
-                    className={`w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors ${
-                      selectedRole?.id === role.id ? 'bg-blue-50 border-l-4 border-blue-500' : ''
+                    className={`w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors ${
+                      selectedRole?.id === role.id ? 'bg-blue-50 dark:bg-blue-500/10 border-l-4 border-blue-500' : ''
                     }`}
                   >
-                    <div className="font-medium text-gray-900">{role.roleName}</div>
-                    <div className="text-sm text-gray-500">{role.description}</div>
+                    <div className="font-medium text-gray-900 dark:text-white">{role.roleName}</div>
+                    <div className="text-sm text-gray-500 dark:text-white/60">{role.description}</div>
                   </button>
                 ))}
               </div>
@@ -167,10 +167,10 @@ export default function RolesPage() {
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                       Permissions for {selectedRole.roleName}
                     </h3>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="text-sm text-gray-600 dark:text-white/60 mt-1">
                       {selectedPermissions.length} of {permissions.length} permissions selected
                     </p>
                   </div>
@@ -191,9 +191,9 @@ export default function RolesPage() {
                     const someSelected = modulePermissions.some(p => selectedPermissions.includes(p.id));
 
                     return (
-                      <div key={module} className="border border-gray-200 rounded-lg p-4">
+                      <div key={module} className="border border-gray-200 dark:border-white/10 rounded-lg p-4">
                         <div className="flex items-center justify-between mb-3">
-                          <h4 className="font-semibold text-gray-900 capitalize">{module}</h4>
+                          <h4 className="font-semibold text-gray-900 dark:text-white capitalize">{module}</h4>
                           <button
                             onClick={() => handleSelectAll(module)}
                             className={`text-sm font-medium ${
@@ -213,22 +213,22 @@ export default function RolesPage() {
                                 key={permission.id}
                                 className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition-all ${
                                   isSelected
-                                    ? 'bg-blue-50 border-blue-300 shadow-sm'
-                                    : 'bg-white border-gray-200 hover:border-gray-300'
+                                    ? 'bg-blue-50 dark:bg-blue-500/10 border-blue-300 dark:border-blue-500/30 shadow-sm'
+                                    : 'bg-white dark:bg-white/5 border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20'
                                 }`}
                               >
                                 <input
                                   type="checkbox"
                                   checked={isSelected}
                                   onChange={() => togglePermission(permission.id)}
-                                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                  className="w-4 h-4 text-blue-600 border-gray-300 dark:border-white/15 rounded focus:ring-blue-500"
                                 />
                                 <div className="flex-1 min-w-0">
-                                  <div className="text-sm font-medium text-gray-900 capitalize">
+                                  <div className="text-sm font-medium text-gray-900 dark:text-white capitalize">
                                     {permission.action}
                                   </div>
                                   {permission.description && (
-                                    <div className="text-xs text-gray-500 truncate">
+                                    <div className="text-xs text-gray-500 dark:text-white/60 truncate">
                                       {permission.description}
                                     </div>
                                   )}
@@ -246,8 +246,8 @@ export default function RolesPage() {
           ) : (
             <Card>
               <CardContent className="py-12">
-                <div className="text-center text-gray-500">
-                  <Shield className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                <div className="text-center text-gray-500 dark:text-white/60">
+                  <Shield className="w-12 h-12 mx-auto mb-4 text-gray-300 dark:text-white/40" />
                   <p>Select a role to manage its permissions</p>
                 </div>
               </CardContent>

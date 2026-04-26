@@ -1,14 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Plus, Edit, Trash2, Receipt } from 'lucide-react';
 import { invoiceAPI } from '../../../lib/api';
-import { Card, CardContent } from '../../../components/ui/card';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../../components/ui/table';
+import PageHeader from '../../../components/ui/page-header';
+import FilterBar from '../../../components/ui/filter-bar';
+import DataTable from '../../../components/ui/data-table';
+import StatusBadge from '../../../components/ui/status-badge';
 import Button from '../../../components/ui/button';
-import Badge from '../../../components/ui/badge';
 import useToast from '../../../hooks/useToast';
 import { formatDate, formatCurrency, getErrorMessage } from '../../../lib/utils';
 
@@ -16,6 +17,8 @@ export default function InvoicesPage() {
   const router = useRouter();
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [stats, setStats] = useState({ total: 0, pending: 0, partial: 0, paid: 0 });
   const { showError, showSuccess } = useToast();
 
   useEffect(() => {
@@ -24,114 +27,60 @@ export default function InvoicesPage() {
 
   const fetchInvoices = async () => {
     try {
-      const response = await invoiceAPI.getAll({ limit: 50 });
-      setInvoices(response.data?.data?.invoices || []);
+      setLoading(true);
+      const response = await invoiceAPI.getAll({ limit: 100 });
+      const data = response.data?.data?.data || [];
+      setInvoices(data);
+      setStats({
+        total: data.length,
+        pending: data.filter((i) => i.status === 'PENDING').length,
+        partial: data.filter((i) => i.status === 'PARTIAL').length,
+        paid: data.filter((i) => i.status === 'PAID').length,
+      });
     } catch (error) {
       showError(getErrorMessage(error));
-      setInvoices([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleEdit = (invoice) => {
-    router.push(`/invoices/edit/${invoice.id}`);
-  };
-
   const handleDelete = async (invoice) => {
-    if (!window.confirm(`Are you sure you want to delete invoice ${invoice.invoiceNumber}?`)) {
-      return;
-    }
-
+    if (!window.confirm(`Delete ${invoice.invoiceNumber}?`)) return;
     try {
       await invoiceAPI.delete(invoice.id);
-      showSuccess('Invoice deleted successfully');
+      showSuccess('Deleted');
       fetchInvoices();
     } catch (error) {
       showError(getErrorMessage(error));
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
-      </div>
-    );
-  }
+  const columns = [
+    { accessor: 'invoiceNumber', label: 'Invoice#', render: (v) => <span className="font-mono font-bold text-primary-600 dark:text-primary-400">{v}</span> },
+    { accessor: 'invoiceDate', label: 'Date', render: (v) => formatDate(v, 'dd/MMM') },
+    { accessor: 'partyName', label: 'Party', render: (v) => <span className="text-xs">{v}</span> },
+    { accessor: 'lineItemCount', label: 'Items', render: (v, r) => <span className="text-xs">{r.consignmentCount || 0}</span> },
+    { accessor: 'totalAmount', label: 'Total', render: (v) => <span className="font-mono text-xs">{formatCurrency(v)}</span> },
+    { accessor: 'paidAmount', label: 'Paid', render: (v) => <span className="font-mono text-xs text-green-600 dark:text-green-400">{formatCurrency(v)}</span> },
+    { accessor: 'status', label: 'Status', render: (v) => <StatusBadge status={v?.toLowerCase()} size="xs" /> },
+  ];
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Invoices</h1>
-          <p className="text-gray-600 mt-1">Manage all invoice records</p>
-        </div>
-        <Link href="/invoices/new">
-          <Button className="flex items-center gap-2">
-            <Plus className="w-4 h-4" />
-            New Invoice
-          </Button>
-        </Link>
-      </div>
-
-      <Card>
-        <CardContent className="p-6">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Invoice Number</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Party Name</TableHead>
-                <TableHead>Total Amount</TableHead>
-                <TableHead>Balance</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {invoices.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center text-gray-500 py-8">
-                    No invoices found
-                  </TableCell>
-                </TableRow>
-              ) : (
-                invoices.map((invoice) => (
-                  <TableRow key={invoice.id}>
-                    <TableCell className="font-medium">{invoice.invoiceNumber}</TableCell>
-                    <TableCell>{formatDate(invoice.invoiceDate)}</TableCell>
-                    <TableCell>{invoice.partyName}</TableCell>
-                    <TableCell>{formatCurrency(invoice.totalAmount)}</TableCell>
-                    <TableCell>{formatCurrency(invoice.balanceAmount)}</TableCell>
-                    <TableCell>
-                      <Badge variant={invoice.paymentStatus}>{invoice.paymentStatus}</Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <button
-                          onClick={() => handleEdit(invoice)}
-                          className="p-1.5 sm:p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
-                          title="Edit invoice"
-                        >
-                          <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(invoice)}
-                          className="p-1.5 sm:p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
-                          title="Delete invoice"
-                        >
-                          <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                        </button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+      <PageHeader
+        title="Billing Hub"
+        subtitle="Manage invoices and billing"
+        icon={Receipt}
+        stats={[
+          { label: 'Total', value: stats.total },
+          { label: 'Pending', value: stats.pending },
+          { label: 'Paid', value: stats.paid },
+        ]}
+        actionLabel="New Invoice"
+        onAction={() => router.push('/invoices/new')}
+      />
+      <FilterBar placeholder="Search invoice#, party..." onSearch={setSearch} activeFilterCount={search ? 1 : 0} />
+      <DataTable columns={columns} data={invoices.filter((i) => i.invoiceNumber?.includes(search) || i.partyName?.includes(search))} loading={loading} />
     </div>
   );
 }

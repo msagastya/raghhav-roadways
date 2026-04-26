@@ -50,9 +50,11 @@ export function setUser(user) {
   // Only store non-sensitive user info (never tokens!)
   const safeUser = {
     id: user.id,
+    username: user.username,
     email: user.email,
-    name: user.name,
+    fullName: user.fullName,
     role: user.role,
+    permissions: user.permissions,
   };
   localStorage.setItem('user', JSON.stringify(safeUser));
 }

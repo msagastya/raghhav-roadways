@@ -20,7 +20,7 @@ export function middleware(request) {
 
   // If authenticated and trying to access login/signup, redirect to dashboard
   if (isPublicRoute && accessToken && pathname !== '/signup') {
-    const dashboardUrl = new URL('/', request.url);
+    const dashboardUrl = new URL('/consignments', request.url);
     return NextResponse.redirect(dashboardUrl);
   }
 

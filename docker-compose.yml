@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: raghhav
+      POSTGRES_PASSWORD: raghhav_dev_password
+      POSTGRES_DB: raghhav_roadways
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U raghhav -d raghhav_roadways"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    ports:
+      - "2026:2026"
+    environment:
+      NODE_ENV: production
+      PORT: 2026
+      DATABASE_URL: postgresql://raghhav:raghhav_dev_password@db:5432/raghhav_roadways
+      JWT_SECRET: change-this-in-production-min-32-chars
+      JWT_REFRESH_SECRET: change-this-refresh-secret-in-production
+      CORS_ORIGIN: http://localhost:2025
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - backend_storage:/app/storage
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:2026/api/v1
+    ports:
+      - "2025:2025"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:2026/api/v1
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+  backend_storage:

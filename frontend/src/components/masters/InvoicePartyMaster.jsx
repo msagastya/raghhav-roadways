@@ -41,7 +41,7 @@ export default function InvoicePartyMaster() {
   const fetchRecords = async () => {
     try {
       const response = await mastersAPI.getInvoiceParties({ limit: 100 });
-      setRecords(response.data?.data?.parties || []);
+      setRecords(response.data?.data?.data || []);
     } catch (error) {
       showError(getErrorMessage(error));
     } finally {
@@ -51,14 +51,10 @@ export default function InvoicePartyMaster() {
 
   const fetchStates = async () => {
     try {
-      console.log('Fetching states...');
       const response = await mastersAPI.getStates();
-      console.log('States response:', response.data);
       const statesData = response.data.data || [];
-      console.log('States data:', statesData.length, 'states loaded');
       setStates(statesData);
     } catch (error) {
-      console.error('Error fetching states:', error);
       showError(getErrorMessage(error));
     }
   };
@@ -160,8 +156,8 @@ export default function InvoicePartyMaster() {
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
-          <h3 className="text-base sm:text-lg font-semibold text-gray-900">Party Master (for Invoices)</h3>
-          <p className="text-xs sm:text-sm text-gray-600">Manage party information for billing and invoices</p>
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Party Master (for Invoices)</h3>
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-white/60">Manage party information for billing and invoices</p>
         </div>
         <Button onClick={openNewForm} className="flex items-center gap-2 w-full sm:w-auto">
           <Plus className="w-4 h-4" />
@@ -187,7 +183,7 @@ export default function InvoicePartyMaster() {
               <TableBody>
                 {records.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center text-gray-500 py-8">
+                    <TableCell colSpan={7} className="text-center text-gray-500 dark:text-white/60 py-8">
                       <div className="flex flex-col items-center gap-2">
                         <p className="text-sm sm:text-base">No parties found</p>
                         <Button onClick={openNewForm} size="sm" variant="outline">
@@ -210,13 +206,13 @@ export default function InvoicePartyMaster() {
                         <div className="flex justify-end gap-2">
                           <button
                             onClick={() => handleEdit(record.id)}
-                            className="p-1.5 sm:p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
+                            className="p-1.5 sm:p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 dark:hover:bg-blue-500/20 rounded-lg transition-colors"
                           >
                             <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                           </button>
                           <button
                             onClick={() => handleDelete(record.id)}
-                            className="p-1.5 sm:p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
+                            className="p-1.5 sm:p-2 text-red-600 hover:text-red-800 hover:bg-red-50 dark:hover:bg-red-500/20 rounded-lg transition-colors"
                           >
                             <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                           </button>
@@ -239,7 +235,7 @@ export default function InvoicePartyMaster() {
       >
         <div className="space-y-3 sm:space-y-4">
           <div>
-            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Name <span className="text-red-500">*</span>
             </label>
             <Input
@@ -250,7 +246,7 @@ export default function InvoicePartyMaster() {
           </div>
 
           <div>
-            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Address
             </label>
             <Input
@@ -262,7 +258,7 @@ export default function InvoicePartyMaster() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 State <span className="text-red-500">*</span>
               </label>
               <Select value={formData.stateId} onChange={handleStateChange}>
@@ -276,7 +272,7 @@ export default function InvoicePartyMaster() {
             </div>
 
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 City <span className="text-red-500">*</span>
               </label>
               <Select
@@ -296,7 +292,7 @@ export default function InvoicePartyMaster() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Pincode
               </label>
               <Input
@@ -307,7 +303,7 @@ export default function InvoicePartyMaster() {
             </div>
 
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 GSTIN
               </label>
               <Input
@@ -319,7 +315,7 @@ export default function InvoicePartyMaster() {
           </div>
 
           <div>
-            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Contact
             </label>
             <Input
@@ -330,7 +326,7 @@ export default function InvoicePartyMaster() {
           </div>
 
           <div>
-            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Remarks
             </label>
             <Input

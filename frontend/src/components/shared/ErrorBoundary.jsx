@@ -41,13 +41,13 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-white to-orange-50 p-4">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-white to-orange-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900 p-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="max-w-md w-full"
           >
-            <div className="bg-white rounded-2xl shadow-2xl p-8 border border-red-100">
+            <div className="bg-white dark:bg-white/5 rounded-2xl shadow-2xl p-8 border border-red-100 dark:border-red-500/20">
               {/* Icon */}
               <motion.div
                 initial={{ scale: 0 }}
@@ -55,8 +55,8 @@ class ErrorBoundary extends React.Component {
                 transition={{ delay: 0.2, type: 'spring' }}
                 className="flex justify-center mb-6"
               >
-                <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
-                  <AlertTriangle className="w-10 h-10 text-red-600" />
+                <div className="w-20 h-20 bg-red-100 dark:bg-red-500/20 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="w-10 h-10 text-red-600 dark:text-red-400" />
                 </div>
               </motion.div>
 
@@ -65,7 +65,7 @@ class ErrorBoundary extends React.Component {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
-                className="text-2xl font-bold text-gray-900 text-center mb-2"
+                className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-2"
               >
                 Oops! Something went wrong
               </motion.h1>
@@ -75,7 +75,7 @@ class ErrorBoundary extends React.Component {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="text-gray-600 text-center mb-6"
+                className="text-gray-600 dark:text-white/60 text-center mb-6"
               >
                 Don't worry, we've been notified and are working on it.
               </motion.p>
@@ -86,12 +86,12 @@ class ErrorBoundary extends React.Component {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.5 }}
-                  className="mb-6 p-4 bg-red-50 rounded-lg border border-red-200"
+                  className="mb-6 p-4 bg-red-50 dark:bg-red-500/10 rounded-lg border border-red-200 dark:border-red-500/20"
                 >
-                  <p className="text-sm font-semibold text-red-900 mb-2">
+                  <p className="text-sm font-semibold text-red-900 dark:text-red-300 mb-2">
                     Error Details (Dev Mode):
                   </p>
-                  <p className="text-xs text-red-700 font-mono break-all">
+                  <p className="text-xs text-red-700 dark:text-red-400 font-mono break-all">
                     {this.state.error.toString()}
                   </p>
                   {this.state.errorInfo && (

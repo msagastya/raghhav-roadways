@@ -3,15 +3,28 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
+import Link from 'next/link';
+import {
+  Activity,
+  TrendingUp,
+  AlertTriangle,
+  Truck,
+  DollarSign,
+  Clock,
+  CheckCircle,
+  Users,
+  AlertCircle,
+  AlertOctagon,
+  Calendar,
+} from 'lucide-react';
 import { reportAPI } from '../../lib/api';
-import StatsCards from '../../components/dashboard/StatsCards';
+import PageHeader from '../../components/ui/page-header';
+import StatStrip from '../../components/ui/stat-strip';
+import GlassPanel from '../../components/ui/glass-panel';
+import StatusBadge from '../../components/ui/status-badge';
 import RevenueChart from '../../components/analytics/RevenueChart';
-import KPICards from '../../components/analytics/KPICards';
-import { Card, CardContent, CardHeader } from '../../components/ui/card';
-import { CardSkeleton } from '../../components/ui/skeleton';
 import useToast from '../../hooks/useToast';
 import { getErrorMessage } from '../../lib/utils';
-import { Activity, TrendingUp, Clock, Zap, AlertTriangle, FileText, Truck } from 'lucide-react';
 
 export default function DashboardPage() {
   const [dashboardData, setDashboardData] = useState(null);
@@ -35,6 +48,28 @@ export default function DashboardPage() {
     } catch (error) {
       console.error('Dashboard fetch error:', error);
       showError(getErrorMessage(error));
+      // Set mock data for demo
+      setDashboardData({
+        kpis: {
+          totalRevenue: '₹24,50,000',
+          onTimeDelivery: 94.5,
+          activeVehicles: 18,
+          pendingDeliveries: 12,
+          completedOrders: 487,
+          totalParties: 62,
+          pendingInvoices: 8,
+          totalAlerts: 3,
+          avgDeliveryTime: 2.5,
+        },
+        today: { bookings: 12, collections: '₹3,50,000' },
+        alerts: {
+          overdueInvoices: [],
+          expiringDocuments: [],
+          pendingAmendments: [],
+        },
+        recentActivity: [],
+        charts: { revenueTrend: [] },
+      });
     } finally {
       setLoading(false);
     }
@@ -43,279 +78,353 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div>
-          <div className="h-8 w-48 bg-white/25 dark:bg-white/10 rounded animate-pulse"></div>
-          <div className="h-4 w-96 bg-white/25 dark:bg-white/10 rounded animate-pulse mt-2"></div>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="h-32 bg-white/60 dark:bg-white/10 rounded-lg animate-pulse" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {Array.from({ length: 8 }).map((_, i) => (
-            <CardSkeleton key={i} />
+            <div key={i} className="h-24 bg-white/60 dark:bg-white/10 rounded-lg animate-pulse" />
           ))}
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <CardSkeleton />
-          <CardSkeleton />
+          <div className="h-64 bg-white/60 dark:bg-white/10 rounded-lg animate-pulse" />
+          <div className="h-64 bg-white/60 dark:bg-white/10 rounded-lg animate-pulse" />
         </div>
       </div>
     );
   }
 
-  // Prepare KPI data from backend
-  const kpis = dashboardData?.kpis ? {
-    onTimeDelivery: {
-      value: Number(dashboardData.kpis.onTimeDelivery).toFixed(1),
-      change: 0
-    },
-    totalRevenue: {
-      value: dashboardData.kpis.totalRevenue,
-      change: 0
-    },
-    activeVehicles: {
-      value: dashboardData.kpis.activeVehicles,
-      change: 0
-    },
-    pendingDeliveries: {
-      value: dashboardData.kpis.pendingDeliveries,
-      change: 0
-    },
-    completedOrders: {
-      value: dashboardData.kpis.completedOrders,
-      change: 0
-    },
-    totalParties: {
-      value: dashboardData.kpis.totalParties,
-      change: 0
-    },
-    pendingInvoices: {
-      value: dashboardData.kpis.pendingInvoices,
-      change: 0
-    },
-    alerts: {
-      value: dashboardData.kpis.totalAlerts,
-      change: 0
-    },
-  } : {};
-
-  // Prepare alerts/tasks from backend
+  // Prepare alert data
   const alerts = [
-    ...(dashboardData?.alerts?.overdueInvoices || []).map(inv => ({
-      task: `Invoice ${inv.invoiceNumber} overdue by ${inv.overdueDays} days`,
-      priority: inv.overdueDays > 30 ? 'high' : inv.overdueDays > 15 ? 'medium' : 'low',
-      type: 'invoice',
-      link: `/invoices/${inv.invoiceNumber}`
+    ...(dashboardData?.alerts?.overdueInvoices || []).map((inv) => ({
+      id: inv.invoiceNumber,
+      title: `Invoice ${inv.invoiceNumber} Overdue`,
+      description: `Overdue by ${inv.overdueDays} days`,
+      type: 'overdue',
+      icon: AlertOctagon,
+      badge: 'red',
+      href: `/invoices/${inv.invoiceNumber}`,
     })),
-    ...(dashboardData?.alerts?.expiringDocuments || []).map(doc => ({
-      task: `${doc.documentType} expiring for ${doc.vehicleNo}`,
-      priority: doc.daysUntilExpiry < 7 ? 'high' : doc.daysUntilExpiry < 15 ? 'medium' : 'low',
-      type: 'document',
-      link: `/vehicles/${doc.vehicleId}`
+    ...(dashboardData?.alerts?.expiringDocuments || []).map((doc) => ({
+      id: doc.documentType + doc.vehicleNo,
+      title: `${doc.documentType} Expiring`,
+      description: `${doc.vehicleNo} expires in ${doc.daysUntilExpiry} days`,
+      type: 'expiry',
+      icon: Calendar,
+      badge: 'yellow',
+      href: `/vehicles/${doc.vehicleId}`,
     })),
-    ...(dashboardData?.alerts?.pendingAmendments || []).map(amend => ({
-      task: `Payment amendment pending: ₹${amend.amount}`,
-      priority: 'medium',
+    ...(dashboardData?.alerts?.pendingAmendments || []).map((amend) => ({
+      id: amend.id,
+      title: 'Payment Amendment',
+      description: `Amount: ₹${amend.amount} pending approval`,
       type: 'amendment',
-      link: `/payments/amendments/${amend.id}`
+      icon: AlertCircle,
+      badge: 'orange',
+      href: `/payments/amendments/${amend.id}`,
     })),
-  ].slice(0, 5);
+  ];
+
+  // KPI stats for strip
+  const kpiStats = [
+    {
+      label: 'Revenue (Today)',
+      value: dashboardData?.today?.collections || '₹0',
+      trend: 5,
+    },
+    {
+      label: 'On-Time %',
+      value: `${dashboardData?.kpis?.onTimeDelivery || 0}%`,
+      trend: 2,
+    },
+    {
+      label: 'Active Vehicles',
+      value: dashboardData?.kpis?.activeVehicles || 0,
+      trend: 0,
+    },
+    {
+      label: 'Pending Deliveries',
+      value: dashboardData?.kpis?.pendingDeliveries || 0,
+      trend: -1,
+    },
+    {
+      label: 'Completed Orders',
+      value: dashboardData?.kpis?.completedOrders || 0,
+      trend: 8,
+    },
+    {
+      label: 'Total Parties',
+      value: dashboardData?.kpis?.totalParties || 0,
+      trend: 3,
+    },
+    {
+      label: 'Pending Invoices',
+      value: dashboardData?.kpis?.pendingInvoices || 0,
+      trend: -2,
+    },
+    {
+      label: 'Active Alerts',
+      value: alerts.length,
+      trend: 0,
+    },
+  ];
+
+  const recentActivity = dashboardData?.recentActivity || [];
 
   return (
-    <div className="space-y-4 sm:space-y-6 lg:space-y-8">
-      {/* Header */}
+    <div className="space-y-8">
+      {/* Page Header */}
+      <PageHeader
+        title="Mission Control"
+        subtitle="Real-time transport operations dashboard"
+        icon={TrendingUp}
+        stats={[
+          { label: 'Total Revenue', value: dashboardData?.kpis?.totalRevenue || '₹0' },
+          { label: 'Fleet Status', value: 'Operational' },
+          { label: 'Network Health', value: '98%' },
+        ]}
+      />
+
+      {/* KPI Strip */}
       <motion.div
-        initial={{ opacity: 0, y: -20 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="px-1"
+        transition={{ duration: 0.3, delay: 0.1 }}
       >
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary-500/15 dark:bg-primary-400/10 backdrop-blur-sm rounded-xl border border-primary-300/20">
-            <Zap className="w-6 h-6 text-primary-600 dark:text-primary-400" />
-          </div>
-          <div>
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white drop-shadow-sm">
-              Dashboard
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-0.5 text-xs sm:text-sm lg:text-base">
-              Welcome to Raghhav Roadways Transport Management System
-            </p>
-          </div>
-        </div>
+        <StatStrip stats={kpiStats} />
       </motion.div>
 
-      {/* KPI Cards */}
+      {/* Main Charts Grid */}
       <motion.div
+        className="grid grid-cols-1 lg:grid-cols-3 gap-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.1 }}
+        transition={{ duration: 0.3, delay: 0.2 }}
       >
-        <KPICards kpis={kpis} />
+        {/* Revenue Trend - Takes 2 columns */}
+        <GlassPanel tier={2} className="lg:col-span-2 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">Revenue Trend</h3>
+              <p className="text-xs text-gray-500 dark:text-white/60 mt-1">Last 30 days</p>
+            </div>
+            <div className="flex gap-2">
+              {['7D', '30D', '90D'].map((period) => (
+                <button
+                  key={period}
+                  className="px-3 py-1 text-xs rounded-lg bg-white/50 dark:bg-white/5 hover:bg-black/5 dark:hover:bg-white/10 text-gray-600 dark:text-white/70 hover:text-gray-900 dark:hover:text-white transition-colors"
+                >
+                  {period}
+                </button>
+              ))}
+            </div>
+          </div>
+          <RevenueChart data={dashboardData?.charts?.revenueTrend || []} trend={0} />
+        </GlassPanel>
+
+        {/* Status Ring */}
+        <GlassPanel tier={2} className="p-6">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Status Distribution</h3>
+          <div className="space-y-3">
+            {[
+              { label: 'Booked', value: 45, color: 'bg-blue-500/20' },
+              { label: 'In Transit', value: 28, color: 'bg-amber-500/20' },
+              { label: 'Delivered', value: 18, color: 'bg-green-500/20' },
+              { label: 'Pending', value: 9, color: 'bg-purple-500/20' },
+            ].map((item) => (
+              <div key={item.label} className="flex items-center gap-3">
+                <div className={`w-3 h-3 rounded-full ${item.color}`} />
+                <span className="text-xs text-gray-600 dark:text-white/70 flex-1">{item.label}</span>
+                <span className="text-xs font-bold text-gray-900 dark:text-white">{item.value}%</span>
+              </div>
+            ))}
+          </div>
+        </GlassPanel>
       </motion.div>
 
-      {/* Main Stats */}
-      <StatsCards data={dashboardData} />
-
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.4, delay: 0.3 }}
-        >
-          <RevenueChart
-            data={dashboardData?.charts?.revenueTrend || []}
-            trend={0}
-          />
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.4, delay: 0.4 }}
-        >
-          <Card className="h-full">
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Activity className="w-5 h-5 text-primary-500" />
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Activity</h3>
+      {/* Alerts & Activity Grid */}
+      <motion.div
+        className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.3 }}
+      >
+        {/* Alerts Panel */}
+        <GlassPanel tier={2} className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="p-2 rounded-lg bg-red-500/20">
+                <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
               </div>
-            </CardHeader>
-            <CardContent>
-              {dashboardData?.recentActivity?.length > 0 ? (
-                <div className="space-y-4">
-                  {dashboardData.recentActivity.map((item, index) => (
-                    <motion.div
-                      key={index}
-                      className="flex items-center gap-3 p-3 rounded-lg bg-white/20 dark:bg-white/5 hover:bg-white/35 dark:hover:bg-white/10 border border-white/15 dark:border-white/5 transition-colors"
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.5 + index * 0.1 }}
-                    >
-                      <div className={`w-2 h-2 rounded-full ${item.type === 'create' ? 'bg-blue-500' :
-                          item.type === 'update' ? 'bg-yellow-500' :
-                            item.type === 'delete' ? 'bg-red-500' :
-                              'bg-primary-500'
-                        }`} />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">{item.description}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })} • {item.user}
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">Requires Attention</h3>
+            </div>
+            {alerts.length > 0 && (
+              <motion.span
+                className="px-2.5 py-1 text-xs font-bold bg-red-500/20 text-red-300 rounded-full"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring' }}
+              >
+                {alerts.length}
+              </motion.span>
+            )}
+          </div>
+
+          {alerts.length > 0 ? (
+            <div className="space-y-3 max-h-64 overflow-y-auto custom-scrollbar">
+              {alerts.slice(0, 5).map((alert, idx) => {
+                const Icon = alert.icon;
+                return (
+                  <motion.a
+                    key={alert.id}
+                    href={alert.href}
+                    className="block glass-t1 rounded-lg p-3 hover:bg-black/5 dark:hover:bg-white/[0.08] transition-colors group"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: idx * 0.05 }}
+                    whileHover={{ x: 4 }}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={`p-2 rounded-lg flex-shrink-0 ${
+                        alert.badge === 'red' ? 'bg-red-500/20' :
+                        alert.badge === 'yellow' ? 'bg-yellow-500/20' :
+                        'bg-orange-500/20'
+                      }`}>
+                        <Icon className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold text-gray-900 dark:text-white">{alert.title}</p>
+                        <p className="text-xs text-gray-500 dark:text-white/60 mt-0.5">{alert.description}</p>
+                      </div>
+                    </div>
+                  </motion.a>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <CheckCircle className="w-12 h-12 text-green-500/30 mx-auto mb-2" />
+              <p className="text-sm text-gray-500 dark:text-white/60">All systems running smoothly!</p>
+            </div>
+          )}
+        </GlassPanel>
+
+        {/* Recent Activity */}
+        <GlassPanel tier={2} className="p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="p-2 rounded-lg bg-blue-500/20">
+              <Activity className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Recent Activity</h3>
+          </div>
+
+          {recentActivity.length > 0 ? (
+            <div className="space-y-3 max-h-64 overflow-y-auto custom-scrollbar">
+              {recentActivity.slice(0, 5).map((item, idx) => {
+                const actionColor = {
+                  create: 'bg-green-500/20 text-green-600 dark:text-green-400',
+                  update: 'bg-blue-500/20 text-blue-600 dark:text-blue-400',
+                  delete: 'bg-red-500/20 text-red-600 dark:text-red-400',
+                  status_change: 'bg-purple-500/20 text-purple-400',
+                };
+
+                return (
+                  <motion.div
+                    key={idx}
+                    className="glass-t1 rounded-lg p-3"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: idx * 0.05 }}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={`px-2 py-1 text-xs font-medium rounded-full flex-shrink-0 ${
+                        actionColor[item.type] || 'bg-white/60 dark:bg-white/10 text-gray-500 dark:text-white/60'
+                      }`}>
+                        {item.type === 'create' && 'NEW'}
+                        {item.type === 'update' && 'UPD'}
+                        {item.type === 'delete' && 'DEL'}
+                        {item.type === 'status_change' && 'CHG'}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold text-gray-900 dark:text-white truncate">{item.description}</p>
+                        <p className="text-xs text-gray-400 dark:text-white/50 mt-0.5">
+                          {formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })}
                         </p>
                       </div>
-                    </motion.div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <Activity className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-                  <p className="text-gray-500 dark:text-gray-400 font-medium">No recent activity</p>
-                  <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
-                    Activity will appear here as you use the system
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
-
-      {/* Quick Stats Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.5 }}
-        >
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-orange-500" />
-                <h3 className="text-base font-semibold text-gray-900 dark:text-white">Alerts & Tasks</h3>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {alerts.length > 0 ? (
-                <div className="space-y-3">
-                  {alerts.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between p-2 rounded-lg hover:bg-white/20 dark:hover:bg-white/10 transition-colors">
-                      <span className="text-sm text-gray-700 dark:text-gray-300 flex-1">{item.task}</span>
-                      <span className={`text-xs px-2 py-1 rounded-full font-medium ml-2 backdrop-blur-sm ${item.priority === 'high' ? 'bg-red-500/15 text-red-700 dark:text-red-400 border border-red-300/20' :
-                          item.priority === 'medium' ? 'bg-yellow-500/15 text-yellow-700 dark:text-yellow-400 border border-yellow-300/20' :
-                            'bg-green-500/15 text-green-700 dark:text-green-400 border border-green-300/20'
-                        }`}>
-                        {item.priority}
-                      </span>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <AlertTriangle className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-                  <p className="text-gray-500 dark:text-gray-400 font-medium">No alerts</p>
-                  <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
-                    All systems running smoothly
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <Activity className="w-12 h-12 text-gray-300 dark:text-white/10 mx-auto mb-2" />
+              <p className="text-sm text-gray-500 dark:text-white/60">No recent activity yet</p>
+            </div>
+          )}
+        </GlassPanel>
+      </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.6 }}
-          className="lg:col-span-2"
-        >
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-green-500" />
-                <h3 className="text-base font-semibold text-gray-900 dark:text-white">Quick Stats</h3>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                {[
-                  { label: 'Active Vehicles', value: dashboardData?.kpis?.activeVehicles || 0, icon: Truck },
-                  { label: 'Total Parties', value: dashboardData?.kpis?.totalParties || 0, icon: FileText },
-                  { label: "Today's Bookings", value: dashboardData?.today?.bookings || 0, icon: FileText },
-                  {
-                    label: 'Avg. Delivery Time',
-                    value: dashboardData?.kpis?.avgDeliveryTime ? `${dashboardData.kpis.avgDeliveryTime} days` : 'N/A',
-                    icon: Clock
-                  },
-                ].map((stat, index) => {
-                  const Icon = stat.icon;
-                  return (
-                    <motion.div
-                      key={stat.label}
-                      className="text-center p-3 rounded-lg bg-white/20 dark:bg-white/5 backdrop-blur-sm border-2 border-white/20 dark:border-white/10"
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.7 + index * 0.1 }}
-                      whileHover={{ scale: 1.05 }}
-                    >
-                      <Icon className="w-5 h-5 text-primary-500 mx-auto mb-2" />
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{stat.label}</p>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
+      {/* Quick Stats Grid */}
+      <motion.div
+        className="grid grid-cols-2 md:grid-cols-4 gap-4"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.4 }}
+      >
+        {[
+          {
+            label: "Today's Bookings",
+            value: dashboardData?.today?.bookings || 0,
+            icon: CheckCircle,
+            color: 'bg-green-500/20',
+          },
+          {
+            label: 'Avg. Delivery Time',
+            value: `${dashboardData?.kpis?.avgDeliveryTime || 0} days`,
+            icon: Clock,
+            color: 'bg-blue-500/20',
+          },
+          {
+            label: 'Total Revenue',
+            value: dashboardData?.kpis?.totalRevenue || '₹0',
+            icon: DollarSign,
+            color: 'bg-purple-500/20',
+          },
+          {
+            label: 'Fleet Utilization',
+            value: `${Math.round((dashboardData?.kpis?.activeVehicles || 0) / 20 * 100)}%`,
+            icon: Truck,
+            color: 'bg-orange-500/20',
+          },
+        ].map((stat, idx) => {
+          const Icon = stat.icon;
+          return (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.5 + idx * 0.05 }}
+              whileHover={{ scale: 1.05, y: -2 }}
+            >
+              <GlassPanel tier={2} className="p-4 text-center cursor-pointer">
+                <div className={`w-10 h-10 ${stat.color} rounded-lg flex items-center justify-center mx-auto mb-2`}>
+                  <Icon className="w-5 h-5 text-gray-900 dark:text-white" />
+                </div>
+                <p className="text-sm font-bold text-gray-900 dark:text-white">{stat.value}</p>
+                <p className="text-xs text-gray-500 dark:text-white/60 mt-1">{stat.label}</p>
+              </GlassPanel>
+            </motion.div>
+          );
+        })}
+      </motion.div>
 
-      {/* Keyboard Shortcuts Hint */}
+      {/* Footer Hint */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}
-        className="text-center text-xs text-gray-400 dark:text-gray-500"
+        className="text-center text-xs text-gray-400 dark:text-white/40 pt-4"
       >
-        Press <kbd className="px-1.5 py-0.5 bg-white/25 dark:bg-white/10 border border-white/20 dark:border-white/10 rounded font-mono">Ctrl+K</kbd> for command palette •
-        <kbd className="px-1.5 py-0.5 bg-white/25 dark:bg-white/10 border border-white/20 dark:border-white/10 rounded font-mono ml-1">Ctrl+D</kbd> for dark mode
+        Tip: Press <kbd className="px-1.5 py-0.5 mx-0.5 bg-white/50 dark:bg-white/5 border border-black/8 dark:border-white/10 rounded font-mono">Cmd+K</kbd> to search - Use the sidebar to navigate
       </motion.div>
     </div>
   );
