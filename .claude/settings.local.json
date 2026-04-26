@@ -46,7 +46,9 @@
       "mcp__4db24efd-3103-480d-834b-807a231c8af2__get_project",
       "mcp__812646eb-fad8-4ed2-b7da-685da44ced72__execute_sql",
       "Skill(claude-api)",
-      "Skill(claude-api:*)"
+      "Skill(claude-api:*)",
+      "Bash(git commit -m ' *)",
+      "Bash(npm uninstall *)"
     ]
   }
 }
