@@ -23,6 +23,9 @@ const agentAvailabilityRoutes = require('./agent.availability.routes');
 // Admin Authentication Routes (for dual authentication system)
 const adminAuthRoutes = require('./admin.auth.routes');
 
+// Claude AI Routes
+const aiRoutes = require('./ai.routes');
+
 // Health check route with DB connectivity
 router.get('/health', async (req, res) => {
   const prisma = require('../config/database');
@@ -65,6 +68,9 @@ router.use('/agent/availability', agentAvailabilityRoutes);
 
 // Mount admin authentication routes (separate from user auth)
 router.use('/admin/auth', adminAuthRoutes);
+
+// Claude AI endpoints
+router.use('/ai', aiRoutes);
 
 // API documentation route
 router.get('/', (req, res) => {

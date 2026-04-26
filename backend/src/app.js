@@ -33,9 +33,9 @@ if (process.env.SENTRY_DSN) {
 const routes = require('./routes');
 const {
   errorConverter,
-  errorHandler,
   notFound,
 } = require('./middleware/errorHandler');
+const { aiErrorAnalyzer, aiErrorHandler } = require('./middleware/aiErrorHandler');
 const logger = require('./utils/logger');
 const { apiLimiter } = require('./middleware/rateLimiter');
 const requestId = require('./middleware/requestId');
@@ -183,7 +183,10 @@ if (Sentry) {
 // Error converter
 app.use(errorConverter);
 
-// Error handler
-app.use(errorHandler);
+// Claude AI error analyzer (attaches ai analysis to req, non-blocking 3s timeout)
+app.use(aiErrorAnalyzer);
+
+// Final error responder (includes Claude's ai field when available)
+app.use(aiErrorHandler);
 
 module.exports = app;

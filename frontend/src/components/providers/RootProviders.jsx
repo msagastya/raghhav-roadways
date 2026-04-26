@@ -1,11 +1,19 @@
 'use client';
 
-import ErrorBoundary from '../shared/ErrorBoundary';
+import { useEffect } from 'react';
+import SmartErrorBoundary from '../shared/SmartErrorBoundary';
+import useThemeStore from '../../store/themeStore';
 
 export default function RootProviders({ children }) {
+  const initializeTheme = useThemeStore((s) => s.initializeTheme);
+
+  useEffect(() => {
+    initializeTheme();
+  }, [initializeTheme]);
+
   return (
-    <ErrorBoundary>
+    <SmartErrorBoundary>
       {children}
-    </ErrorBoundary>
+    </SmartErrorBoundary>
   );
 }
