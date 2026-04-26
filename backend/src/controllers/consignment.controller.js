@@ -170,11 +170,16 @@ const uploadChallan = asyncHandler(async (req, res) => {
   }
 
   // Move file to appropriate location
-  const fileName = `${req.params.id}_challan_${Date.now()}${path.extname(
-    req.file.originalname
-  )}`;
+  const safeExt = path.extname(req.file.originalname).replace(/[^.a-zA-Z0-9]/g, '');
+  const fileName = `${req.params.id}_challan_${Date.now()}${safeExt}`;
   const filePath = path.join('challans', new Date().getFullYear().toString(), fileName);
-  const fullPath = path.join(__dirname, '../../storage', filePath);
+  const storageDir = path.resolve(__dirname, '../../storage');
+  const fullPath = path.resolve(storageDir, filePath);
+
+  // Prevent directory traversal
+  if (!fullPath.startsWith(storageDir + path.sep)) {
+    throw new ApiError(400, 'Invalid file path');
+  }
 
   // Ensure directory exists
   const dir = path.dirname(fullPath);

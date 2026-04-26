@@ -60,12 +60,10 @@ const formatCurrency = (amount) => {
 const getPaginationMeta = (totalRecords, page, limit) => {
   const totalPages = Math.ceil(totalRecords / limit);
   return {
-    currentPage: page,
+    page,
+    limit,
+    total: totalRecords,
     totalPages,
-    totalRecords,
-    perPage: limit,
-    hasNextPage: page < totalPages,
-    hasPreviousPage: page > 1,
   };
 };
 

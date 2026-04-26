@@ -98,7 +98,7 @@ const getPayments = async (filters = {}) => {
   });
 
   return {
-    payments,
+    data: payments,
     pagination: getPaginationMeta(totalRecords, parseInt(page), parseInt(limit)),
   };
 };
@@ -311,20 +311,29 @@ const addPaymentTransaction = async (paymentId, data, userId, ipAddress, userAge
     throw new ApiError(400, 'Transaction amount must be greater than 0');
   }
 
-  if (Number(amount) > Number(payment.balanceAmount)) {
-    throw new ApiError(
-      400,
-      `Transaction amount (₹${amount}) exceeds balance amount (₹${payment.balanceAmount})`
-    );
-  }
-
-  // Calculate new amounts
-  const newPaidAmount = Number(payment.paidAmount) + Number(amount);
-  const newBalanceAmount = Number(payment.totalAmount) - newPaidAmount;
-  const newStatus = newBalanceAmount === 0 ? 'Completed' : newPaidAmount > 0 ? 'Partial' : 'Pending';
-
-  // Create transaction in database transaction
+  // Use serializable isolation to prevent concurrent overpayment
   const result = await prisma.$transaction(async (tx) => {
+    // Re-fetch payment inside transaction for atomicity
+    const freshPayment = await tx.payment.findUnique({
+      where: { id: parseInt(paymentId) },
+    });
+
+    if (!freshPayment || freshPayment.isDeleted) {
+      throw new ApiError(404, 'Payment not found');
+    }
+
+    if (Number(amount) > Number(freshPayment.balanceAmount)) {
+      throw new ApiError(
+        400,
+        `Transaction amount (₹${amount}) exceeds balance amount (₹${freshPayment.balanceAmount})`
+      );
+    }
+
+    // Calculate new amounts
+    const newPaidAmount = Number(freshPayment.paidAmount) + Number(amount);
+    const newBalanceAmount = Number(freshPayment.totalAmount) - newPaidAmount;
+    const newStatus = newBalanceAmount === 0 ? 'Completed' : newPaidAmount > 0 ? 'Partial' : 'Pending';
+
     // Create payment transaction
     const transaction = await tx.paymentTransaction.create({
       data: {
@@ -354,6 +363,8 @@ const addPaymentTransaction = async (paymentId, data, userId, ipAddress, userAge
     });
 
     return transaction;
+  }, {
+    isolationLevel: 'Serializable',
   });
 
   // Create audit log

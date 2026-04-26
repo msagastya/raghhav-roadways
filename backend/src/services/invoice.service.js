@@ -88,7 +88,7 @@ const getInvoices = async (filters = {}) => {
   });
 
   return {
-    invoices,
+    data: invoices,
     pagination: getPaginationMeta(totalRecords, parseInt(page), parseInt(limit)),
   };
 };

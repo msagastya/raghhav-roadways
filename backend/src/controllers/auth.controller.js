@@ -24,7 +24,7 @@ const login = asyncHandler(async (req, res, next) => {
     const cookieOptions = {
       httpOnly: true, // Prevent JavaScript from accessing tokens
       secure: process.env.NODE_ENV === 'production', // HTTPS only in production
-      sameSite: 'strict', // Prevent CSRF
+      sameSite: 'lax', // Lax allows same-site cross-origin requests (different ports)
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days for access token
       path: '/',
     };

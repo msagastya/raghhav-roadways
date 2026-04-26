@@ -15,6 +15,7 @@ const {
  * @route   GET /api/v1/invoices/overdue
  * @desc    Get overdue invoices
  * @access  Private
+ * @reserved Mobile/Flutter app — not used by web frontend
  */
 router.get(
   '/overdue',
@@ -27,6 +28,7 @@ router.get(
  * @route   GET /api/v1/invoices/summary/payments
  * @desc    Get payment summary
  * @access  Private
+ * @reserved Mobile/Flutter app — not used by web frontend
  */
 router.get(
   '/summary/payments',

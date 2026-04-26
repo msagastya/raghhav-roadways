@@ -227,11 +227,18 @@ const generateInvoicePDF = async (invoice) => {
 };
 
 /**
- * Get PDF file
+ * Get PDF file (with path traversal protection)
  */
 const getPDFFile = async (filePath) => {
   try {
-    const fullPath = path.join(__dirname, '../../storage', filePath);
+    const storageDir = path.resolve(__dirname, '../../storage');
+    const fullPath = path.resolve(storageDir, filePath);
+
+    // Prevent directory traversal — resolved path must be within storage
+    if (!fullPath.startsWith(storageDir + path.sep)) {
+      throw new Error('Invalid file path');
+    }
+
     const fileBuffer = await fs.readFile(fullPath);
     return fileBuffer;
   } catch (error) {

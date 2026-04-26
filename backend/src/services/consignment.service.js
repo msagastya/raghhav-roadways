@@ -107,7 +107,7 @@ const getConsignments = async (filters = {}) => {
   });
 
   return {
-    consignments,
+    data: consignments,
     pagination: getPaginationMeta(totalRecords, parseInt(page), parseInt(limit)),
   };
 };

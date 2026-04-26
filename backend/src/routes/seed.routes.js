@@ -2,11 +2,11 @@ const express = require('express');
 const router = express.Router();
 const { execSync } = require('child_process');
 const path = require('path');
-const { authenticate, authorize } = require('../middleware/auth');
-const logger = require('../config/logger');
+const { authenticateToken, authorize } = require('../middleware/auth');
+const logger = require('../utils/logger');
 
 // Seed endpoint - Protected with Super Admin authentication only
-router.post('/run-seeds', authenticate, authorize(['SUPER_ADMIN']), async (req, res, next) => {
+router.post('/run-seeds', authenticateToken, authorize(['SUPER_ADMIN']), async (req, res, next) => {
   // Only allow in development environment
   if (process.env.NODE_ENV === 'production') {
     return res.status(403).json({

@@ -2,6 +2,7 @@ const app = require('./app');
 const logger = require('./utils/logger');
 const prisma = require('./config/database');
 const { validateEnv } = require('./config/envValidation');
+const os = require('os');
 
 // Validate environment variables on startup
 try {
@@ -13,6 +14,19 @@ try {
 }
 
 const PORT = process.env.PORT || 5000;
+
+// Get local IP address for network access
+const getLocalIpAddress = () => {
+  const interfaces = os.networkInterfaces();
+  for (const name of Object.keys(interfaces)) {
+    for (const iface of interfaces[name]) {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        return iface.address;
+      }
+    }
+  }
+  return '127.0.0.1';
+};
 
 // Test database connection
 const testDatabaseConnection = async () => {
@@ -29,10 +43,12 @@ const testDatabaseConnection = async () => {
 const startServer = async () => {
   await testDatabaseConnection();
 
-  const server = app.listen(PORT, () => {
+  const localIp = getLocalIpAddress();
+  const server = app.listen(PORT, '0.0.0.0', () => {
     logger.info(`🚀 Server running on port ${PORT}`);
     logger.info(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
-    logger.info(`🔗 API URL: http://localhost:${PORT}/api/v1`);
+    logger.info(`🔗 Local API URL: http://localhost:${PORT}/api/v1`);
+    logger.info(`🔗 Network API URL: http://${localIp}:${PORT}/api/v1`);
   });
 
   // Graceful shutdown

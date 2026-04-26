@@ -152,17 +152,6 @@ const getUserById = async (userId) => {
         },
       },
     },
-    select: {
-      id: true,
-      username: true,
-      email: true,
-      fullName: true,
-      mobile: true,
-      isActive: true,
-      lastLogin: true,
-      createdAt: true,
-      role: true,
-    },
   });
 
   if (!user) {
@@ -173,8 +162,10 @@ const getUserById = async (userId) => {
     (rp) => rp.permission.permissionCode
   );
 
+  const { passwordHash, ...safeUser } = user;
+
   return {
-    ...user,
+    ...safeUser,
     roleName: user.role.roleName,
     permissions,
   };
