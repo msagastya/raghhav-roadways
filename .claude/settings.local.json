@@ -48,7 +48,13 @@
       "Skill(claude-api)",
       "Skill(claude-api:*)",
       "Bash(git commit -m ' *)",
-      "Bash(npm uninstall *)"
+      "Bash(npm uninstall *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(openssl rand *)",
+      "mcp__812646eb-fad8-4ed2-b7da-685da44ced72__get_project",
+      "mcp__812646eb-fad8-4ed2-b7da-685da44ced72__apply_migration",
+      "Read(//dev/**)"
     ]
   }
 }
