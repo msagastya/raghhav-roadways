@@ -68,13 +68,10 @@ const corsOptions = {
       allowedOrigins.push('https://raghhav-roadways.vercel.app');
     }
 
-    // In development, allow localhost and ngrok
+    // In development, allow localhost
     if (process.env.NODE_ENV === 'development') {
       allowedOrigins.push('http://localhost:3000');
-      // Allow ngrok in development only
-      if (origin && origin.includes('.ngrok')) {
-        return callback(null, true);
-      }
+      // Add your specific ngrok URL to CORS_ORIGIN env var when needed — never wildcard
     }
 
     // Allow requests with no origin (like mobile apps or curl requests)
@@ -104,6 +101,17 @@ app.use(cors(corsOptions));
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
   crossOriginOpenerPolicy: false,
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", 'data:', 'https:'],
+      connectSrc: ["'self'", 'https://*.onrender.com', 'https://*.supabase.co', 'https://*.vercel.app'],
+      frameSrc: ["'none'"],
+      objectSrc: ["'none'"],
+    },
+  },
 }));
 
 // Compression middleware - compress all responses

@@ -26,9 +26,9 @@ exports.exportAllData = asyncHandler(async (req, res) => {
     timestamp: new Date().toISOString(),
     version: '1.0.0',
     data: {
-      users: await prisma.user.findMany({
-        include: { role: true },
-      }),
+      users: (await prisma.user.findMany({ include: { role: true } })).map(
+        ({ passwordHash, ...safe }) => safe
+      ),
       roles: await prisma.role.findMany({
         include: { rolePermissions: { include: { permission: true } } },
       }),
