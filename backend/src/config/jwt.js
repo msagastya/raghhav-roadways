@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const { v4: uuidv4 } = require('uuid');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
@@ -9,20 +10,15 @@ if (!JWT_SECRET || !JWT_REFRESH_SECRET) {
   throw new Error('JWT secrets are not defined in environment variables');
 }
 
-/**
- * Generate access token
- */
+// Each token gets a unique jti (JWT ID) so it can be individually blacklisted on logout
 const generateAccessToken = (payload) => {
-  return jwt.sign(payload, JWT_SECRET, {
+  return jwt.sign({ ...payload, jti: uuidv4() }, JWT_SECRET, {
     expiresIn: JWT_EXPIRES_IN,
   });
 };
 
-/**
- * Generate refresh token
- */
 const generateRefreshToken = (payload) => {
-  return jwt.sign(payload, JWT_REFRESH_SECRET, {
+  return jwt.sign({ ...payload, jti: uuidv4() }, JWT_REFRESH_SECRET, {
     expiresIn: JWT_REFRESH_EXPIRES_IN,
   });
 };
