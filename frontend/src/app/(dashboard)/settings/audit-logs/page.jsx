@@ -5,6 +5,9 @@ import { FileText, User, Clock, Search } from 'lucide-react';
 import GlassPanel from '../../../../components/ui/glass-panel';
 import PageHeader from '../../../../components/ui/page-header';
 import StatusBadge from '../../../../components/ui/status-badge';
+import { auditAPI } from '../../../../lib/api';
+import useToast from '../../../../hooks/useToast';
+import { getErrorMessage } from '../../../../lib/utils';
 
 export default function AuditLogsPage() {
   const [logs, setLogs] = useState([]);
@@ -14,11 +17,29 @@ export default function AuditLogsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const { showError } = useToast();
 
   useEffect(() => {
-    // TODO: Fetch audit logs from API
-    setLoading(false);
-    setLogs([]);
+    const fetchLogs = async () => {
+      setLoading(true);
+      try {
+        const res = await auditAPI.getAll({
+          page: currentPage,
+          limit: 20,
+          search: searchTerm || undefined,
+          startDate: startDate || undefined,
+          endDate: endDate || undefined,
+        });
+        const d = res.data?.data;
+        setLogs(d?.data || []);
+        setTotalPages(d?.pagination?.totalPages || 1);
+      } catch (error) {
+        showError(getErrorMessage(error));
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLogs();
   }, [currentPage, searchTerm, startDate, endDate]);
 
   const getActionVariant = (action) => {

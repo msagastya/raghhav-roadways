@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Plus, Edit, Trash2, Receipt } from 'lucide-react';
+import { Edit, Trash2, Receipt } from 'lucide-react';
 import { invoiceAPI } from '../../../lib/api';
 import PageHeader from '../../../components/ui/page-header';
 import FilterBar from '../../../components/ui/filter-bar';
@@ -21,9 +21,7 @@ export default function InvoicesPage() {
   const [stats, setStats] = useState({ total: 0, pending: 0, partial: 0, paid: 0 });
   const { showError, showSuccess } = useToast();
 
-  useEffect(() => {
-    fetchInvoices();
-  }, []);
+  useEffect(() => { fetchInvoices(); }, []);
 
   const fetchInvoices = async () => {
     try {
@@ -48,7 +46,7 @@ export default function InvoicesPage() {
     if (!window.confirm(`Delete ${invoice.invoiceNumber}?`)) return;
     try {
       await invoiceAPI.delete(invoice.id);
-      showSuccess('Deleted');
+      showSuccess('Invoice deleted');
       fetchInvoices();
     } catch (error) {
       showError(getErrorMessage(error));
@@ -59,11 +57,15 @@ export default function InvoicesPage() {
     { accessor: 'invoiceNumber', label: 'Invoice#', render: (v) => <span className="font-mono font-bold text-primary-600 dark:text-primary-400">{v}</span> },
     { accessor: 'invoiceDate', label: 'Date', render: (v) => formatDate(v, 'dd/MMM') },
     { accessor: 'partyName', label: 'Party', render: (v) => <span className="text-xs">{v}</span> },
-    { accessor: 'lineItemCount', label: 'Items', render: (v, r) => <span className="text-xs">{r.consignmentCount || 0}</span> },
     { accessor: 'totalAmount', label: 'Total', render: (v) => <span className="font-mono text-xs">{formatCurrency(v)}</span> },
     { accessor: 'paidAmount', label: 'Paid', render: (v) => <span className="font-mono text-xs text-green-600 dark:text-green-400">{formatCurrency(v)}</span> },
     { accessor: 'status', label: 'Status', render: (v) => <StatusBadge status={v?.toLowerCase()} size="xs" /> },
   ];
+
+  const filtered = invoices.filter(
+    (i) => i.invoiceNumber?.toLowerCase().includes(search.toLowerCase()) ||
+           i.partyName?.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="space-y-6">
@@ -80,7 +82,42 @@ export default function InvoicesPage() {
         onAction={() => router.push('/invoices/new')}
       />
       <FilterBar placeholder="Search invoice#, party..." onSearch={setSearch} activeFilterCount={search ? 1 : 0} />
-      <DataTable columns={columns} data={invoices.filter((i) => i.invoiceNumber?.includes(search) || i.partyName?.includes(search))} loading={loading} />
+      <DataTable
+        columns={columns}
+        data={filtered}
+        loading={loading}
+        expandable
+        onRowClick={(row) => router.push(`/invoices/${row.id}`)}
+        renderExpandedRow={(row) => (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+              <p className="text-xs text-gray-500 dark:text-white/60 mb-1">GR Count</p>
+              <p className="text-sm text-gray-900 dark:text-white">{row.consignmentCount || 0}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 dark:text-white/60 mb-1">Balance</p>
+              <p className="text-sm font-mono text-gray-900 dark:text-white">{formatCurrency((row.totalAmount || 0) - (row.paidAmount || 0))}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 dark:text-white/60 mb-1">Due Date</p>
+              <p className="text-sm text-gray-900 dark:text-white">{formatDate(row.dueDate, 'dd/MMM/yy') || '-'}</p>
+            </div>
+            <div className="flex gap-2">
+              <Link href={`/invoices/${row.id}/edit`}>
+                <Button variant="secondary" size="sm" className="w-full">
+                  <Edit className="w-3 h-3" /> Edit
+                </Button>
+              </Link>
+              <button
+                onClick={(e) => { e.stopPropagation(); handleDelete(row); }}
+                className="flex-1 px-2 py-1 text-xs rounded-lg bg-red-500/20 text-red-600 dark:text-red-300 hover:bg-red-500/30 transition-colors"
+              >
+                <Trash2 className="w-3 h-3 inline mr-1" /> Delete
+              </button>
+            </div>
+          </div>
+        )}
+      />
     </div>
   );
 }

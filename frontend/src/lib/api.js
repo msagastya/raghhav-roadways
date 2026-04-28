@@ -177,6 +177,10 @@ export const reportAPI = {
   getVehicleSettlement: (params) => api.get('/reports/vehicle-settlement', { params }),
 };
 
+export const auditAPI = {
+  getAll: (params) => api.get('/audit-logs', { params }),
+};
+
 export const mastersAPI = {
   // State-City
   getStates: () => api.get('/masters/states'),

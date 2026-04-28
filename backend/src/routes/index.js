@@ -22,6 +22,7 @@ const agentAvailabilityRoutes = require('./agent.availability.routes');
 
 // Admin Authentication Routes (for dual authentication system)
 const adminAuthRoutes = require('./admin.auth.routes');
+const auditRoutes = require('./audit.routes');
 
 // Health check route with DB connectivity
 router.get('/health', async (req, res) => {
@@ -57,6 +58,7 @@ router.use('/reports', reportRoutes);
 router.use('/masters', mastersRoutes);
 router.use('/seed', seedRoutes);
 router.use('/backup', backupRoutes);
+router.use('/audit-logs', auditRoutes);
 
 // Mount agent portal routes (isolated from admin)
 router.use('/agent/auth', agentAuthRoutes);
