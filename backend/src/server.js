@@ -9,7 +9,7 @@ try {
   validateEnv();
   logger.info('✅ Environment variables validated successfully');
 } catch (error) {
-  logger.error('❌ Environment validation failed:', error.message);
+  logger.error(`❌ Environment validation failed: ${error.message}`);
   process.exit(1);
 }
 
