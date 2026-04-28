@@ -3,6 +3,7 @@ services:
     name: raghhav-roadways-backend
     env: node
     region: singapore
+    plan: free
     buildCommand: cd backend && npm install && npx prisma generate
     startCommand: cd backend && npm start
     healthCheckPath: /api/v1/health
@@ -10,23 +11,21 @@ services:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 5000
+        value: 2026
       - key: API_VERSION
         value: v1
       - key: DATABASE_URL
-        fromDatabase:
-          name: raghhav-roadways-db
-          property: connectionString
+        sync: false
       - key: JWT_SECRET
-        generateValue: true
+        value: 8cad5e92b0d5c52699d51b145a3ff5308a600421b2868d87bf12c5d58d7957bf
       - key: JWT_EXPIRES_IN
         value: 7d
       - key: JWT_REFRESH_SECRET
-        generateValue: true
+        value: 6a0b9106c734c82f7011408d085eb5349143896c55d37fa7f47d530502838583
       - key: JWT_REFRESH_EXPIRES_IN
         value: 30d
       - key: CORS_ORIGIN
-        value: http://localhost:3000,https://*.vercel.app,https://raghhav-roadways.vercel.app
+        sync: false
       - key: STORAGE_PATH
         value: ./storage
       - key: MAX_FILE_SIZE
@@ -36,24 +35,18 @@ services:
       - key: COMPANY_GSTIN
         value: 24BQCPP3322B1ZH
       - key: COMPANY_ADDRESS
-        value: PLOT NO. D-407, BLD. NO. D-1, 4TH FLOOR, UMANG RESIDENCY NR. SACHIN RAILWAY STATION, SACHIN, SURAT - 394230
+        value: "PLOT NO. D-407, BLD. NO. D-1, 4TH FLOOR, UMANG RESIDENCY NR. SACHIN RAILWAY STATION, SACHIN, SURAT - 394230"
       - key: COMPANY_PHONE
-        value: +91 9727-466-477
+        value: "+91 9727-466-477"
       - key: COMPANY_EMAIL
         value: raghhavroadways@gmail.com
       - key: COMPANY_BANK_NAME
         value: AXIS BANK
       - key: COMPANY_BANK_ACCOUNT
-        value: 924020013795444
+        value: "924020013795444"
       - key: COMPANY_BANK_IFSC
         value: UTIB0005605
       - key: COMPANY_BANK_BRANCH
         value: STATION ROAD SACHIN
       - key: LOG_LEVEL
         value: info
-
-databases:
-  - name: raghhav-roadways-db
-    databaseName: raghhav_roadways
-    user: raghhav_roadways_user
-    region: singapore
