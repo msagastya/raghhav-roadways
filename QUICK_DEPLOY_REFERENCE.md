@@ -28,7 +28,7 @@ git push origin master
 **Copy-paste these 25 vars** (from `VERCEL_DEPLOYMENT_GUIDE.md` if needed):
 
 ```
-DATABASE_URL=postgresql://app_user:RaghhavRoadways%402026%23Secure%24Connection@db.uelwxwrklqrrlonxtpmq.supabase.co:5432/postgres
+DATABASE_URL=postgresql://app_user.uelwxwrklqrrlonxtpmq:RaghhavRoadways%402026%23Secure%24Connection@aws-1-ap-south-1.pooler.supabase.com:5432/postgres?sslmode=require
 JWT_SECRET=fca8298b28a0acc80edf273519e118a7a9b313c1fc1a0421facb44d4f764f19c
 JWT_REFRESH_SECRET=96bc8433c9b37aff8e490d0e79081f72a1a48ce8f2563209805cb840530aaa65
 JWT_EXPIRES_IN=7d

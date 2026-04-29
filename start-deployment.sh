@@ -79,7 +79,7 @@ cat > .env.vercel << 'EOF'
 # Backend Project → Settings → Environment Variables
 
 # DATABASE (1)
-DATABASE_URL=postgresql://app_user:RaghhavRoadways%402026%23Secure%24Connection@db.uelwxwrklqrrlonxtpmq.supabase.co:5432/postgres
+DATABASE_URL=postgresql://app_user.uelwxwrklqrrlonxtpmq:RaghhavRoadways%402026%23Secure%24Connection@aws-1-ap-south-1.pooler.supabase.com:5432/postgres?sslmode=require
 
 # AUTHENTICATION (4)
 JWT_SECRET=fca8298b28a0acc80edf273519e118a7a9b313c1fc1a0421facb44d4f764f19c
@@ -217,7 +217,7 @@ Admin URL:         https://raghhav-roadways.vercel.app/admin
 
 CREDENTIALS:
 Email:             admin@raghhavroadways.com
-Database Host:     db.uelwxwrklqrrlonxtpmq.supabase.co
+Database Host:     aws-1-ap-south-1.pooler.supabase.com
 
 EOF
 

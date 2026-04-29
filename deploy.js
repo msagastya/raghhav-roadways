@@ -27,8 +27,8 @@ const CONFIG = {
   backend: 'raghhav-roadways',
   frontend: 'raghhav-roadways-frontend',
   database: {
-    url: 'postgresql://app_user:RaghhavRoadways%402026%23Secure%24Connection@db.uelwxwrklqrrlonxtpmq.supabase.co:5432/postgres',
-    host: 'db.uelwxwrklqrrlonxtpmq.supabase.co',
+    url: 'postgresql://app_user.uelwxwrklqrrlonxtpmq:RaghhavRoadways%402026%23Secure%24Connection@aws-1-ap-south-1.pooler.supabase.com:5432/postgres?sslmode=require',
+    host: 'aws-1-ap-south-1.pooler.supabase.com',
     user: 'app_user',
   },
   jwt: {

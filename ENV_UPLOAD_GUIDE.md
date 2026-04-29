@@ -42,7 +42,7 @@ You can also manually copy the variables from `.env.production` file and paste t
 **Contains all 25 variables:**
 
 ```
-DATABASE_URL=postgresql://app_user:RaghhavRoadways%402026%23Secure%24Connection@db.uelwxwrklqrrlonxtpmq.supabase.co:5432/postgres
+DATABASE_URL=postgresql://app_user.uelwxwrklqrrlonxtpmq:RaghhavRoadways%402026%23Secure%24Connection@aws-1-ap-south-1.pooler.supabase.com:5432/postgres?sslmode=require
 NODE_ENV=production
 PORT=3000
 JWT_SECRET=fca8298b28a0acc80edf273519e118a7a9b313c1fc1a0421facb44d4f764f19c

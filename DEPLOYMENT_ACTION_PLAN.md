@@ -51,7 +51,7 @@ Go to: **Vercel Dashboard** → Select `raghhav-roadways` → **Settings** → *
 **Add these 25 variables** (copy-paste from `VERCEL_DEPLOYMENT_GUIDE.md`):
 
 Key ones:
-- `DATABASE_URL` = `postgresql://app_user:RaghhavRoadways%402026%23Secure%24Connection@db.uelwxwrklqrrlonxtpmq.supabase.co:5432/postgres`
+- `DATABASE_URL` = `postgresql://app_user.uelwxwrklqrrlonxtpmq:RaghhavRoadways%402026%23Secure%24Connection@aws-1-ap-south-1.pooler.supabase.com:5432/postgres?sslmode=require`
 - `JWT_SECRET` = `fca8298b28a0acc80edf273519e118a7a9b313c1fc1a0421facb44d4f764f19c`
 - `CORS_ORIGIN` = `https://your-frontend-vercel-url.vercel.app` (update after frontend URL is known)
 
@@ -150,7 +150,7 @@ curl https://raghhav-roadways.onrender.com/api/v1/health
 ## 🔑 Important Credentials
 
 ### Database
-- **Host**: db.uelwxwrklqrrlonxtpmq.supabase.co
+- **Host**: aws-1-ap-south-1.pooler.supabase.com
 - **User**: app_user
 - **Password**: RaghhavRoadways@2026#Secure$Connection
 - **Database**: postgres

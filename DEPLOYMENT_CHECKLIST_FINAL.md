@@ -47,7 +47,7 @@ Go to: **Vercel Dashboard** → `raghhav-roadways` project → **Settings** → 
 
 #### Database Connection
 ```
-DATABASE_URL = postgresql://app_user:RaghhavRoadways%402026%23Secure%24Connection@db.uelwxwrklqrrlonxtpmq.supabase.co:5432/postgres
+DATABASE_URL = postgresql://app_user.uelwxwrklqrrlonxtpmq:RaghhavRoadways%402026%23Secure%24Connection@aws-1-ap-south-1.pooler.supabase.com:5432/postgres?sslmode=require
 ```
 
 #### Authentication

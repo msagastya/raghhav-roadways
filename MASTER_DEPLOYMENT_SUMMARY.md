@@ -156,7 +156,7 @@ Keep these safe - you'll need them in Vercel:
 
 ```
 DATABASE_URL
-postgresql://app_user:RaghhavRoadways%402026%23Secure%24Connection@db.uelwxwrklqrrlonxtpmq.supabase.co:5432/postgres
+postgresql://app_user.uelwxwrklqrrlonxtpmq:RaghhavRoadways%402026%23Secure%24Connection@aws-1-ap-south-1.pooler.supabase.com:5432/postgres?sslmode=require
 
 JWT_SECRET
 fca8298b28a0acc80edf273519e118a7a9b313c1fc1a0421facb44d4f764f19c
