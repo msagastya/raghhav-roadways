@@ -2,6 +2,8 @@ const authService = require('../services/auth.service');
 const { asyncHandler, ApiError } = require('../middleware/errorHandler');
 const logger = require('../utils/logger');
 const { recordFailedLogin, recordSuccessfulLogin } = require('../middleware/loginRateLimiter');
+const { blacklistToken } = require('../config/redis');
+const { verifyAccessToken } = require('../config/jwt');
 
 /**
  * Login user
@@ -62,11 +64,23 @@ const login = asyncHandler(async (req, res, next) => {
  * POST /api/v1/auth/logout
  */
 const logout = asyncHandler(async (req, res) => {
-  // Clear authentication cookies
+  // Blacklist the current token so it cannot be reused after logout
+  const token = req.cookies?.accessToken || req.headers['authorization']?.split(' ')[1];
+  if (token) {
+    try {
+      const decoded = verifyAccessToken(token);
+      if (decoded.jti) {
+        // TTL matches token lifetime so Redis entry auto-expires
+        const ttl = Math.max(decoded.exp - Math.floor(Date.now() / 1000), 0);
+        await blacklistToken(decoded.jti, ttl);
+      }
+    } catch { /* token already invalid — nothing to blacklist */ }
+  }
+
   res.clearCookie('accessToken', { path: '/', httpOnly: true });
   res.clearCookie('refreshToken', { path: '/', httpOnly: true });
 
-  logger.info(`User ${req.user.username} logged out`);
+  logger.info(`User ${req.user?.username} logged out`);
 
   res.status(200).json({
     success: true,

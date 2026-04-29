@@ -1,5 +1,5 @@
 const agentAuthService = require('../services/agent.auth.service');
-const { asyncHandler } = require('../middleware/errorHandler');
+const { asyncHandler, ApiError } = require('../middleware/errorHandler');
 const logger = require('../utils/logger');
 
 /**
@@ -40,10 +40,16 @@ const login = asyncHandler(async (req, res) => {
 
     logger.info(`Agent ${result.agent.agentCode} logged in`);
 
+    const isProd = process.env.NODE_ENV === 'production';
+    const cookieOpts = { httpOnly: true, secure: isProd, sameSite: 'strict' };
+
+    res.cookie('agentAccessToken', result.accessToken, { ...cookieOpts, maxAge: 15 * 60 * 1000 });
+    res.cookie('agentRefreshToken', result.refreshToken, { ...cookieOpts, maxAge: 7 * 24 * 60 * 60 * 1000 });
+
     res.status(200).json({
         success: true,
         message: 'Login successful',
-        data: result,
+        data: { agent: result.agent }, // Tokens moved to httpOnly cookies
     });
 });
 
@@ -53,6 +59,9 @@ const login = asyncHandler(async (req, res) => {
  */
 const logout = asyncHandler(async (req, res) => {
     logger.info(`Agent ${req.agent.agentCode} logged out`);
+
+    res.clearCookie('agentAccessToken');
+    res.clearCookie('agentRefreshToken');
 
     res.status(200).json({
         success: true,
@@ -65,14 +74,22 @@ const logout = asyncHandler(async (req, res) => {
  * POST /api/v1/agent/auth/refresh
  */
 const refreshToken = asyncHandler(async (req, res) => {
-    const { refreshToken } = req.body;
+    const token = req.cookies.agentRefreshToken;
 
-    const result = await agentAuthService.refreshAccessToken(refreshToken);
+    if (!token) {
+        throw new ApiError(401, 'Refresh token required');
+    }
+
+    const result = await agentAuthService.refreshAccessToken(token);
+
+    const isProd = process.env.NODE_ENV === 'production';
+    res.cookie('agentAccessToken', result.accessToken, {
+        httpOnly: true, secure: isProd, sameSite: 'strict', maxAge: 15 * 60 * 1000,
+    });
 
     res.status(200).json({
         success: true,
         message: 'Token refreshed successfully',
-        data: result,
     });
 });
 

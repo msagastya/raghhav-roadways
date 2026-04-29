@@ -1,43 +1,71 @@
 import { NextResponse } from 'next/server';
 
-// Define public routes that don't require authentication
-const publicRoutes = ['/login', '/signup'];
+const publicRoutes = ['/login', '/signup', '/forgot-password', '/reset-password', '/track'];
+
+// Routes that require specific roles
+const adminOnlyRoutes = ['/admin'];
+const agentOnlyRoutes = ['/agent'];
+
+function decodeJwtPayload(token) {
+  try {
+    const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(Buffer.from(base64, 'base64').toString('utf-8'));
+  } catch {
+    return null;
+  }
+}
 
 export function middleware(request) {
   const { pathname } = request.nextUrl;
 
-  // Check if the route is public
   const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
 
-  // Get access token from cookies
   const accessToken = request.cookies.get('accessToken')?.value;
+  const agentToken = request.cookies.get('agentAccessToken')?.value;
 
-  // If trying to access protected route without token, redirect to login
-  if (!isPublicRoute && !accessToken) {
-    const loginUrl = new URL('/login', request.url);
-    return NextResponse.redirect(loginUrl);
+  // No token at all — bounce to login for protected routes
+  if (!isPublicRoute && !accessToken && !agentToken) {
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // If authenticated and trying to access login/signup, redirect to dashboard
-  if (isPublicRoute && accessToken && pathname !== '/signup') {
-    const dashboardUrl = new URL('/consignments', request.url);
-    return NextResponse.redirect(dashboardUrl);
+  // Already authenticated — redirect away from login/signup
+  if (isPublicRoute && (accessToken || agentToken) && pathname === '/login') {
+    return NextResponse.redirect(new URL('/consignments', request.url));
+  }
+
+  // Role-based route protection
+  if (accessToken) {
+    const payload = decodeJwtPayload(accessToken);
+    if (payload) {
+      const role = payload.role;
+
+      // Admin-only routes — reject non-admins
+      if (adminOnlyRoutes.some(r => pathname.startsWith(r))) {
+        if (!['SUPER_ADMIN', 'ADMIN'].includes(role)) {
+          return NextResponse.redirect(new URL('/consignments', request.url));
+        }
+      }
+
+      // Agent routes — reject non-agents trying to use admin token here
+      if (agentOnlyRoutes.some(r => pathname.startsWith(r))) {
+        return NextResponse.redirect(new URL('/consignments', request.url));
+      }
+    }
+  }
+
+  // Agent token — only valid for agent routes
+  if (agentToken && !accessToken) {
+    const agentOnlyAccess = agentOnlyRoutes.some(r => pathname.startsWith(r)) || isPublicRoute;
+    if (!agentOnlyAccess) {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
   }
 
   return NextResponse.next();
 }
 
-// Configure which routes should be checked by middleware
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
     '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };

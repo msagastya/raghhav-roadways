@@ -8,9 +8,8 @@ const prisma = require('../config/database');
  */
 const authenticateAgent = async (req, res, next) => {
     try {
-        // Get token from header
-        const authHeader = req.headers['authorization'];
-        const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+        // Read token from httpOnly cookie (secure) or Authorization header (fallback for mobile)
+        const token = req.cookies.agentAccessToken || req.headers['authorization']?.split(' ')[1];
 
         if (!token) {
             throw new ApiError(401, 'Access token is required');
@@ -74,8 +73,7 @@ const authenticateAgent = async (req, res, next) => {
  */
 const optionalAgentAuth = async (req, res, next) => {
     try {
-        const authHeader = req.headers['authorization'];
-        const token = authHeader && authHeader.split(' ')[1];
+        const token = req.cookies.agentAccessToken || req.headers['authorization']?.split(' ')[1];
 
         if (token) {
             const decoded = verifyAccessToken(token);

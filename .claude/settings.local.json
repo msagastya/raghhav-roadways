@@ -32,7 +32,29 @@
       "Bash(npx prisma migrate:*)",
       "Bash(# Kill just the frontend, restart it lsof -ti:2025)",
       "Bash(python3:*)",
-      "Bash(kill:*)"
+      "Bash(kill:*)",
+      "Read(//tmp/**)",
+      "Bash(rm '/Users/msagastya/Desktop/raghhav-roadways/.claude/worktrees/nice-black-d57690/frontend/src/app/api/auth/[...nextauth]/route.js')",
+      "Bash(rmdir '/Users/msagastya/Desktop/raghhav-roadways/.claude/worktrees/nice-black-d57690/frontend/src/app/api/auth/[...nextauth]')",
+      "mcp__812646eb-fad8-4ed2-b7da-685da44ced72__list_projects",
+      "mcp__4db24efd-3103-480d-834b-807a231c8af2__list_teams",
+      "mcp__812646eb-fad8-4ed2-b7da-685da44ced72__list_tables",
+      "mcp__4db24efd-3103-480d-834b-807a231c8af2__list_projects",
+      "mcp__812646eb-fad8-4ed2-b7da-685da44ced72__list_migrations",
+      "mcp__4db24efd-3103-480d-834b-807a231c8af2__list_deployments",
+      "mcp__4db24efd-3103-480d-834b-807a231c8af2__get_deployment_build_logs",
+      "mcp__4db24efd-3103-480d-834b-807a231c8af2__get_project",
+      "mcp__812646eb-fad8-4ed2-b7da-685da44ced72__execute_sql",
+      "Skill(claude-api)",
+      "Skill(claude-api:*)",
+      "Bash(git commit -m ' *)",
+      "Bash(npm uninstall *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(openssl rand *)",
+      "mcp__812646eb-fad8-4ed2-b7da-685da44ced72__get_project",
+      "mcp__812646eb-fad8-4ed2-b7da-685da44ced72__apply_migration",
+      "Read(//dev/**)"
     ]
   }
 }

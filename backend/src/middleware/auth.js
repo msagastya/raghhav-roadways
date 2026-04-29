@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const { verifyAccessToken } = require('../config/jwt');
 const { ApiError } = require('./errorHandler');
 const prisma = require('../config/database');
+const { isTokenBlacklisted } = require('../config/redis');
 
 /**
  * Authenticate JWT token
@@ -22,8 +23,13 @@ const authenticateToken = async (req, res, next) => {
       throw new ApiError(401, 'Access token is required');
     }
 
-    // Verify token
+    // Verify token signature and expiry
     const decoded = verifyAccessToken(token);
+
+    // Check if token was revoked on logout
+    if (decoded.jti && await isTokenBlacklisted(decoded.jti)) {
+      throw new ApiError(401, 'Token has been revoked. Please log in again.');
+    }
 
     // Get user details with role and permissions
     const user = await prisma.user.findUnique({
