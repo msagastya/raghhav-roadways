@@ -24,7 +24,6 @@ const agentAvailabilityRoutes = require('./agent.availability.routes');
 const adminAuthRoutes = require('./admin.auth.routes');
 const auditRoutes = require('./audit.routes');
 
-
 // Health check route with DB connectivity
 router.get('/health', async (req, res) => {
   const prisma = require('../config/database');

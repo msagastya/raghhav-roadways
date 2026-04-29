@@ -4,7 +4,12 @@ node_modules/
 # Environment variables
 .env
 .env.local
+.env.production
+.env.staging
 .env.*.local
+ENV_CONFIG.json
+upload-env-to-vercel.js
+upload-env-to-vercel.sh
 
 # System files
 .DS_Store
@@ -34,3 +39,5 @@ logs/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.vercel
+.env*.local
