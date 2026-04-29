@@ -47,8 +47,8 @@ No more manual steps needed.
 Both apps will be live at:
 
 ```
-🔗 Backend:  https://raghhav-roadways-backend.vercel.app
-🔗 Frontend: https://raghhav-roadways-frontend.vercel.app
+🔗 Backend:  https://raghhav-roadways.onrender.com
+🔗 Frontend: https://raghhav-roadways.vercel.app
 ```
 
 ---

@@ -171,8 +171,8 @@ git push origin master
 After deployment:
 
 ```
-Backend API:   https://raghhav-roadways-backend.vercel.app
-Frontend:      https://raghhav-roadways-frontend.vercel.app
+Backend API:   https://raghhav-roadways.onrender.com
+Frontend:      https://raghhav-roadways.vercel.app
 Database:      Supabase (ap-south-1)
 ```
 

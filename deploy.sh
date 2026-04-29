@@ -24,7 +24,7 @@ NC='\033[0m' # No Color
 # ============================================================================
 
 PROJECT_NAME="raghhav-roadways"
-BACKEND_NAME="raghhav-roadways-backend"
+BACKEND_NAME="raghhav-roadways"
 FRONTEND_NAME="raghhav-roadways-frontend"
 BACKEND_URL="https://${BACKEND_NAME}.vercel.app"
 FRONTEND_URL="https://${FRONTEND_NAME}.vercel.app"
@@ -208,7 +208,7 @@ JWT_REFRESH_EXPIRES_IN
 ├─────────────────────────────────────────────────────────────────────┤
 
 CORS_ORIGIN
-https://raghhav-roadways-frontend.vercel.app
+https://raghhav-roadways.vercel.app
 
 ├─────────────────────────────────────────────────────────────────────┤
 │ FILE UPLOAD & PAGINATION                                            │

@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: raghhav-roadways-backend
+    name: raghhav-roadways
     env: node
     region: singapore
     plan: free

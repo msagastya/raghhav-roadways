@@ -66,7 +66,7 @@ This will:
 Update DATABASE_URL in Vercel:
 
 ```
-1. Go to: https://vercel.com/suyashs-projects-3acd31bf/raghhavroadways/settings/environment-variables
+1. Go to: https://vercel.com/msagastya/raghhav-roadways/settings/environment-variables
 2. Find: DATABASE_URL
 3. Click: Edit
 4. Paste: Your new connection string

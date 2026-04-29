@@ -24,7 +24,7 @@ const { execSync } = require('child_process');
 
 const CONFIG = {
   project: 'raghhav-roadways',
-  backend: 'raghhav-roadways-backend',
+  backend: 'raghhav-roadways',
   frontend: 'raghhav-roadways-frontend',
   database: {
     url: 'postgresql://app_user:RaghhavRoadways%402026%23Secure%24Connection@db.uelwxwrklqrrlonxtpmq.supabase.co:5432/postgres',
@@ -36,8 +36,8 @@ const CONFIG = {
     refreshSecret: '96bc8433c9b37aff8e490d0e79081f72a1a48ce8f2563209805cb840530aaa65',
   },
   vercel: {
-    backendUrl: 'https://raghhav-roadways-backend.vercel.app',
-    frontendUrl: 'https://raghhav-roadways-frontend.vercel.app',
+    backendUrl: 'https://raghhav-roadways.onrender.com',
+    frontendUrl: 'https://raghhav-roadways.vercel.app',
   },
 };
 
@@ -245,7 +245,7 @@ function displayEnvVars() {
       JWT_REFRESH_EXPIRES_IN: '30d',
     },
     'CORS & NETWORK': {
-      CORS_ORIGIN: 'https://raghhav-roadways-frontend.vercel.app',
+      CORS_ORIGIN: 'https://raghhav-roadways.vercel.app',
     },
     'FILE UPLOAD & PAGINATION': {
       MAX_FILE_SIZE: '10485760',

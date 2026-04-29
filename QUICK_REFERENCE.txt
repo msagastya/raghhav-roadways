@@ -17,7 +17,7 @@ JWT_REFRESH_SECRET:
 DATABASE DETAILS:
 - Project: msagastya
 - Region: ap-south-1 (Mumbai)
-- Host: db.ugqufwuxndvzczcubbmf.supabase.co
+- Host: db.uelwxwrklqrrlonxtpmq.supabase.co
 - User: postgres
 - Database: postgres
 - Port: 6543 (connection pooler)
@@ -159,9 +159,9 @@ IMPORTANT FILES TO READ
 VERCEL URLS (After Deployment)
 ================================================================================
 
-Backend:  https://your-backend-project.vercel.app/api/v1
+Backend:  https://raghhav-roadways.onrender.com/api/v1
 Frontend: https://your-frontend-project.vercel.app
-Health:   https://your-backend-project.vercel.app/api/v1/health
+Health:   https://raghhav-roadways.onrender.com/api/v1/health
 
 ================================================================================
 EMERGENCY TROUBLESHOOTING

@@ -71,7 +71,7 @@
 ```
 Project:     msagastya
 Region:      ap-south-1 (Mumbai)
-Host:        db.ugqufwuxndvzczcubbmf.supabase.co
+Host:        db.uelwxwrklqrrlonxtpmq.supabase.co
 Database:    postgres
 User:        postgres
 Port:        6543 (connection pooler)
@@ -138,7 +138,7 @@ Publishable:  sb_publishable_d2NTlGsMYRA6y2wFoxhTtw_xAMHeEAE
 
 #### Step 1: Update backend/.env
 1. Open `backend/.env` in your editor
-2. Find the line: `DATABASE_URL="postgresql://postgres.ugqufwuxndvzczcubbmf:[YOUR_SUPABASE_PASSWORD]@..."`
+2. Find the line: `DATABASE_URL="postgresql://postgres.uelwxwrklqrrlonxtpmq:[YOUR_SUPABASE_PASSWORD]@..."`
 3. Replace `[YOUR_SUPABASE_PASSWORD]` with your actual password
 4. Save the file
 
@@ -150,7 +150,7 @@ Publishable:  sb_publishable_d2NTlGsMYRA6y2wFoxhTtw_xAMHeEAE
 ```
 VERCEL_TOKEN          = [Copy from Vercel]
 VERCEL_ORG_ID         = [Copy from Vercel Settings]
-DATABASE_URL          = postgresql://postgres.ugqufwuxndvzczcubbmf:[PASSWORD]@aws-0-ap-south-1.pooler.supabase.co:6543/postgres
+DATABASE_URL          = postgresql://postgres.uelwxwrklqrrlonxtpmq:[PASSWORD]@aws-0-ap-south-1.pooler.supabase.co:6543/postgres
 JWT_SECRET            = fca8298b28a0acc80edf273519e118a7a9b313c1fc1a0421facb44d4f764f19c
 JWT_REFRESH_SECRET    = 96bc8433c9b37aff8e490d0e79081f72a1a48ce8f2563209805cb840530aaa65
 SENTRY_DSN            = [Copy from Sentry - optional]

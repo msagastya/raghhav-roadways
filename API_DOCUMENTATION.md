@@ -1,6 +1,6 @@
 # Raghhav Roadways API Documentation
 
-**Base URL**: `https://raghhavroadways.vercel.app/api/v1`  
+**Base URL**: `https://raghhav-roadways.onrender.com/api/v1`  
 **Version**: 1.0.0  
 **Last Updated**: April 2026
 
@@ -584,7 +584,7 @@ POST https://your-webhook-url.com/rides/completed
 const axios = require('axios');
 
 const client = axios.create({
-  baseURL: 'https://raghhavroadways.vercel.app/api/v1',
+  baseURL: 'https://raghhav-roadways.onrender.com/api/v1',
   headers: {
     Authorization: `Bearer ${token}`
   }
@@ -607,7 +607,7 @@ headers = {
 }
 
 response = requests.post(
-    'https://raghhavroadways.vercel.app/api/v1/rides/book',
+    'https://raghhav-roadways.onrender.com/api/v1/rides/book',
     json={
         'pickupLocation': '123 Main St',
         'dropLocation': 'Airport',
@@ -619,7 +619,7 @@ response = requests.post(
 
 ### cURL
 ```bash
-curl -X POST https://raghhavroadways.vercel.app/api/v1/rides/book \
+curl -X POST https://raghhav-roadways.onrender.com/api/v1/rides/book \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{

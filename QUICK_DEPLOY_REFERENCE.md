@@ -16,8 +16,8 @@ git push origin master
 ✅ **Expected**: Vercel starts building backend automatically
 
 **Your URLs**:
-- Backend: `https://raghhav-roadways-backend.vercel.app`
-- Frontend: `https://raghhav-roadways-frontend.vercel.app`
+- Backend: `https://raghhav-roadways.onrender.com`
+- Frontend: `https://raghhav-roadways.vercel.app`
 
 ---
 
@@ -62,7 +62,7 @@ COMPANY_BANK_BRANCH=New Delhi
 ## 3️⃣ TEST BACKEND (2 min)
 
 ```bash
-curl https://raghhav-roadways-backend.vercel.app/health
+curl https://raghhav-roadways.onrender.com/health
 ```
 
 ✅ **Should return**: `{"status":"ok","database":"connected",...}`
@@ -73,7 +73,7 @@ curl https://raghhav-roadways-backend.vercel.app/health
 
 **Update**: `frontend/.env.local`
 ```
-NEXT_PUBLIC_API_URL=https://raghhav-roadways-backend.vercel.app/api/v1
+NEXT_PUBLIC_API_URL=https://raghhav-roadways.onrender.com/api/v1
 ```
 
 **Deploy**:
@@ -93,7 +93,7 @@ git push origin master
 
 Go back to: **Backend → Environment Variables**
 
-**Change**: `CORS_ORIGIN=https://raghhav-roadways-frontend.vercel.app`
+**Change**: `CORS_ORIGIN=https://raghhav-roadways.vercel.app`
 
 **Click**: Save → Redeploy
 
@@ -105,13 +105,13 @@ Go back to: **Backend → Environment Variables**
 
 ```bash
 # Test 1: Frontend loads
-curl https://raghhav-roadways-frontend.vercel.app
+curl https://raghhav-roadways.vercel.app
 
 # Test 2: Backend responds
-curl https://raghhav-roadways-backend.vercel.app/health
+curl https://raghhav-roadways.onrender.com/health
 
 # Test 3: Admin can login
-# Visit: https://raghhav-roadways-frontend.vercel.app/admin/login
+# Visit: https://raghhav-roadways.vercel.app/admin/login
 # Email: admin@raghhavroadways.com
 ```
 

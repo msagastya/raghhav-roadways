@@ -76,7 +76,7 @@ node deploy.js
 After script finishes, go to **Vercel Dashboard**:
 
 1. Login: https://vercel.com/dashboard
-2. Select project: `raghhav-roadways-backend`
+2. Select project: `raghhav-roadways`
 3. Click: **Settings** → **Environment Variables**
 4. Add all 25 variables from script output (or from `ENV_CONFIG.json`)
 5. Click: **Save**
@@ -97,7 +97,7 @@ After script finishes, go to **Vercel Dashboard**:
 
 **Test health endpoint**:
 ```bash
-curl https://raghhav-roadways-backend.vercel.app/health
+curl https://raghhav-roadways.onrender.com/health
 ```
 
 **Expected response**:
@@ -109,7 +109,7 @@ curl https://raghhav-roadways-backend.vercel.app/health
 ```
 
 **Test admin login**:
-- URL: https://raghhav-roadways-frontend.vercel.app/admin/login
+- URL: https://raghhav-roadways.vercel.app/admin/login
 - Email: `admin@raghhavroadways.com`
 - Password: Set on first login
 
@@ -165,7 +165,7 @@ JWT_REFRESH_SECRET
 96bc8433c9b37aff8e490d0e79081f72a1a48ce8f2563209805cb840530aaa65
 
 CORS_ORIGIN
-https://raghhav-roadways-frontend.vercel.app
+https://raghhav-roadways.vercel.app
 ```
 
 ---
@@ -208,7 +208,7 @@ Everything is live ✅✅✅
 After deployment:
 
 - [ ] Health check returns `"database": "connected"`
-- [ ] Frontend loads: https://raghhav-roadways-frontend.vercel.app
+- [ ] Frontend loads: https://raghhav-roadways.vercel.app
 - [ ] Admin login page appears: /admin/login
 - [ ] Admin can login with: admin@raghhavroadways.com
 - [ ] No errors in Vercel logs
@@ -320,7 +320,7 @@ git push origin master
 
 ✅ **Backend health check**:
 ```bash
-curl https://raghhav-roadways-backend.vercel.app/health
+curl https://raghhav-roadways.onrender.com/health
 
 # Returns:
 {"status":"ok","database":"connected",...}
@@ -328,7 +328,7 @@ curl https://raghhav-roadways-backend.vercel.app/health
 
 ✅ **Frontend loads**:
 ```
-https://raghhav-roadways-frontend.vercel.app
+https://raghhav-roadways.vercel.app
 # Shows login page
 ```
 

@@ -101,7 +101,7 @@ I understand. However, there are **fundamental technical and security constraint
 
 5. **Run one curl command** (10 seconds)
    ```bash
-   curl https://raghhav-roadways-backend.vercel.app/health
+   curl https://raghhav-roadways.onrender.com/health
    ```
 
 **Total manual time: ~5 minutes**
@@ -190,7 +190,7 @@ I understand. However, there are **fundamental technical and security constraint
 
 5. **Run health check** (your machine):
    ```bash
-   curl https://raghhav-roadways-backend.vercel.app/health
+   curl https://raghhav-roadways.onrender.com/health
    ```
 
 **That's it. 5 minutes of actual interaction.**
@@ -225,7 +225,7 @@ chmod +x start-deployment.sh
 # Step 2: Open Vercel in browser
 # https://vercel.com/dashboard
 
-# Step 3: Select raghhav-roadways-backend project
+# Step 3: Select raghhav-roadways service
 
 # Step 4: Settings → Environment Variables
 # Copy 25 values from .env.vercel file
@@ -234,7 +234,7 @@ chmod +x start-deployment.sh
 # Step 5: Click Redeploy (wait 2-3 min)
 
 # Step 6: Test
-curl https://raghhav-roadways-backend.vercel.app/health
+curl https://raghhav-roadways.onrender.com/health
 ```
 
 **Total time: 10-15 minutes**

@@ -133,7 +133,7 @@ node upload-env-to-vercel.js
 
 **Option C: Manual**
 1. Go to: https://vercel.com/dashboard
-2. Select: `raghhav-roadways-backend`
+2. Select: `raghhav-roadways`
 3. Settings → Environment Variables
 4. Copy-paste each variable from `.env.production`
 5. Click: Redeploy
@@ -142,7 +142,7 @@ node upload-env-to-vercel.js
 
 ### Step 3: Test
 ```bash
-curl https://raghhav-roadways-backend.vercel.app/health
+curl https://raghhav-roadways.onrender.com/health
 ```
 
 **Expected**:
@@ -264,7 +264,7 @@ If scripts don't work, upload manually:
 
 1. **Open `.env.production`** in your text editor
 2. **Go to Vercel**: https://vercel.com/dashboard
-3. **Select project**: raghhav-roadways-backend
+3. **Select project**: raghhav-roadways
 4. **Go to**: Settings → Environment Variables
 5. **For each line** in `.env.production`:
    - Copy the key name (before `=`)
@@ -295,7 +295,7 @@ Scripts completed successfully when you see:
 1. **Wait** 2-3 minutes for redeployment
 2. **Test** health endpoint:
    ```bash
-   curl https://raghhav-roadways-backend.vercel.app/health
+   curl https://raghhav-roadways.onrender.com/health
    ```
 3. **Check response** for `"database": "connected"`
 4. **You're done!** 🚀

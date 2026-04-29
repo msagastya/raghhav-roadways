@@ -69,7 +69,7 @@ DATABASE_URL="postgresql://postgres:[YOUR_PASSWORD]@aws-0-ap-south-1.supabase.co
 
 ### Step 4: Update Vercel Environment
 ```
-1. Go to https://vercel.com/suyashs-projects-3acd31bf/raghhavroadways/settings/environment-variables
+1. Go to https://vercel.com/msagastya/raghhav-roadways/settings/environment-variables
 2. Find DATABASE_URL → Edit it
 3. Paste the new connection string
 4. Click Save

@@ -44,7 +44,7 @@
       "eas": {
         "projectId": "raghhav-roadways-mobile"
       },
-      "apiUrl": "https://raghhavroadways.vercel.app/api/v1"
+      "apiUrl": "https://raghhav-roadways.onrender.com/api/v1"
     }
   }
 }

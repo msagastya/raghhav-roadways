@@ -49,7 +49,7 @@ Visit https://vercel.com and either:
 1. Go to Vercel Dashboard → Add New → Project
 2. Select "Import Git Repository"
 3. Choose `raghhav-roadways` repository
-4. Project name: `raghhav-roadways-backend`
+4. Project name: `raghhav-roadways`
 5. Framework: `Express`
 6. Root directory: `backend`
 7. Click Deploy
@@ -103,8 +103,8 @@ After frontend deployment:
 ## 📊 Production URLs (After Deployment)
 
 ```
-Backend API:   https://raghhav-roadways-backend.vercel.app
-Frontend App:  https://raghhav-roadways-frontend.vercel.app
+Backend API:   https://raghhav-roadways.onrender.com
+Frontend App:  https://raghhav-roadways.vercel.app
 Database:      PostgreSQL on Supabase (Mumbai region)
 ```
 
@@ -133,7 +133,7 @@ After deployment, verify:
 
 1. **Health Check:**
    ```bash
-   curl https://raghhav-roadways-backend.vercel.app/health
+   curl https://raghhav-roadways.onrender.com/health
    # Expected: { "status": "ok", "database": "connected" }
    ```
 

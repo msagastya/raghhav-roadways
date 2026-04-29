@@ -28,7 +28,7 @@ npm i -g vercel
 
 # Navigate to backend folder and deploy
 cd backend
-vercel --prod --name raghhav-roadways-backend
+vercel --prod --name raghhav-roadways
 ```
 
 ---
@@ -95,8 +95,8 @@ COMPANY_BANK_BRANCH = New Delhi
 ### Step 3: Get Your Backend URL
 
 After backend deploys successfully:
-- Your backend URL will be: **`https://raghhav-roadways-backend.vercel.app`**
-- Test it: `curl https://raghhav-roadways-backend.vercel.app/health`
+- Your backend URL will be: **`https://raghhav-roadways.onrender.com`**
+- Test it: `curl https://raghhav-roadways.onrender.com/health`
 
 Expected response:
 ```json
@@ -114,8 +114,8 @@ Expected response:
 #### In frontend folder, create/update `.env.production`:
 
 ```bash
-NEXT_PUBLIC_API_URL=https://raghhav-roadways-backend.vercel.app/api/v1
-NEXT_PUBLIC_SOCKET_URL=https://raghhav-roadways-backend.vercel.app
+NEXT_PUBLIC_API_URL=https://raghhav-roadways.onrender.com/api/v1
+NEXT_PUBLIC_SOCKET_URL=https://raghhav-roadways.onrender.com
 ```
 
 #### Deploy:
@@ -145,7 +145,7 @@ Go back to **Vercel Dashboard** → Backend Project → **Environment Variables*
 
 Update:
 ```
-CORS_ORIGIN = https://raghhav-roadways-frontend.vercel.app
+CORS_ORIGIN = https://raghhav-roadways.vercel.app
 ```
 
 Then **Redeploy** the backend.
@@ -156,12 +156,12 @@ Then **Redeploy** the backend.
 
 ### 1. Health Check
 ```bash
-curl https://raghhav-roadways-backend.vercel.app/health
+curl https://raghhav-roadways.onrender.com/health
 ```
 
 ### 2. Test Admin Login
 
-Navigate to: `https://raghhav-roadways-frontend.vercel.app/admin/login`
+Navigate to: `https://raghhav-roadways.vercel.app/admin/login`
 
 **Credentials**:
 - Email: `admin@raghhavroadways.com`
@@ -176,7 +176,7 @@ From backend logs in Vercel:
 ### 4. Test API Endpoint
 
 ```bash
-curl -X GET https://raghhav-roadways-backend.vercel.app/api/v1/health \
+curl -X GET https://raghhav-roadways.onrender.com/api/v1/health \
   -H "Content-Type: application/json"
 ```
 
@@ -290,11 +290,11 @@ eas build --platform android
 
 | Service | URL |
 |---------|-----|
-| Backend API | https://raghhav-roadways-backend.vercel.app |
-| Admin Dashboard | https://raghhav-roadways-frontend.vercel.app/admin |
-| User App | https://raghhav-roadways-frontend.vercel.app |
-| Health Check | https://raghhav-roadways-backend.vercel.app/health |
-| API Docs | https://raghhav-roadways-backend.vercel.app/docs |
+| Backend API | https://raghhav-roadways.onrender.com |
+| Admin Dashboard | https://raghhav-roadways.vercel.app/admin |
+| User App | https://raghhav-roadways.vercel.app |
+| Health Check | https://raghhav-roadways.onrender.com/health |
+| API Docs | https://raghhav-roadways.onrender.com/docs |
 
 ---
 

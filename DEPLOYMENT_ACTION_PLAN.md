@@ -40,13 +40,13 @@ git push origin master
 
 **Expected**: Deployment completes in 1-2 minutes. Check Vercel dashboard for success.
 
-**Your backend URL**: `https://raghhav-roadways-backend.vercel.app`
+**Your backend URL**: `https://raghhav-roadways.onrender.com`
 
 ---
 
 ### **Step 2: Configure Backend Environment Variables** (3 minutes)
 
-Go to: **Vercel Dashboard** → Select `raghhav-roadways-backend` → **Settings** → **Environment Variables**
+Go to: **Vercel Dashboard** → Select `raghhav-roadways` → **Settings** → **Environment Variables**
 
 **Add these 25 variables** (copy-paste from `VERCEL_DEPLOYMENT_GUIDE.md`):
 
@@ -65,7 +65,7 @@ Then click **Redeploy** button.
 
 ```bash
 # Test health endpoint
-curl https://raghhav-roadways-backend.vercel.app/health
+curl https://raghhav-roadways.onrender.com/health
 
 # Expected response:
 # {
@@ -99,7 +99,7 @@ git push origin master  # Vercel redeploys everything
 
 **Expected**: Frontend deploys in 2-3 minutes.
 
-**Your frontend URL**: `https://raghhav-roadways-frontend.vercel.app`
+**Your frontend URL**: `https://raghhav-roadways.vercel.app`
 
 ---
 
@@ -108,7 +108,7 @@ git push origin master  # Vercel redeploys everything
 Now that you know your frontend URL, go back to backend environment variables and update:
 
 ```
-CORS_ORIGIN = https://raghhav-roadways-frontend.vercel.app
+CORS_ORIGIN = https://raghhav-roadways.vercel.app
 ```
 
 Then **Redeploy** backend again.
@@ -118,17 +118,17 @@ Then **Redeploy** backend again.
 ### **Step 6: Verify Everything Works** (5 minutes)
 
 **Test 1: Frontend loads**
-- Visit: `https://raghhav-roadways-frontend.vercel.app`
+- Visit: `https://raghhav-roadways.vercel.app`
 - Should show login page ✅
 
 **Test 2: Admin login**
-- Go to: `https://raghhav-roadways-frontend.vercel.app/admin/login`
+- Go to: `https://raghhav-roadways.vercel.app/admin/login`
 - Email: `admin@raghhavroadways.com`
 - Set your password on first login
 
 **Test 3: API is accessible**
 ```bash
-curl https://raghhav-roadways-backend.vercel.app/api/v1/health
+curl https://raghhav-roadways.onrender.com/api/v1/health
 ```
 
 ---

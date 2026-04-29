@@ -87,14 +87,14 @@ Add these 5 secrets one by one:
 #### 4. VERCEL_BACKEND_URL
 - **Name:** `VERCEL_BACKEND_URL`
 - **Value:** Your backend domain (without https://)
-  - Example: `raghhav-roadways-backend.vercel.app`
+  - Example: `raghhav-roadways.vercel.app`
   - Get from: Vercel dashboard when backend is deployed
 - Click "Add secret"
 
 #### 5. VERCEL_FRONTEND_URL
 - **Name:** `VERCEL_FRONTEND_URL`
 - **Value:** Your frontend domain (without https://)
-  - Example: `raghhav-roadways-frontend.vercel.app`
+  - Example: `raghhav-roadways.vercel.app`
   - Get from: Vercel dashboard when frontend is deployed
 - Click "Add secret"
 
@@ -236,8 +236,8 @@ Health checks verify deployment
 | VERCEL_TOKEN | https://vercel.com/account/tokens | `abc123def456...` |
 | VERCEL_ORG_ID | Vercel settings or project URL | `team_abc123` |
 | VERCEL_PROJECT_ID | Vercel Project → Settings | `prj_xyz789` |
-| VERCEL_BACKEND_URL | Vercel dashboard | `raghhav-roadways-backend.vercel.app` |
-| VERCEL_FRONTEND_URL | Vercel dashboard | `raghhav-roadways-frontend.vercel.app` |
+| VERCEL_BACKEND_URL | Vercel dashboard | `raghhav-roadways.vercel.app` |
+| VERCEL_FRONTEND_URL | Vercel dashboard | `raghhav-roadways.vercel.app` |
 
 ---
 

@@ -170,7 +170,7 @@ Go to Vercel dashboard and watch the backend deploy.
 
 In Vercel Dashboard:
 
-1. Go to: `raghhav-roadways-backend` → **Settings** → **Environment Variables**
+1. Go to: `raghhav-roadways` → **Settings** → **Environment Variables**
 2. Copy all 25 variables from script output (or from `ENV_CONFIG.json`)
 3. Add each variable with its value
 4. Click **Save**
@@ -186,7 +186,7 @@ After adding env vars:
 
 Run health check:
 ```bash
-curl https://raghhav-roadways-backend.vercel.app/health
+curl https://raghhav-roadways.onrender.com/health
 ```
 
 Expected response:
@@ -214,7 +214,7 @@ Or let script handle it in next run.
 
 Back in Vercel backend environment variables:
 
-1. Update: `CORS_ORIGIN = https://raghhav-roadways-frontend.vercel.app`
+1. Update: `CORS_ORIGIN = https://raghhav-roadways.vercel.app`
 2. Click **Save**
 3. Click **Redeploy**
 
@@ -224,13 +224,13 @@ Test all endpoints:
 
 ```bash
 # Health check
-curl https://raghhav-roadways-backend.vercel.app/health
+curl https://raghhav-roadways.onrender.com/health
 
 # Frontend loads
-curl https://raghhav-roadways-frontend.vercel.app
+curl https://raghhav-roadways.vercel.app
 
 # Admin login page
-# Visit: https://raghhav-roadways-frontend.vercel.app/admin/login
+# Visit: https://raghhav-roadways.vercel.app/admin/login
 ```
 
 ---
@@ -384,8 +384,8 @@ eas build --platform android
 |----------|-----|
 | Vercel Dashboard | https://vercel.com/dashboard |
 | Supabase Console | https://app.supabase.com |
-| Backend Health | https://raghhav-roadways-backend.vercel.app/health |
-| Admin Dashboard | https://raghhav-roadways-frontend.vercel.app/admin |
+| Backend Health | https://raghhav-roadways.onrender.com/health |
+| Admin Dashboard | https://raghhav-roadways.vercel.app/admin |
 | GitHub | https://github.com/your-username/raghhav-roadways |
 
 ---
@@ -402,12 +402,12 @@ eas build --platform android
 - Password: `RaghhavRoadways@2026#Secure$Connection`
 
 **Backend**:
-- URL: `https://raghhav-roadways-backend.vercel.app`
+- URL: `https://raghhav-roadways.onrender.com`
 - Health: `/health`
 - API Base: `/api/v1`
 
 **Frontend**:
-- URL: `https://raghhav-roadways-frontend.vercel.app`
+- URL: `https://raghhav-roadways.vercel.app`
 - Admin: `/admin`
 - User: `/`
 

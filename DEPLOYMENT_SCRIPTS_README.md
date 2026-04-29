@@ -145,8 +145,8 @@ JWT_REFRESH_SECRET=96bc8433c9b37aff8e490d0e79081f72a1a48ce8f2563209805cb840530aa
 
 **Updated by Scripts to**:
 ```
-NEXT_PUBLIC_API_URL=https://raghhav-roadways-backend.vercel.app/api/v1
-NEXT_PUBLIC_SOCKET_URL=https://raghhav-roadways-backend.vercel.app
+NEXT_PUBLIC_API_URL=https://raghhav-roadways.onrender.com/api/v1
+NEXT_PUBLIC_SOCKET_URL=https://raghhav-roadways.onrender.com
 ```
 
 **Automatic**: Scripts create/update this file
@@ -228,8 +228,8 @@ cd ~/Desktop/raghhav-roadways
 
 # Update frontend .env.local
 cat > frontend/.env.local << EOF
-NEXT_PUBLIC_API_URL=https://raghhav-roadways-backend.vercel.app/api/v1
-NEXT_PUBLIC_SOCKET_URL=https://raghhav-roadways-backend.vercel.app
+NEXT_PUBLIC_API_URL=https://raghhav-roadways.onrender.com/api/v1
+NEXT_PUBLIC_SOCKET_URL=https://raghhav-roadways.onrender.com
 EOF
 
 # Stage changes
@@ -298,8 +298,8 @@ git push origin master
 ### Modify Backend URL
 
 Both scripts use hardcoded URLs:
-- Backend: `https://raghhav-roadways-backend.vercel.app`
-- Frontend: `https://raghhav-roadways-frontend.vercel.app`
+- Backend: `https://raghhav-roadways.onrender.com`
+- Frontend: `https://raghhav-roadways.vercel.app`
 
 To change, edit in scripts:
 
@@ -467,7 +467,7 @@ Script completed successfully when:
 2. **Check Vercel**: Go to dashboard, see backend deploying
 3. **Add env vars**: Use script output to add 25 variables in Vercel
 4. **Redeploy**: Click Redeploy in Vercel after adding vars
-5. **Test**: Run health check: `curl https://raghhav-roadways-backend.vercel.app/health`
+5. **Test**: Run health check: `curl https://raghhav-roadways.onrender.com/health`
 
 ---
 

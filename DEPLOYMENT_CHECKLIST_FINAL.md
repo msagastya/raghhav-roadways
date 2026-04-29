@@ -41,7 +41,7 @@ ls -la frontend/.env.local    # Frontend env exists
 
 ### Phase 2: Backend Deployment Configuration
 
-Go to: **Vercel Dashboard** → `raghhav-roadways-backend` project → **Settings** → **Environment Variables**
+Go to: **Vercel Dashboard** → `raghhav-roadways` project → **Settings** → **Environment Variables**
 
 **Add these 25 variables** (exact values):
 
@@ -110,7 +110,7 @@ Once backend is redeployed:
 
 **Test 1: Health Check**
 ```bash
-curl https://raghhav-roadways-backend.vercel.app/health
+curl https://raghhav-roadways.onrender.com/health
 
 # Expected response (should have "database": "connected"):
 {
@@ -127,7 +127,7 @@ curl https://raghhav-roadways-backend.vercel.app/health
 - [ ] Verify: `✅ Database connected successfully`
 - [ ] No error messages in logs
 
-**Notes Your Backend URL**: `https://raghhav-roadways-backend.vercel.app`
+**Notes Your Backend URL**: `https://raghhav-roadways.onrender.com`
 
 ---
 
@@ -137,8 +137,8 @@ Update frontend environment variable:
 
 **File**: `frontend/.env.local` (or create `.env.production`)
 ```
-NEXT_PUBLIC_API_URL=https://raghhav-roadways-backend.vercel.app/api/v1
-NEXT_PUBLIC_SOCKET_URL=https://raghhav-roadways-backend.vercel.app
+NEXT_PUBLIC_API_URL=https://raghhav-roadways.onrender.com/api/v1
+NEXT_PUBLIC_SOCKET_URL=https://raghhav-roadways.onrender.com
 ```
 
 **Deploy**:
@@ -156,7 +156,7 @@ git push origin master
 - [ ] Frontend deployment shows "Ready" status
 - [ ] No build errors in logs
 
-**Notes Your Frontend URL**: `https://raghhav-roadways-frontend.vercel.app`
+**Notes Your Frontend URL**: `https://raghhav-roadways.vercel.app`
 
 ---
 
@@ -165,7 +165,7 @@ git push origin master
 Back to backend environment variables in Vercel:
 
 - [ ] Go back to Backend → **Settings** → **Environment Variables**
-- [ ] Update: `CORS_ORIGIN = https://raghhav-roadways-frontend.vercel.app`
+- [ ] Update: `CORS_ORIGIN = https://raghhav-roadways.vercel.app`
 - [ ] Click **Save**
 - [ ] Click **Redeploy**
 - [ ] Wait: 2 minutes for redeployment
@@ -175,12 +175,12 @@ Back to backend environment variables in Vercel:
 ## 🧪 Post-Deployment Testing
 
 ### Test 1: Frontend Loads
-- [ ] Visit: `https://raghhav-roadways-frontend.vercel.app`
+- [ ] Visit: `https://raghhav-roadways.vercel.app`
 - [ ] Should see login page
 - [ ] No errors in browser console (F12)
 
 ### Test 2: Admin Login
-- [ ] Navigate to: `https://raghhav-roadways-frontend.vercel.app/admin/login`
+- [ ] Navigate to: `https://raghhav-roadways.vercel.app/admin/login`
 - [ ] Enter email: `admin@raghhavroadways.com`
 - [ ] Click "Login"
 - [ ] Should ask to set password on first login
@@ -189,7 +189,7 @@ Back to backend environment variables in Vercel:
 
 ### Test 3: API Connectivity
 ```bash
-curl https://raghhav-roadways-backend.vercel.app/api/v1/health
+curl https://raghhav-roadways.onrender.com/api/v1/health
 
 # Expected: Returns data with no errors
 ```
@@ -204,7 +204,7 @@ curl https://raghhav-roadways-backend.vercel.app/api/v1/health
 - [ ] [ ] Database query executes successfully
 
 ### Test 5: User Registration (Optional)
-- [ ] Visit: `https://raghhav-roadways-frontend.vercel.app/signup`
+- [ ] Visit: `https://raghhav-roadways.vercel.app/signup`
 - [ ] Create test user account
 - [ ] Login with new account
 - [ ] [ ] User registration flow works
@@ -325,11 +325,11 @@ eas build --platform android
 ### Deployment URLs
 | Service | URL |
 |---------|-----|
-| Admin Dashboard | https://raghhav-roadways-frontend.vercel.app/admin |
-| User Frontend | https://raghhav-roadways-frontend.vercel.app |
-| Backend API | https://raghhav-roadways-backend.vercel.app |
-| Health Check | https://raghhav-roadways-backend.vercel.app/health |
-| API Base | https://raghhav-roadways-backend.vercel.app/api/v1 |
+| Admin Dashboard | https://raghhav-roadways.vercel.app/admin |
+| User Frontend | https://raghhav-roadways.vercel.app |
+| Backend API | https://raghhav-roadways.onrender.com |
+| Health Check | https://raghhav-roadways.onrender.com/health |
+| API Base | https://raghhav-roadways.onrender.com/api/v1 |
 
 ### Admin Credentials
 - **Email**: admin@raghhavroadways.com

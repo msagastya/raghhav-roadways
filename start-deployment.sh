@@ -37,8 +37,8 @@ echo ""
 echo "→ Updating frontend environment..."
 mkdir -p frontend
 cat > frontend/.env.local << 'EOF'
-NEXT_PUBLIC_API_URL=https://raghhav-roadways-backend.vercel.app/api/v1
-NEXT_PUBLIC_SOCKET_URL=https://raghhav-roadways-backend.vercel.app
+NEXT_PUBLIC_API_URL=https://raghhav-roadways.onrender.com/api/v1
+NEXT_PUBLIC_SOCKET_URL=https://raghhav-roadways.onrender.com
 EOF
 echo -e "${GREEN}✓ Frontend environment configured${NC}"
 
@@ -90,7 +90,7 @@ JWT_REFRESH_EXPIRES_IN=30d
 # SERVER (3)
 NODE_ENV=production
 PORT=3000
-CORS_ORIGIN=https://raghhav-roadways-frontend.vercel.app
+CORS_ORIGIN=https://raghhav-roadways.vercel.app
 
 # FILES & PAGINATION (4)
 MAX_FILE_SIZE=10485760
@@ -133,12 +133,12 @@ cat << 'EOF'
 1️⃣  WAIT 1-2 MINUTES
    → Vercel is auto-deploying backend right now
    → Go to: https://vercel.com/dashboard
-   → Select: raghhav-roadways-backend project
+   → Select: raghhav-roadways service
    → Check deployment status in "Deployments" tab
 
 2️⃣  ADD ENVIRONMENT VARIABLES (Copy-paste from .env.vercel file)
    → Vercel Dashboard
-   → raghhav-roadways-backend project
+   → raghhav-roadways service
    → Settings → Environment Variables
    → Add all 25 variables listed in: .env.vercel file
    → Click: Save
@@ -148,7 +148,7 @@ cat << 'EOF'
    → Wait: 2-3 minutes
 
 4️⃣  TEST BACKEND
-   → Run: curl https://raghhav-roadways-backend.vercel.app/health
+   → Run: curl https://raghhav-roadways.onrender.com/health
    → Should see: "database": "connected"
 
 5️⃣  UPDATE CORS_ORIGIN
@@ -185,7 +185,7 @@ echo ""
 
 echo -e "${GREEN}File with all env vars: $(pwd)/.env.vercel${NC}"
 echo ""
-echo -e "${CYAN}Next: Open Vercel dashboard → raghhav-roadways-backend → Add env vars${NC}"
+echo -e "${CYAN}Next: Open Vercel dashboard → raghhav-roadways → Add env vars${NC}"
 echo ""
 
 # ============================================================================
@@ -210,10 +210,10 @@ USER INPUT: ~5 minutes of copy-paste
 🚀 QUICK REFERENCE:
 
 Vercel Dashboard:  https://vercel.com/dashboard
-Backend Project:   raghhav-roadways-backend
+Backend Project:   raghhav-roadways
 Env Vars File:     .env.vercel (in project root)
-API Health Test:   curl https://raghhav-roadways-backend.vercel.app/health
-Admin URL:         https://raghhav-roadways-frontend.vercel.app/admin
+API Health Test:   curl https://raghhav-roadways.onrender.com/health
+Admin URL:         https://raghhav-roadways.vercel.app/admin
 
 CREDENTIALS:
 Email:             admin@raghhavroadways.com

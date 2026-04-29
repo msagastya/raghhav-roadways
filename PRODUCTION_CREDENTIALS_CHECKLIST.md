@@ -32,7 +32,7 @@ This file lists all credentials you need to collect. **NEVER share credentials i
 
 **Where it goes:**
 ```
-DATABASE_URL="postgresql://postgres.ugqufwuxndvzczcubbmf:[PASTE_PASSWORD_HERE]@aws-0-ap-south-1.pooler.supabase.co:6543/postgres"
+DATABASE_URL="postgresql://postgres.uelwxwrklqrrlonxtpmq:[PASTE_PASSWORD_HERE]@aws-0-ap-south-1.pooler.supabase.co:6543/postgres"
 ```
 
 **Files to update:**
