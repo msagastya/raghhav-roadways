@@ -1,9 +1,6 @@
-import { Inter } from 'next/font/google'
 import './globals.css'
 import { Toaster } from 'react-hot-toast'
 import RootProviders from '../components/providers/RootProviders'
-
-const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
   title: 'Raghhav Roadways - Transport Management System',
@@ -13,7 +10,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className} suppressHydrationWarning>
+      <body suppressHydrationWarning>
         <RootProviders>
           {children}
         </RootProviders>

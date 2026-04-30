@@ -159,22 +159,8 @@ export default function Sidebar({ isOpen }) {
                           ? 'bg-white/15 text-white shadow-lg shadow-primary-600/20 border-2 border-primary-400/30 backdrop-blur-sm'
                           : 'text-gray-300 hover:bg-white/10 hover:text-white border-2 border-transparent hover:border-white/15'
                       )}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      whileHover={{ scale: expanded ? 1.03 : 1.1, x: expanded ? 6 : 0 }}
-                      whileTap={{ scale: 0.98 }}
                       title={!expanded ? item.name : undefined}
                     >
-                      {isActive && (
-                        <motion.div
-                          className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"
-                          initial={{ x: '-100%' }}
-                          animate={{ x: '100%' }}
-                          transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-                        />
-                      )}
-
                       <Icon className="relative z-10 w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                       {expanded && (
                         <motion.span

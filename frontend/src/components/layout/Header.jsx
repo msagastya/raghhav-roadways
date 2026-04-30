@@ -50,11 +50,8 @@ export default function Header() {
 
   return (
     <>
-      <motion.header
+      <header
         className="glass-header sticky top-0 z-30"
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
       >
         <div className="flex items-center justify-between h-14 sm:h-16 lg:h-18 px-3 sm:px-6">
           <div className="flex items-center gap-2 sm:gap-3">
@@ -78,82 +75,67 @@ export default function Header() {
             </motion.h1>
           </div>
 
-          <motion.div
+          <div
             className="flex items-center gap-1.5 sm:gap-2 lg:gap-3"
-            initial={{ x: 100, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
           >
             {/* Search Button */}
-            <motion.button
+            <button
               onClick={() => setCommandPaletteOpen(true)}
               className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/30 dark:bg-white/10 hover:bg-white/50 dark:hover:bg-white/20 border-2 border-white/20 dark:border-white/10 text-gray-500 dark:text-gray-400 text-sm transition-colors"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
             >
               <Search className="w-4 h-4" />
               <span className="hidden lg:inline">Search...</span>
               <kbd className="hidden md:inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-white/40 dark:bg-white/10 border border-white/30 dark:border-white/10 rounded text-[10px] font-semibold">
                 <Command className="w-3 h-3" />K
               </kbd>
-            </motion.button>
+            </button>
 
             {/* Mobile Search Icon */}
-            <motion.button
+            <button
               onClick={() => setCommandPaletteOpen(true)}
               className="sm:hidden p-2 rounded-lg bg-white/30 dark:bg-white/10 hover:bg-white/50 dark:hover:bg-white/20 border-2 border-white/20 dark:border-white/10 transition-colors"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
             >
               <Search className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-            </motion.button>
+            </button>
 
             {/* Voice Command Button */}
             {isSupported && (
-              <motion.button
+              <button
                 onClick={toggleListening}
                 className={`p-2 rounded-lg transition-all border-2 ${
                   isListening
                     ? 'bg-red-500/20 dark:bg-red-500/15 text-red-600 dark:text-red-400 animate-pulse shadow-lg shadow-red-500/30 border-red-400/30'
                     : 'bg-white/30 dark:bg-white/10 hover:bg-white/50 dark:hover:bg-white/20 text-gray-600 dark:text-gray-400 border-white/20 dark:border-white/10'
                 }`}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
                 title={isListening ? 'Stop listening' : 'Voice command'}
               >
                 {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-              </motion.button>
+              </button>
             )}
 
             {/* Theme Toggle */}
-            <motion.button
+            <button
               onClick={toggleTheme}
               className="p-2 rounded-lg bg-white/30 dark:bg-white/10 hover:bg-white/50 dark:hover:bg-white/20 border-2 border-white/20 dark:border-white/10 text-gray-600 dark:text-gray-400 transition-colors"
-              whileHover={{ scale: 1.05, rotate: 180 }}
-              whileTap={{ scale: 0.95 }}
               title="Toggle theme"
             >
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </motion.button>
+            </button>
 
             {/* User Info */}
-            <motion.div
+            <div
               className="flex items-center gap-2 sm:gap-3 p-1.5 sm:p-2 rounded-xl hover:bg-white/30 dark:hover:bg-white/10 transition-all"
-              whileHover={{ scale: 1.02 }}
-              transition={{ duration: 0.2 }}
             >
               <div className="text-right hidden md:block">
                 <p className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">{user?.fullName || user?.username}</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">{user?.roleName}</p>
               </div>
-              <motion.div
+              <div
                 className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center shadow-lg shadow-primary-500/50"
-                whileHover={{ scale: 1.15, rotate: 360 }}
-                transition={{ duration: 0.6, type: 'spring' }}
               >
                 <User className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
 
             {/* Logout Button */}
             <Button
@@ -165,7 +147,7 @@ export default function Header() {
               <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline text-xs sm:text-sm">Logout</span>
             </Button>
-          </motion.div>
+          </div>
         </div>
 
         {/* Voice Transcript Bar */}
@@ -181,7 +163,7 @@ export default function Header() {
             </p>
           </motion.div>
         )}
-      </motion.header>
+      </header>
 
       {/* Command Palette */}
       <CommandPalette

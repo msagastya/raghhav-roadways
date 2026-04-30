@@ -1,6 +1,3 @@
-'use client';
-
-import { motion } from 'framer-motion';
 import { cn } from '../../lib/utils';
 
 export function Table({ children, className, ...props }) {
@@ -30,26 +27,13 @@ export function TableBody({ children, className, ...props }) {
 }
 
 export function TableRow({ children, className, animate = false, index = 0, ...props }) {
-  const Component = animate ? motion.tr : 'tr';
-
-  const animationProps = animate ? {
-    initial: { opacity: 0, x: -20 },
-    animate: { opacity: 1, x: 0 },
-    transition: {
-      duration: 0.3,
-      delay: index * 0.03,
-      ease: "easeOut"
-    }
-  } : {};
-
   return (
-    <Component
+    <tr
       className={cn('hover:bg-white/20 dark:hover:bg-white/10 transition-colors duration-150', className)}
-      {...animationProps}
       {...props}
     >
       {children}
-    </Component>
+    </tr>
   );
 }
 

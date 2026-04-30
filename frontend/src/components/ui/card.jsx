@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { cn } from '../../lib/utils';
 
-export function Card({ children, className, animate = true, hover3d = true, ...props }) {
+export function Card({ children, className, animate = false, hover3d = false, ...props }) {
   const Component = animate ? motion.div : 'div';
 
   const animationProps = animate ? {
@@ -24,7 +24,7 @@ export function Card({ children, className, animate = true, hover3d = true, ...p
     <Component
       className={cn(
         'glass-card rounded-xl',
-        'hover:shadow-xl transition-all duration-300 transform-gpu',
+        'transition-shadow duration-150',
         'relative overflow-hidden',
         className
       )}
@@ -32,10 +32,6 @@ export function Card({ children, className, animate = true, hover3d = true, ...p
       {...hoverProps}
       {...props}
     >
-      {/* Glass Shine Effect */}
-      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/30 to-transparent pointer-events-none" />
-
-      {/* Content */}
       <div className="relative z-10">
         {children}
       </div>
