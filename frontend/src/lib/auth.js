@@ -38,6 +38,7 @@ export function setUser(user) {
     username: user.username,
     email: user.email,
     fullName: user.fullName,
+    mobile: user.mobile,
     role: user.role,
     permissions: user.permissions,
   };

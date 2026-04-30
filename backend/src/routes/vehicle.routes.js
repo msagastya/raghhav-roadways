@@ -15,7 +15,6 @@ const {
  * @route   GET /api/v1/vehicles/search
  * @desc    Search vehicles (autocomplete)
  * @access  Private
- * @reserved Mobile/Flutter app — not used by web frontend
  */
 router.get(
   '/search',
@@ -28,7 +27,6 @@ router.get(
  * @route   GET /api/v1/vehicles/expiring-documents
  * @desc    Get vehicles with expiring documents
  * @access  Private
- * @reserved Mobile/Flutter app — not used by web frontend
  */
 router.get(
   '/expiring-documents',

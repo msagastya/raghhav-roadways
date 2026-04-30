@@ -2,268 +2,283 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import Link from 'next/link';
-import Image from 'next/image';
-import { Lock, Eye, EyeOff, AlertCircle, User, CheckCircle2, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Truck, Lock, User, ArrowRight, Sparkles } from 'lucide-react';
+import Input from '../../../components/ui/input';
+import Button from '../../../components/ui/button';
+import { Card, CardContent, CardHeader } from '../../../components/ui/card';
+import { authAPI } from '../../../lib/api';
 import useAuthStore from '../../../store/authStore';
+import useToast from '../../../hooks/useToast';
+import { getErrorMessage } from '../../../lib/utils';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: 'easeOut' }
+  }
+};
+
+const floatingVariants = {
+  animate: {
+    y: [-5, 5, -5],
+    transition: {
+      duration: 4,
+      repeat: Infinity,
+      ease: 'easeInOut'
+    }
+  }
+};
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, error } = useAuthStore();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [localError, setLocalError] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [loginSuccess, setLoginSuccess] = useState(false);
+  const { setUser, setTokens } = useAuthStore();
+  const { showSuccess, showError } = useToast();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLocalError('');
+  const [formData, setFormData] = useState({
+    username: '',
+    password: '',
+  });
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
 
-    if (!username || !password) {
-      setLocalError('Please fill in all fields');
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      await login(username, password);
-      setLoginSuccess(true);
-      // Delay redirect to show success state
-      setTimeout(() => {
-        router.push('/consignments');
-      }, 1200);
-    } catch (err) {
-      setLocalError(err.response?.data?.message || err.message || 'Login failed');
-      setSubmitting(false);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: '' }));
     }
   };
 
-  const displayError = localError || error;
+  const validate = () => {
+    const newErrors = {};
+    if (!formData.username) newErrors.username = 'Username is required';
+    if (!formData.password) newErrors.password = 'Password is required';
+    return newErrors;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const newErrors = validate();
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await authAPI.login(formData);
+      const { user, accessToken, refreshToken } = response.data.data;
+
+      setTokens(accessToken, refreshToken);
+      setUser(user);
+
+      showSuccess('Login successful!');
+      window.location.href = '/consignments';
+    } catch (error) {
+      showError(getErrorMessage(error));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center overflow-hidden"
-      style={{ background: 'linear-gradient(145deg, #f8faf9 0%, #f0f7f2 30%, #eef5f0 60%, #f5f8f6 100%)' }}
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="w-full max-w-md mx-auto"
     >
-      {/* Subtle decorative elements */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full opacity-30"
-        style={{ background: 'radial-gradient(circle, rgba(34,197,94,0.06) 0%, transparent 70%)' }}
+      {/* Decorative Elements - Hidden on larger screens to reduce clutter */}
+      <motion.div
+        className="absolute top-10 left-10 w-16 h-16 md:w-20 md:h-20 lg:w-16 lg:h-16 bg-primary-400/20 rounded-full blur-xl"
+        animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+        transition={{ duration: 4, repeat: Infinity }}
       />
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full opacity-30"
-        style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.05) 0%, transparent 70%)' }}
-      />
-
-      {/* Logo watermark */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-        <div className="relative w-[500px] h-[500px]" style={{ opacity: 0.03 }}>
-          <Image src="/logo.png" alt="" fill className="object-contain" priority />
-        </div>
-      </div>
-
-      {/* Decorative line pattern */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.015]"
-        style={{
-          backgroundImage: `
-            linear-gradient(90deg, #166534 1px, transparent 1px),
-            linear-gradient(#166534 1px, transparent 1px)
-          `,
-          backgroundSize: '80px 80px',
-        }}
+      <motion.div
+        className="absolute bottom-10 right-10 w-24 h-24 md:w-32 md:h-32 lg:w-24 lg:h-24 bg-brand-400/20 rounded-full blur-xl"
+        animate={{ scale: [1.2, 1, 1.2], opacity: [0.5, 0.3, 0.5] }}
+        transition={{ duration: 5, repeat: Infinity }}
       />
 
-      {/* Content */}
-      <AnimatePresence mode="wait">
-        {loginSuccess ? (
-          /* Success State */
+      <Card className="w-full relative overflow-hidden backdrop-blur-sm bg-white/90">
+        {/* Gradient Border Effect */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-500/10 via-transparent to-brand-500/10 pointer-events-none" />
+
+        <CardHeader className="text-center relative">
           <motion.div
-            key="success"
-            className="relative z-10 text-center"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, ease: 'easeOut' }}
+            variants={itemVariants}
+            className="flex flex-col items-center mb-6"
           >
+            {/* Animated Logo */}
             <motion.div
-              className="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg, #dcfce7, #bbf7d0)' }}
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
+              variants={floatingVariants}
+              animate="animate"
+              className="relative"
             >
-              <CheckCircle2 className="w-10 h-10 text-green-600" />
+              <motion.div
+                className="absolute inset-0 bg-primary-400/30 rounded-2xl blur-xl"
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              />
+              <img
+                src="/logo.png"
+                alt="Raghhav Roadways Logo"
+                className="w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-32 lg:h-32 object-contain rounded-2xl shadow-2xl relative z-10 border-2 border-white/50"
+              />
             </motion.div>
-            <motion.h2
-              className="text-2xl font-bold text-gray-900 mb-2"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-            >
-              Welcome back!
-            </motion.h2>
-            <motion.p
-              className="text-gray-500 mb-6"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-            >
-              Redirecting to your dashboard...
-            </motion.p>
+
+            {/* Animated Title */}
             <motion.div
-              className="flex items-center justify-center gap-2 text-green-600"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
+              variants={itemVariants}
+              className="space-y-0 mt-4"
             >
-              <div className="w-5 h-5 border-2 border-green-200 border-t-green-600 rounded-full animate-spin" />
-              <span className="text-sm font-medium">Loading dashboard</span>
+              <motion.h1
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-4xl font-brand font-bold tracking-wider uppercase leading-tight"
+                style={{
+                  background: 'linear-gradient(135deg, #1a4d2e 0%, #2d6b45 50%, #1a4d2e 100%)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                RAGHHAV
+              </motion.h1>
+              <motion.h1
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-4xl font-brand font-bold tracking-wider uppercase leading-tight"
+                style={{
+                  background: 'linear-gradient(135deg, #1a4d2e 0%, #2d6b45 50%, #1a4d2e 100%)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                ROADWAYS
+              </motion.h1>
             </motion.div>
           </motion.div>
-        ) : (
-          /* Login Form */
+
           <motion.div
-            key="form"
-            className="relative z-10 w-full max-w-[440px] mx-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.5 }}
+            variants={itemVariants}
+            className="flex items-center justify-center gap-2"
           >
-            {/* Branding */}
-            <div className="text-center mb-8">
-              <motion.div
-                className="inline-block mb-4"
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.1, duration: 0.4 }}
+            <Truck className="w-4 h-4 text-primary-500" />
+            <p className="text-gray-600 text-sm font-medium">Transport Management System</p>
+            <Sparkles className="w-4 h-4 text-primary-500" />
+          </motion.div>
+        </CardHeader>
+
+        <CardContent className="relative">
+          <motion.form
+            variants={containerVariants}
+            onSubmit={handleSubmit}
+            className="space-y-5"
+          >
+            <motion.div variants={itemVariants}>
+              <Input
+                label="Username"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                error={errors.username}
+                required
+                autoFocus
+                placeholder="Enter your username"
+              />
+            </motion.div>
+
+            <motion.div variants={itemVariants}>
+              <Input
+                label="Password"
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                error={errors.password}
+                required
+                placeholder="Enter your password"
+              />
+            </motion.div>
+
+            <motion.div variants={itemVariants}>
+              <Button
+                type="submit"
+                className="w-full group relative overflow-hidden"
+                disabled={loading}
               >
-                <div className="w-16 h-16 mx-auto relative drop-shadow-md">
-                  <Image src="/logo.png" alt="Raghhav Roadways" fill className="object-contain" priority />
-                </div>
-              </motion.div>
-              <h1 className="text-2xl font-bold text-gray-900 tracking-tight">RAGHHAV ROADWAYS</h1>
-              <div className="w-10 h-[2px] bg-gradient-to-r from-green-500 to-emerald-500 mx-auto mt-2.5 rounded-full" />
-              <p className="text-gray-400 text-xs tracking-[0.2em] uppercase mt-2">Transport Management System</p>
-            </div>
-
-            {/* Glass Card */}
-            <motion.div
-              className="rounded-2xl p-7 sm:p-8"
-              style={{
-                background: 'rgba(255, 255, 255, 0.75)',
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255, 255, 255, 0.9)',
-                boxShadow: '0 8px 40px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255,255,255,1)',
-              }}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-            >
-              <div className="mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Sign In</h2>
-                <p className="text-gray-500 text-sm mt-1">Enter your credentials to access the system</p>
-              </div>
-
-              {/* Error */}
-              <AnimatePresence>
-                {displayError && (
-                  <motion.div
-                    className="mb-5 px-4 py-3 rounded-xl flex items-center gap-3"
-                    style={{ background: '#fef2f2', border: '1px solid #fecaca' }}
-                    initial={{ opacity: 0, height: 0, marginBottom: 0 }}
-                    animate={{ opacity: 1, height: 'auto', marginBottom: 20 }}
-                    exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-                  >
-                    <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
-                    <p className="text-sm text-red-700 font-medium">{displayError}</p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="text-sm font-semibold text-gray-700 block mb-1.5">Username</label>
-                  <div className="relative group">
-                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-green-500 transition-colors" />
-                    <input
-                      type="text"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      placeholder="Enter your username"
-                      autoComplete="username"
-                      className="w-full pl-10 pr-4 py-3 rounded-xl text-sm text-gray-900 placeholder-gray-400 outline-none transition-all duration-200 bg-gray-50 border border-gray-200 focus:border-green-400 focus:bg-white focus:ring-2 focus:ring-green-100 hover:border-gray-300"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-sm font-semibold text-gray-700 block mb-1.5">Password</label>
-                  <div className="relative group">
-                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-green-500 transition-colors" />
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Enter your password"
-                      autoComplete="current-password"
-                      className="w-full pl-10 pr-10 py-3 rounded-xl text-sm text-gray-900 placeholder-gray-400 outline-none transition-all duration-200 bg-gray-50 border border-gray-200 focus:border-green-400 focus:bg-white focus:ring-2 focus:ring-green-100 hover:border-gray-300"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                    >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                <motion.button
-                  type="submit"
-                  disabled={submitting}
-                  className="w-full py-3 mt-2 text-white font-semibold text-sm rounded-xl flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed group"
-                  style={{
-                    background: 'linear-gradient(135deg, #22C55E 0%, #16A34A 100%)',
-                    boxShadow: '0 4px 14px rgba(34,197,94,0.25), inset 0 1px 0 rgba(255,255,255,0.15)',
-                  }}
-                  whileHover={!submitting ? { y: -1, boxShadow: '0 6px 20px rgba(34,197,94,0.35), inset 0 1px 0 rgba(255,255,255,0.15)' } : {}}
-                  whileTap={!submitting ? { scale: 0.98 } : {}}
-                >
-                  {submitting ? (
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                  {loading ? (
                     <>
-                      <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                      <motion.div
+                        className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                      />
                       Signing in...
                     </>
                   ) : (
                     <>
                       Sign In
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                      <motion.div
+                        initial={{ x: 0 }}
+                        whileHover={{ x: 5 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <ArrowRight className="w-4 h-4" />
+                      </motion.div>
                     </>
                   )}
-                </motion.button>
-              </form>
-
-              {/* Links */}
-              <div className="mt-6 pt-5" style={{ borderTop: '1px solid #f0f0f0' }}>
-                <p className="text-center text-sm text-gray-500">
-                  Don&apos;t have an account?{' '}
-                  <Link href="/signup" className="text-green-600 hover:text-green-700 font-semibold transition-colors">
-                    Sign Up
-                  </Link>
-                </p>
-                <p className="text-center text-xs text-gray-400 mt-2">
-                  Forgot your password? Contact your administrator.
-                </p>
-              </div>
+                </span>
+              </Button>
             </motion.div>
+          </motion.form>
 
-            {/* Footer */}
-            <p className="text-center text-gray-400 text-xs mt-6">&copy; 2026 Raghhav Roadways. All rights reserved.</p>
+          <motion.div
+            variants={itemVariants}
+            className="mt-6 text-center"
+          >
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-white text-gray-500">New to Raghhav Roadways?</span>
+              </div>
+            </div>
+            <motion.a
+              href="/signup"
+              className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              Create an account
+              <ArrowRight className="w-4 h-4" />
+            </motion.a>
           </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+        </CardContent>
+      </Card>
+
+      {/* Footer */}
+      <motion.p
+        variants={itemVariants}
+        className="mt-6 text-center text-xs text-gray-500"
+      >
+        Secure login powered by advanced encryption
+      </motion.p>
+    </motion.div>
   );
 }

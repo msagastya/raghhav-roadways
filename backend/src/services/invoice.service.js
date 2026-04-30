@@ -88,7 +88,7 @@ const getInvoices = async (filters = {}) => {
   });
 
   return {
-    data: invoices,
+    invoices,
     pagination: getPaginationMeta(totalRecords, parseInt(page), parseInt(limit)),
   };
 };
@@ -211,9 +211,9 @@ const createInvoice = async (data, userId, ipAddress, userAgent) => {
     : 0;
   const invoiceNumber = generateCode('INV', lastNumber, 4);
 
-  // Calculate subtotal
+  // Calculate subtotal from freight amounts only (GR charge shown separately)
   const subtotal = consignments.reduce(
-    (sum, consignment) => sum + Number(consignment.totalAmount),
+    (sum, consignment) => sum + Number(consignment.freightAmount),
     0
   );
 
@@ -269,13 +269,10 @@ const createInvoice = async (data, userId, ipAddress, userAgent) => {
           vehicleNumber: consignment.vehicleNumber,
           fromLocation: consignment.fromLocation,
           toLocation: consignment.toLocation,
-          contents: consignment.description,
-          qtyInMt: consignment.actualWeight,
-          rateMt:
-            consignment.actualWeight > 0
-              ? Number(consignment.freightAmount) / Number(consignment.actualWeight)
-              : null,
-          amount: consignment.totalAmount,
+          contents: consignment.description || '',
+          qtyInMt: consignment.vehicleSize || 'FT L',
+          rateMt: consignment.rateType === 'Fixed' ? 'FIXED' : (consignment.rateType || 'FIXED'),
+          amount: consignment.freightAmount,
         },
       });
 
@@ -404,8 +401,8 @@ const createCustomInvoice = async (data, userId, ipAddress, userAgent) => {
           fromLocation: grItem.from || '',
           toLocation: grItem.to || '',
           contents: grItem.contents || '',
-          qtyInMt: null,
-          rateMt: null,
+          qtyInMt: grItem.qty || 'FT L',
+          rateMt: grItem.rate || 'FIXED',
           amount: Number(grItem.amount || 0),
         },
       });

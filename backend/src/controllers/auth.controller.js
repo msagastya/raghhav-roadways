@@ -20,11 +20,12 @@ const login = asyncHandler(async (req, res, next) => {
     // SECURITY: Set tokens as httpOnly cookies to prevent XSS token theft
     // httpOnly prevents JavaScript from accessing the token
     // Secure flag ensures cookies only sent over HTTPS in production
-    // SameSite=Strict prevents CSRF attacks
+    // SameSite=Lax keeps same-site browser behavior while the Vercel app uses
+    // Authorization headers because it runs on a different domain from Render.
     const cookieOptions = {
       httpOnly: true, // Prevent JavaScript from accessing tokens
       secure: process.env.NODE_ENV === 'production', // HTTPS only in production
-      sameSite: 'lax', // Lax allows same-site cross-origin requests (different ports)
+      sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days for access token
       path: '/',
     };
@@ -39,9 +40,8 @@ const login = asyncHandler(async (req, res, next) => {
 
     logger.info(`User ${username} logged in successfully`);
 
-    // Send tokens as well because the frontend is hosted on a different domain
-    // from the API. Browser cookies set by Render are not visible to Vercel
-    // middleware/client code, so the SPA uses Authorization headers in production.
+    // Send tokens as well for the Vercel frontend, which cannot read Render's
+    // domain cookies. The API still sets httpOnly cookies for same-domain use.
     res.status(200).json({
       success: true,
       message: 'Login successful',
@@ -83,8 +83,7 @@ const logout = asyncHandler(async (req, res) => {
  * SECURITY: Gets refreshToken from httpOnly cookie, returns new accessToken in cookie
  */
 const refreshToken = asyncHandler(async (req, res) => {
-  // Get refresh token from cookie first, then Authorization header for the
-  // Vercel frontend because it runs on a different domain from Render.
+  // Prefer cookie, fall back to Authorization header for cross-domain Vercel use.
   const authHeader = req.headers.authorization;
   const refreshTokenFromCookie = req.cookies.refreshToken || (authHeader && authHeader.split(' ')[1]);
 

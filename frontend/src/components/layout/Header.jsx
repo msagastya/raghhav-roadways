@@ -3,16 +3,13 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Menu, LogOut, User, Search, Mic, MicOff, Moon, Sun, Command } from 'lucide-react';
+import { Menu, LogOut, User, Search, Mic, MicOff, Moon, Sun, Command, Keyboard } from 'lucide-react';
 import useAuthStore from '../../store/authStore';
 import useUIStore from '../../store/uiStore';
-import api from '../../lib/api';
 import useThemeStore from '../../store/themeStore';
 import useVoiceCommand from '../../hooks/useVoiceCommand';
 import useKeyboardShortcuts from '../../hooks/useKeyboardShortcuts';
 import CommandPalette from '../shared/CommandPalette';
-import Breadcrumb from './Breadcrumb';
-import NotificationBell from './NotificationBell';
 import Button from '../ui/button';
 
 export default function Header() {
@@ -22,18 +19,19 @@ export default function Header() {
   const { theme, toggleTheme, initializeTheme } = useThemeStore();
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const { isListening, toggleListening, isSupported, transcript } = useVoiceCommand();
-  const [mounted, setMounted] = useState(false);
 
+  // Initialize theme on mount
   useEffect(() => {
-    setMounted(true);
     initializeTheme();
   }, [initializeTheme]);
 
+  // Keyboard shortcuts
   useKeyboardShortcuts({
     onSearch: () => setCommandPaletteOpen(true),
     onToggleTheme: toggleTheme
   });
 
+  // Global keyboard shortcut for command palette
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -45,103 +43,79 @@ export default function Header() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const searchPlaceholders = [
-    'Search GR numbers...',
-    'Find parties...',
-    'Search vehicles...',
-  ];
-  const [placeholderIdx, setPlaceholderIdx] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setPlaceholderIdx((prev) => (prev + 1) % searchPlaceholders.length);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleLogout = async () => {
-    try {
-      await api.post('/auth/logout');
-    } catch (e) {
-      // Ignore — clearing cookies anyway
-    }
+  const handleLogout = () => {
     logout();
-    window.location.href = '/login';
+    router.push('/login');
   };
-
-  if (!mounted) return null;
 
   return (
     <>
-      {/* Header — glass-t4 (always dark forest green) */}
       <motion.header
-        className="glass-t4 sticky top-0 z-40 border-b border-white/8 h-14"
+        className="glass-header sticky top-0 z-30"
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
       >
-        {/* Accent bottom border */}
-        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary-500/30 to-transparent" />
-
-        <div className="h-full flex items-center justify-between px-3 sm:px-6">
-          {/* Left: Hamburger + Breadcrumb */}
-          <div className="flex items-center gap-3 min-w-0 flex-1">
+        <div className="flex items-center justify-between h-14 sm:h-16 lg:h-18 px-3 sm:px-6">
+          <div className="flex items-center gap-2 sm:gap-3">
             <motion.button
               onClick={toggleSidebar}
-              className="p-2 rounded-lg hover:bg-white/10 transition-colors text-white/70 hover:text-white flex-shrink-0 md:hidden"
-              whileHover={{ scale: 1.05 }}
+              className="p-2 rounded-xl bg-white/30 dark:bg-white/10 hover:bg-white/50 dark:hover:bg-white/20 border-2 border-white/20 dark:border-white/10 focus:outline-none transition-all"
+              whileHover={{ scale: 1.05, rotate: 90, y: -2 }}
               whileTap={{ scale: 0.95 }}
-              title="Toggle sidebar"
+              transition={{ duration: 0.2, type: 'spring' }}
             >
-              <Menu className="w-5 h-5" />
+              <Menu className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700 dark:text-gray-300" />
             </motion.button>
 
-            <div className="hidden sm:block min-w-0">
-              <Breadcrumb />
-            </div>
+            {/* App Name on Mobile */}
+            <motion.h1
+              className="block sm:hidden text-sm font-bold text-primary-600 dark:text-primary-400"
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+            >
+              Raghhav Roadways
+            </motion.h1>
           </div>
 
-          {/* Center: Search Bar */}
           <motion.div
-            className="hidden lg:flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full mx-4 flex-shrink-0 w-96 max-w-md focus-within:border-primary-500/50 cursor-pointer"
-            whileTap={{ scale: 0.98 }}
-            onClick={() => setCommandPaletteOpen(true)}
-          >
-            <Search className="w-4 h-4 text-white/50 flex-shrink-0" />
-            <span className="flex-1 text-sm text-white/40 select-none">
-              {searchPlaceholders[placeholderIdx]}
-            </span>
-            <kbd className="text-xs text-white/40 px-2 py-0.5 bg-white/5 border border-white/10 rounded flex-shrink-0">
-              Cmd K
-            </kbd>
-          </motion.div>
-
-          {/* Right: Actions */}
-          <motion.div
-            className="flex items-center gap-2 sm:gap-3"
+            className="flex items-center gap-1.5 sm:gap-2 lg:gap-3"
             initial={{ x: 100, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.4, delay: 0.2 }}
           >
-            {/* Mobile Search */}
+            {/* Search Button */}
             <motion.button
               onClick={() => setCommandPaletteOpen(true)}
-              className="lg:hidden p-2 rounded-lg hover:bg-white/10 transition-colors text-white/70 hover:text-white"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              title="Search"
+              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/30 dark:bg-white/10 hover:bg-white/50 dark:hover:bg-white/20 border-2 border-white/20 dark:border-white/10 text-gray-500 dark:text-gray-400 text-sm transition-colors"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               <Search className="w-4 h-4" />
+              <span className="hidden lg:inline">Search...</span>
+              <kbd className="hidden md:inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-white/40 dark:bg-white/10 border border-white/30 dark:border-white/10 rounded text-[10px] font-semibold">
+                <Command className="w-3 h-3" />K
+              </kbd>
             </motion.button>
 
-            {/* Voice Command */}
+            {/* Mobile Search Icon */}
+            <motion.button
+              onClick={() => setCommandPaletteOpen(true)}
+              className="sm:hidden p-2 rounded-lg bg-white/30 dark:bg-white/10 hover:bg-white/50 dark:hover:bg-white/20 border-2 border-white/20 dark:border-white/10 transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Search className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+            </motion.button>
+
+            {/* Voice Command Button */}
             {isSupported && (
               <motion.button
                 onClick={toggleListening}
-                className={`p-2 rounded-lg transition-all ${
+                className={`p-2 rounded-lg transition-all border-2 ${
                   isListening
-                    ? 'bg-red-500/20 text-red-400 animate-pulse'
-                    : 'hover:bg-white/10 text-white/70 hover:text-white'
+                    ? 'bg-red-500/20 dark:bg-red-500/15 text-red-600 dark:text-red-400 animate-pulse shadow-lg shadow-red-500/30 border-red-400/30'
+                    : 'bg-white/30 dark:bg-white/10 hover:bg-white/50 dark:hover:bg-white/20 text-gray-600 dark:text-gray-400 border-white/20 dark:border-white/10'
                 }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -151,13 +125,10 @@ export default function Header() {
               </motion.button>
             )}
 
-            {/* Notification Bell */}
-            <NotificationBell />
-
             {/* Theme Toggle */}
             <motion.button
               onClick={toggleTheme}
-              className="p-2 rounded-lg hover:bg-white/10 transition-colors text-white/70 hover:text-white"
+              className="p-2 rounded-lg bg-white/30 dark:bg-white/10 hover:bg-white/50 dark:hover:bg-white/20 border-2 border-white/20 dark:border-white/10 text-gray-600 dark:text-gray-400 transition-colors"
               whileHover={{ scale: 1.05, rotate: 180 }}
               whileTap={{ scale: 0.95 }}
               title="Toggle theme"
@@ -165,32 +136,34 @@ export default function Header() {
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </motion.button>
 
-            {/* User Pill */}
+            {/* User Info */}
             <motion.div
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors text-white cursor-pointer ml-1"
+              className="flex items-center gap-2 sm:gap-3 p-1.5 sm:p-2 rounded-xl hover:bg-white/30 dark:hover:bg-white/10 transition-all"
               whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.2 }}
             >
               <div className="text-right hidden md:block">
-                <p className="text-xs font-semibold text-white">{user?.fullName || user?.username}</p>
-                <p className="text-xs text-white/60">{user?.roleName}</p>
+                <p className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">{user?.fullName || user?.username}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{user?.roleName}</p>
               </div>
               <motion.div
-                className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center flex-shrink-0"
-                whileHover={{ scale: 1.1 }}
+                className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center shadow-lg shadow-primary-500/50"
+                whileHover={{ scale: 1.15, rotate: 360 }}
+                transition={{ duration: 0.6, type: 'spring' }}
               >
-                <User className="w-4 h-4 text-white" />
+                <User className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </motion.div>
             </motion.div>
 
-            {/* Logout */}
+            {/* Logout Button */}
             <Button
               variant="ghost"
               size="sm"
               onClick={handleLogout}
-              className="flex items-center gap-1 !px-2 sm:!px-3 text-white hover:bg-white/10"
+              className="flex items-center gap-1 sm:gap-2 !px-2 sm:!px-3"
             >
-              <LogOut className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline text-xs">Logout</span>
+              <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline text-xs sm:text-sm">Logout</span>
             </Button>
           </motion.div>
         </div>
@@ -200,11 +173,11 @@ export default function Header() {
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
-            className="px-4 py-2 bg-red-500/10 border-t border-red-500/20"
+            className="px-4 py-2 bg-red-500/10 dark:bg-red-500/10 border-t border-red-300/30 dark:border-red-500/20"
           >
-            <p className="text-sm text-red-300 flex items-center gap-2">
+            <p className="text-sm text-red-700 dark:text-red-300 flex items-center gap-2">
               <span className="inline-block w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-              Listening: &ldquo;{transcript}&rdquo;
+              Listening: "{transcript}"
             </p>
           </motion.div>
         )}

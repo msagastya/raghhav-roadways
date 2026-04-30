@@ -60,7 +60,7 @@ const getVehicles = async (filters = {}) => {
   });
 
   return {
-    data: vehicles,
+    vehicles,
     pagination: getPaginationMeta(totalRecords, parseInt(page), parseInt(limit)),
   };
 };

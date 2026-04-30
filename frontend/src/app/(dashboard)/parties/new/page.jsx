@@ -1,84 +1,133 @@
 'use client';
-
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
-import { Users } from 'lucide-react';
-import { partyAPI } from '../../../../lib/api';
-import FormSection from '../../../../components/ui/form-section';
-import PageHeader from '../../../../components/ui/page-header';
-import Button from '../../../../components/ui/button';
-import Input from '../../../../components/ui/input';
-import useToast from '../../../../hooks/useToast';
+import Link from 'next/link';
+import { useForm } from 'react-hook-form';
+import { Users, ArrowLeft, Check } from 'lucide-react';
+import { SectionHeader } from '@/components/ui/section-header';
+import { GlassCard } from '@/components/ui/glass-card';
+import { PremiumButton } from '@/components/ui/premium-button';
+import { partyAPI } from '@/lib/api';
+import toast from 'react-hot-toast';
 
-export default function NewPartyPage() {
+export default function CreatePartyPage() {
   const router = useRouter();
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm();
-  const { showError, showSuccess } = useToast();
+  const [loading, setLoading] = useState(false);
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    defaultValues: {
+      partyName: '',
+      partyType: 'consignor',
+      city: '',
+      gstin: '',
+      creditLimit: '',
+      contactPerson: '',
+      phoneNumber: '',
+      email: '',
+      address: '',
+      active: true,
+    },
+  });
 
   const onSubmit = async (data) => {
     try {
-      await partyAPI.create(data);
-      showSuccess('Party created');
-      router.push('/parties');
+      setLoading(true);
+      const response = await partyAPI.create({
+        ...data,
+        creditLimit: parseFloat(data.creditLimit),
+      });
+      toast.success('Party created successfully!');
+      router.push(`/parties/${response.data.data.id}`);
     } catch (error) {
-      showError(error?.response?.data?.message || error?.userMessage || 'Error creating party');
+      toast.error(error.response?.data?.message || 'Failed to create party');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="space-y-6">
-      <PageHeader title="Add Party" subtitle="Create new party/contact" icon={Users} />
+    <motion.div className="space-y-8" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+      <div className="flex items-center gap-4">
+        <Link href="/parties">
+          <motion.button whileHover={{ scale: 1.05 }} className="p-2 rounded-lg bg-glass hover:bg-glass-hover">
+            <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+          </motion.button>
+        </Link>
+        <SectionHeader title="Create Party" description="Add a new consignor or consignee." icon={Users} variant="orange" className="mb-0" />
+      </div>
 
-      <motion.form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <FormSection title="Basic Info" defaultOpen required>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input label="Name" required {...register('partyName', { required: 'Party name is required', minLength: { value: 2, message: 'Min 2 characters' } })} error={errors.partyName?.message} />
-            <Input label="Code" {...register('partyCode')} />
-            <select {...register('partyType', { required: 'Party type is required', validate: v => v !== 'Select Type' || 'Please select a type' })} className="col-span-full glass-t1 rounded px-3 py-2 text-gray-800 dark:text-white/90 text-sm">
-              <option>Select Type</option>
-              <option value="CONSIGNOR">Consignor</option>
-              <option value="CONSIGNEE">Consignee</option>
-              <option value="BOTH">Both</option>
-            </select>
-            {errors.partyType && <p className="text-red-500 text-xs col-span-full">{errors.partyType.message}</p>}
-          </div>
-        </FormSection>
+      <motion.div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2">
+          <GlassCard variant="premium">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Party Name *</label>
+                  <input type="text" placeholder="Company or individual name" {...register('partyName', { required: 'Required' })} className="w-full px-4 py-2.5 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Type</label>
+                  <select {...register('partyType')} className="w-full px-4 py-2.5 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    <option value="consignor">Consignor (Shipper)</option>
+                    <option value="consignee">Consignee (Receiver)</option>
+                    <option value="both">Both</option>
+                  </select>
+                </div>
+              </div>
 
-        <FormSection title="Address">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input label="Address" {...register('address')} />
-            <Input label="City" {...register('city')} />
-            <Input label="State" {...register('state')} />
-            <Input label="Pincode" {...register('pincode', { pattern: { value: /^\d{6}$/, message: 'Must be 6 digits' } })} error={errors.pincode?.message} />
-          </div>
-        </FormSection>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">City</label>
+                  <input type="text" placeholder="City name" {...register('city')} className="w-full px-4 py-2.5 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">GSTIN</label>
+                  <input type="text" placeholder="Goods and Services Tax ID" {...register('gstin')} className="w-full px-4 py-2.5 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                </div>
+              </div>
 
-        <FormSection title="Contact">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input label="Contact Person" {...register('contactPerson')} />
-            <Input label="Mobile" {...register('mobile', { pattern: { value: /^[6-9]\d{9}$/, message: 'Invalid mobile number' } })} error={errors.mobile?.message} />
-            <Input label="Email" type="email" {...register('email', { pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Invalid email' } })} error={errors.email?.message} />
-            <Input label="Phone" {...register('phone')} />
-          </div>
-        </FormSection>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Contact Person</label>
+                  <input type="text" placeholder="Name" {...register('contactPerson')} className="w-full px-4 py-2.5 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Phone Number</label>
+                  <input type="tel" placeholder="+91 XXXXX XXXXX" {...register('phoneNumber')} className="w-full px-4 py-2.5 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                </div>
+              </div>
 
-        <FormSection title="Financial">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input label="GSTIN" {...register('gstin', { pattern: { value: /^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}[Z]{1}[A-Z\d]{1}$/, message: 'Invalid GSTIN format' } })} error={errors.gstin?.message} />
-            <Input label="PAN" {...register('pan', { pattern: { value: /^[A-Z]{5}\d{4}[A-Z]{1}$/, message: 'Invalid PAN format' } })} error={errors.pan?.message} />
-            <Input label="Credit Limit" type="number" {...register('creditLimit', { min: { value: 0, message: 'Must be 0 or more' } })} error={errors.creditLimit?.message} />
-            <Input label="Credit Days" type="number" {...register('creditDays', { min: { value: 0, message: 'Must be 0 or more' }, max: { value: 365, message: 'Max 365 days' } })} error={errors.creditDays?.message} />
-          </div>
-        </FormSection>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Email</label>
+                  <input type="email" placeholder="email@example.com" {...register('email')} className="w-full px-4 py-2.5 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Credit Limit (₹)</label>
+                  <input type="number" placeholder="0.00" step="0.01" {...register('creditLimit')} className="w-full px-4 py-2.5 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                </div>
+              </div>
 
-        <div className="flex gap-3 pt-6 border-t border-black/8 dark:border-white/10">
-          <Button type="button" variant="secondary" onClick={() => router.back()}>Cancel</Button>
-          <Button type="submit" className="flex-1" disabled={isSubmitting}>
-            {isSubmitting ? 'Creating...' : 'Create Party'}
-          </Button>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Address</label>
+                <textarea placeholder="Full address" rows="3" {...register('address')} className="w-full px-4 py-2.5 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none" />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input type="checkbox" id="active" {...register('active')} className="w-4 h-4 rounded cursor-pointer" defaultChecked />
+                <label htmlFor="active" className="text-sm font-semibold text-gray-700 dark:text-gray-300">Active Status</label>
+              </div>
+
+              <div className="flex gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <Link href="/parties" className="flex-1">
+                  <PremiumButton variant="outline" className="w-full">Cancel</PremiumButton>
+                </Link>
+                <PremiumButton type="submit" disabled={loading} loading={loading} icon={Check} className="flex-1">{loading ? 'Creating...' : 'Create Party'}</PremiumButton>
+              </div>
+            </form>
+          </GlassCard>
         </div>
-      </motion.form>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

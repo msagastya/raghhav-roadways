@@ -13,7 +13,7 @@ export const SectionHeader = ({ title, subtitle, icon: Icon, children }) => {
         <h2 className="text-xl font-bold text-gray-900 dark:text-white">{title}</h2>
       </div>
       {subtitle && (
-        <p className="text-sm text-gray-500 dark:text-white/60 ml-8">{subtitle}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 ml-8">{subtitle}</p>
       )}
       {children}
     </motion.div>

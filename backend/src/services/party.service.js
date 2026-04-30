@@ -67,7 +67,7 @@ const getParties = async (filters = {}) => {
   });
 
   return {
-    data: parties,
+    parties,
     pagination: getPaginationMeta(totalRecords, parseInt(page), parseInt(limit)),
   };
 };

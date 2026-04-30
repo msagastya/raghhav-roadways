@@ -113,9 +113,9 @@ export default function UsersPage() {
 
   const getStatusBadge = (status) => {
     const styles = {
-      pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-500/20 dark:text-yellow-300',
-      approved: 'bg-green-100 text-green-800 dark:bg-green-500/20 dark:text-green-300',
-      rejected: 'bg-red-100 text-red-800 dark:bg-red-500/20 dark:text-red-300',
+      pending: 'bg-yellow-100 text-yellow-800',
+      approved: 'bg-green-100 text-green-800',
+      rejected: 'bg-red-100 text-red-800',
     };
     return (
       <span className={`px-2 py-1 rounded-full text-xs font-medium ${styles[status]}`}>
@@ -127,12 +127,12 @@ export default function UsersPage() {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">User Management</h1>
-        <p className="text-gray-600 dark:text-white/60 mt-1">Manage user access and permissions</p>
+        <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
+        <p className="text-gray-600 mt-1">Manage user access and permissions</p>
       </div>
 
       {/* Filter Tabs */}
-      <div className="mb-6 border-b border-gray-200 dark:border-white/10">
+      <div className="mb-6 border-b border-gray-200">
         <nav className="-mb-px flex space-x-8">
           {['all', 'pending', 'approved', 'rejected'].map((tab) => (
             <button
@@ -141,8 +141,8 @@ export default function UsersPage() {
               className={`
                 py-2 px-1 border-b-2 font-medium text-sm
                 ${filter === tab
-                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-white/50 dark:hover:text-white/70 dark:hover:border-white/20'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }
               `}
             >
@@ -155,50 +155,50 @@ export default function UsersPage() {
       {/* Users Table */}
       {loading ? (
         <div className="text-center py-12">
-          <p className="text-gray-500 dark:text-white/60">Loading users...</p>
+          <p className="text-gray-500">Loading users...</p>
         </div>
       ) : users.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-500 dark:text-white/60">No users found</p>
+          <p className="text-gray-500">No users found</p>
         </div>
       ) : (
-        <div className="bg-white dark:bg-white/5 shadow-sm rounded-lg overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-white/10">
-            <thead className="bg-gray-50 dark:bg-white/5">
+        <div className="bg-white shadow-sm rounded-lg overflow-hidden">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white/60 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   User
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white/60 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Contact
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white/60 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Role
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white/60 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white/60 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-white/5 divide-y divide-gray-200 dark:divide-white/10">
+            <tbody className="bg-white divide-y divide-gray-200">
               {users.map((user) => (
                 <tr key={user.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900 dark:text-white">{user.fullName}</div>
-                    <div className="text-sm text-gray-500 dark:text-white/60">@{user.username}</div>
+                    <div className="text-sm font-medium text-gray-900">{user.fullName}</div>
+                    <div className="text-sm text-gray-500">@{user.username}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900 dark:text-white">{user.email}</div>
-                    <div className="text-sm text-gray-500 dark:text-white/60">{user.mobile || '-'}</div>
+                    <div className="text-sm text-gray-900">{user.email}</div>
+                    <div className="text-sm text-gray-500">{user.mobile || '-'}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <select
                       value={user.role.id}
                       onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                      className="text-sm border-gray-300 dark:border-white/15 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-white/5 dark:text-white"
+                      className="text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
                       disabled={user.approvalStatus !== 'approved'}
                     >
                       {roles.map((role) => (
@@ -254,14 +254,14 @@ export default function UsersPage() {
 
       {/* Reset Password Modal */}
       {resetPasswordModal.open && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 dark:bg-black/60 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border border-gray-200 dark:border-white/10 w-96 shadow-lg rounded-md bg-white dark:bg-white/5">
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div className="mt-3">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">
                 Reset Password for @{resetPasswordModal.username}
               </h3>
               <div className="mt-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   New Password
                 </label>
                 <input
@@ -269,7 +269,7 @@ export default function UsersPage() {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Enter new password (min 6 characters)"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-white/15 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-white/5 dark:text-white dark:placeholder-white/40"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   onKeyPress={(e) => {
                     if (e.key === 'Enter') {
                       handleResetPassword();
@@ -286,7 +286,7 @@ export default function UsersPage() {
                 </button>
                 <button
                   onClick={closeResetPasswordModal}
-                  className="flex-1 px-4 py-2 bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-400 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
                 >
                   Cancel
                 </button>

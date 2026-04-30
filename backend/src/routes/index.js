@@ -20,28 +20,12 @@ const agentAuthRoutes = require('./agent.auth.routes');
 const agentVehicleRoutes = require('./agent.vehicle.routes');
 const agentAvailabilityRoutes = require('./agent.availability.routes');
 
-// Admin Authentication Routes (for dual authentication system)
-const adminAuthRoutes = require('./admin.auth.routes');
-const auditRoutes = require('./audit.routes');
-
-// Health check route with DB connectivity
-router.get('/health', async (req, res) => {
-  const prisma = require('../config/database');
-  let dbStatus = 'disconnected';
-  try {
-    await prisma.$queryRaw`SELECT 1`;
-    dbStatus = 'connected';
-  } catch {
-    dbStatus = 'error';
-  }
-
-  const status = dbStatus === 'connected' ? 200 : 503;
-  res.status(status).json({
-    success: dbStatus === 'connected',
-    message: 'Raghhav Roadways API',
+// Health check route
+router.get('/health', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'API is running',
     timestamp: new Date().toISOString(),
-    uptime: Math.floor(process.uptime()),
-    database: dbStatus,
   });
 });
 
@@ -58,15 +42,11 @@ router.use('/reports', reportRoutes);
 router.use('/masters', mastersRoutes);
 router.use('/seed', seedRoutes);
 router.use('/backup', backupRoutes);
-router.use('/audit-logs', auditRoutes);
 
 // Mount agent portal routes (isolated from admin)
 router.use('/agent/auth', agentAuthRoutes);
 router.use('/agent/vehicles', agentVehicleRoutes);
 router.use('/agent/availability', agentAvailabilityRoutes);
-
-// Mount admin authentication routes (separate from user auth)
-router.use('/admin/auth', adminAuthRoutes);
 
 // API documentation route
 router.get('/', (req, res) => {
@@ -77,7 +57,6 @@ router.get('/', (req, res) => {
     endpoints: {
       // Admin endpoints
       auth: '/api/v1/auth',
-      adminAuth: '/api/v1/admin/auth',
       parties: '/api/v1/parties',
       vehicles: '/api/v1/vehicles',
       consignments: '/api/v1/consignments',

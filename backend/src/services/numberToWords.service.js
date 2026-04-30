@@ -1,5 +1,5 @@
 const { numberToWords } = require('number-to-words');
-const logger = require('../utils/logger');
+const logger = require('../config/logger');
 
 /**
  * Convert amount to words (Indian Rupees format)

@@ -37,22 +37,17 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     // If 401 (unauthorized), try to refresh token
-    // SKIP refresh for auth endpoints (login, signup, refresh) — they don't need token refresh
-    const isAuthEndpoint = originalRequest?.url?.includes('/auth/login') ||
-      originalRequest?.url?.includes('/auth/signup') ||
-      originalRequest?.url?.includes('/auth/refresh');
-
-    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
+    if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
         const refreshToken = getRefreshToken();
-        const refreshResponse = await axios.post(`${API_URL}/auth/refresh`, {}, {
+        const response = await axios.post(`${API_URL}/auth/refresh`, {}, {
           withCredentials: true, // Send existing refresh token cookie
           headers: refreshToken ? { Authorization: `Bearer ${refreshToken}` } : {},
         });
 
-        const tokens = refreshResponse.data?.data;
+        const tokens = response.data?.data;
         if (tokens?.accessToken) {
           setAuthTokens(tokens.accessToken, tokens.refreshToken);
           originalRequest.headers.Authorization = `Bearer ${tokens.accessToken}`;
@@ -66,21 +61,6 @@ api.interceptors.response.use(
           window.location.href = '/login';
         }
         return Promise.reject(refreshError);
-      }
-    }
-
-    // Handle specific HTTP status codes
-    if (error.response) {
-      switch (error.response.status) {
-        case 403:
-          error.userMessage = 'You do not have permission to perform this action';
-          break;
-        case 413:
-          error.userMessage = 'File is too large. Please reduce the file size and try again';
-          break;
-        case 429:
-          error.userMessage = 'Too many requests. Please wait a moment and try again';
-          break;
       }
     }
 
@@ -184,10 +164,6 @@ export const reportAPI = {
   getDaily: (date) => api.get('/reports/daily', { params: { date } }),
   getMonthlyStatement: (params) => api.get('/reports/monthly-statement', { params }),
   getVehicleSettlement: (params) => api.get('/reports/vehicle-settlement', { params }),
-};
-
-export const auditAPI = {
-  getAll: (params) => api.get('/audit-logs', { params }),
 };
 
 export const mastersAPI = {

@@ -6,6 +6,14 @@ const logger = require('../utils/logger');
 const { buildFilePath } = require('../utils/helpers');
 const { COMPANY } = require('../config/constants');
 
+// Handlebars helper: {{#times N}} ... {{/times}}
+handlebars.registerHelper('times', function (n, block) {
+  let result = '';
+  const count = parseInt(n) || 0;
+  for (let i = 0; i < count; i++) result += block.fn(i);
+  return result;
+});
+
 /**
  * Generate Consignment Note PDF
  */
@@ -141,17 +149,35 @@ const generateInvoicePDF = async (invoice) => {
     const template = handlebars.compile(templateSource);
 
     // Prepare consignment items
-    const consignments = invoice.items.map((item) => ({
-      grNumber: item.grNumber,
-      grDate: new Date(item.grDate).toLocaleDateString('en-IN'),
-      vehicleNumber: item.vehicleNumber,
-      fromLocation: item.fromLocation,
-      toLocation: item.toLocation,
-      contents: item.contents || '',
-      qtyInMt: item.qtyInMt ? Number(item.qtyInMt).toFixed(3) : '',
-      rateMt: item.rateMt ? Number(item.rateMt).toFixed(2) : '',
-      amount: Number(item.amount).toFixed(2),
-    }));
+    const consignments = invoice.items
+      .filter(item => item.grNumber) // only GR rows (skip extra/amendment items)
+      .map((item) => {
+        const amt = Number(item.amount);
+        return {
+          grNumber: item.grNumber,
+          grDate: item.grDate
+            ? (() => { const d = new Date(item.grDate); return `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`; })()
+            : '',
+          vehicleNumber: item.vehicleNumber || '',
+          fromLocation: item.fromLocation || '',
+          toLocation: item.toLocation || '',
+          contents: item.contents || '',
+          qtyInMt: item.qtyInMt || 'FT L',
+          rateMt: item.rateMt || 'FIXED',
+          amount: amt > 0 ? `₹${amt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '',
+        };
+      });
+
+    // Extra rows (detention charges etc.) — no grNumber
+    const extraRows = invoice.items
+      .filter(item => !item.grNumber && item.contents)
+      .map(item => ({
+        isExtra: true,
+        contents: item.contents,
+        amount: Number(item.amount) > 0
+          ? `₹${Number(item.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`
+          : '',
+      }));
 
     // Determine watermark based on payment status
     let watermark = 'UNPAID';
@@ -161,20 +187,33 @@ const generateInvoicePDF = async (invoice) => {
       watermark = 'PARTIAL';
     }
 
+    // Format invoice number: strip "INV" prefix, zero-pad to 3 digits
+    const rawNum = invoice.invoiceNumber.replace(/^INV0*/i, '');
+    const displayInvoiceNumber = rawNum.padStart(3, '0');
+
+    const grChargeNum = Number(invoice.grCharge);
+    const totalAmountNum = Number(invoice.totalAmount);
+
+    // Pad to at least 7 visible rows (GR rows + extra rows combined)
+    const visibleRows = consignments.length + extraRows.length;
+    const emptyRows = Math.max(0, 7 - visibleRows);
+
     // Prepare data
     const data = {
       company: COMPANY,
-      invoiceNumber: invoice.invoiceNumber,
-      invoiceDate: new Date(invoice.invoiceDate).toLocaleDateString('en-IN'),
-      branch: invoice.branch || 'SURAT',
+      invoiceNumber: displayInvoiceNumber,
+      invoiceDate: (() => { const d = new Date(invoice.invoiceDate); return `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`; })(),
+      branch: (invoice.branch || 'SURAT').toUpperCase(),
       party: {
         name: invoice.partyName,
         address: invoice.partyAddress || '',
         gstin: invoice.partyGstin || '',
       },
       consignments,
-      grCharge: Number(invoice.grCharge).toFixed(2),
-      totalAmount: Number(invoice.totalAmount).toFixed(2),
+      extraRows,
+      emptyRows,
+      grCharge: grChargeNum > 0 ? `₹${grChargeNum.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹ -',
+      totalAmount: `₹${totalAmountNum.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`,
       amountInWords: invoice.amountInWords,
       watermark: watermark,
     };
@@ -227,18 +266,11 @@ const generateInvoicePDF = async (invoice) => {
 };
 
 /**
- * Get PDF file (with path traversal protection)
+ * Get PDF file
  */
 const getPDFFile = async (filePath) => {
   try {
-    const storageDir = path.resolve(__dirname, '../../storage');
-    const fullPath = path.resolve(storageDir, filePath);
-
-    // Prevent directory traversal — resolved path must be within storage
-    if (!fullPath.startsWith(storageDir + path.sep)) {
-      throw new Error('Invalid file path');
-    }
-
+    const fullPath = path.join(__dirname, '../../storage', filePath);
     const fileBuffer = await fs.readFile(fullPath);
     return fileBuffer;
   } catch (error) {

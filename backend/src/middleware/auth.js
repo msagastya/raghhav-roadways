@@ -1,4 +1,3 @@
-const jwt = require('jsonwebtoken');
 const { verifyAccessToken } = require('../config/jwt');
 const { ApiError } = require('./errorHandler');
 const prisma = require('../config/database');
@@ -164,99 +163,9 @@ const authorize = (requiredPermission) => {
   };
 };
 
-/**
- * Authenticate Admin JWT token
- * Admin authentication uses separate JWT_SECRET
- */
-const authenticateAdminToken = async (req, res, next) => {
-  try {
-    // Try to get token from httpOnly cookie first (more secure)
-    let token = req.cookies?.adminAccessToken;
-
-    // Fallback to Authorization header for API tools
-    if (!token) {
-      const authHeader = req.headers['authorization'];
-      token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
-    }
-
-    if (!token) {
-      throw new ApiError(401, 'Admin access token is required');
-    }
-
-    // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    if (decoded.type !== 'admin') {
-      throw new ApiError(401, 'Invalid token type');
-    }
-
-    // Get admin user details
-    const admin = await prisma.adminUser.findUnique({
-      where: { id: decoded.id }
-    });
-
-    if (!admin || !admin.isActive) {
-      throw new ApiError(401, 'Admin not found or inactive');
-    }
-
-    // Attach admin info to request
-    req.admin = {
-      id: admin.id,
-      adminId: admin.adminId,
-      name: admin.name,
-      email: admin.email,
-      role: admin.role,
-    };
-
-    next();
-  } catch (error) {
-    if (error instanceof ApiError) {
-      next(error);
-    } else if (error.name === 'TokenExpiredError') {
-      next(new ApiError(401, 'Admin token expired'));
-    } else {
-      next(new ApiError(401, 'Invalid or expired admin token'));
-    }
-  }
-};
-
-/**
- * Middleware to ensure request is from authenticated admin
- */
-const adminOnly = (req, res, next) => {
-  if (!req.admin) {
-    return next(new ApiError(401, 'Admin authentication required'));
-  }
-  next();
-};
-
-/**
- * Authorize admin based on role
- */
-const authorizeAdminRole = (requiredRole) => {
-  return (req, res, next) => {
-    if (!req.admin) {
-      return next(new ApiError(401, 'Admin authentication required'));
-    }
-
-    // super_admin can access everything
-    if (req.admin.role === 'super_admin') {
-      return next();
-    }
-
-    if (requiredRole && req.admin.role !== requiredRole) {
-      return next(new ApiError(403, 'Insufficient admin permissions'));
-    }
-
-    next();
-  };
-};
-
 module.exports = {
   authenticateToken,
+  authenticate: authenticateToken,
   optionalAuth,
   authorize,
-  authenticateAdminToken,
-  adminOnly,
-  authorizeAdminRole,
 };

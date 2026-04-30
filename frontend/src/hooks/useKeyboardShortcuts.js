@@ -81,6 +81,7 @@ export default function useKeyboardShortcuts({ onSearch, onToggleTheme } = {}) {
     if (event.key === '?' && !event.ctrlKey && !event.altKey) {
       event.preventDefault();
       // Could trigger a modal here
+      console.log('Shortcuts:', SHORTCUTS);
       return;
     }
   }, [router, onSearch, onToggleTheme]);

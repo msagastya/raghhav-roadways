@@ -21,19 +21,15 @@ model User {
   passwordHash   String    @map("password_hash") @db.VarChar(255)
   fullName       String?   @map("full_name") @db.VarChar(100)
   mobile         String?   @db.VarChar(15)
-  profilePhotoUrl String?  @map("profile_photo_url") @db.VarChar(500)
   roleId         Int       @map("role_id")
   role           Role      @relation(fields: [roleId], references: [id])
   isActive       Boolean   @default(true) @map("is_active")
-  isDeleted      Boolean   @default(false) @map("is_deleted")
   approvalStatus String    @default("approved") @map("approval_status") @db.VarChar(20)
-  verifiedEmail  Boolean   @default(false) @map("verified_email")
-  verifiedPhone  Boolean   @default(false) @map("verified_phone")
   lastLogin      DateTime? @map("last_login")
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime  @updatedAt @map("updated_at")
 
-  // Relations - Freight Management
+  // Relations
   createdConsignments     Consignment[]        @relation("ConsignmentCreator")
   updatedConsignments     Consignment[]        @relation("ConsignmentUpdater")
   createdInvoices         Invoice[]            @relation("InvoiceCreator")
@@ -48,11 +44,6 @@ model User {
   statusChanges           StatusHistory[]
   approvedAmendments      PaymentAmendment[]
 
-  // Relations - Ride Sharing Platform
-  createdAdminUsers AdminUser[]
-  rideRequests      Ride[]        @relation("RideUser")
-  rideRatings       RideRating[]
-
   @@map("users")
 }
 
@@ -61,7 +52,6 @@ model Role {
   roleName    String   @unique @map("role_name") @db.VarChar(50)
   description String?  @db.Text
   createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
 
   // Relations
   users           User[]
@@ -76,7 +66,6 @@ model Permission {
   module         String   @db.VarChar(50)
   action         String   @db.VarChar(50)
   description    String?  @db.Text
-  updatedAt      DateTime @updatedAt @map("updated_at")
 
   // Relations
   rolePermissions RolePermission[]
@@ -138,7 +127,6 @@ model Party {
   vehiclesAsBroker       Vehicle[]
 
   @@index([partyName])
-  @@index([partyType])
   @@index([gstin])
   @@index([isActive, isDeleted])
   @@map("parties")
@@ -257,9 +245,7 @@ model Consignment {
   @@index([grDate])
   @@index([status])
   @@index([consignorId])
-  @@index([consigneeId])
   @@index([vehicleId])
-  @@index([fromLocation, toLocation])
   @@map("consignments")
 }
 
@@ -465,7 +451,6 @@ model State {
   consignorConsignees     ConsignorConsignee[]
   invoiceParties          InvoiceParty[]
   vehicleOwnerBrokers     VehicleOwnerBroker[]
-  agents                  Agent[]
 
   @@map("states")
 }
@@ -482,7 +467,6 @@ model City {
   consignorConsignees     ConsignorConsignee[]
   invoiceParties          InvoiceParty[]
   vehicleOwnerBrokers     VehicleOwnerBroker[]
-  agents                  Agent[]
 
   @@unique([cityName, stateId])
   @@index([stateId])
@@ -582,91 +566,6 @@ model OwnerVehicle {
 }
 
 // ============================================
-// ADMIN USERS TABLE (For Dual Authentication)
-// ============================================
-
-model AdminUser {
-  id            Int       @id @default(autoincrement())
-  adminId       String    @unique @map("admin_id") @db.VarChar(50)
-  passwordHash  String    @map("password_hash") @db.VarChar(255)
-  name          String    @db.VarChar(100)
-  email         String?   @db.VarChar(100)
-  role          String    @default("admin") @db.VarChar(20) // admin, super_admin
-  lastLogin     DateTime? @map("last_login")
-  isActive      Boolean   @default(true) @map("is_active")
-  createdById   Int?      @map("created_by")
-  createdBy     User?     @relation(fields: [createdById], references: [id])
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
-
-  @@index([adminId])
-  @@index([isActive])
-  @@map("admin_users")
-}
-
-// ============================================
-// RIDE SHARING PLATFORM TABLES
-// ============================================
-
-model Ride {
-  id               Int       @id @default(autoincrement())
-  userId           Int       @map("user_id")
-  user             User      @relation("RideUser", fields: [userId], references: [id])
-  pickupLocation   String    @map("pickup_location") @db.VarChar(300)
-  dropoffLocation  String    @map("dropoff_location") @db.VarChar(300)
-  pickupLat        Float?    @map("pickup_lat")
-  pickupLng        Float?    @map("pickup_lng")
-  dropoffLat       Float?    @map("dropoff_lat")
-  dropoffLng       Float?    @map("dropoff_lng")
-  status           String    @default("requested") @db.VarChar(30) // requested, accepted, started, completed, cancelled
-  estimatedFare    Decimal?  @map("estimated_fare") @db.Decimal(10, 2)
-  actualFare       Decimal?  @map("actual_fare") @db.Decimal(10, 2)
-  distanceKm       Float?    @map("distance_km")
-  durationMinutes  Int?      @map("duration_minutes")
-  rideType         String    @default("economy") @map("ride_type") @db.VarChar(30) // economy, premium, sharing
-  paymentStatus    String    @default("pending") @map("payment_status") @db.VarChar(20) // pending, completed, failed
-  paymentMethod    String?   @map("payment_method") @db.VarChar(30)
-  razorpayOrderId  String?   @map("razorpay_order_id") @db.VarChar(100)
-  scheduledAt      DateTime? @map("scheduled_at")
-  startedAt        DateTime? @map("started_at")
-  completedAt      DateTime? @map("completed_at")
-  cancelledAt      DateTime? @map("cancelled_at")
-  cancellationReason String? @map("cancellation_reason") @db.VarChar(200)
-  notes            String?   @db.Text
-  isDeleted        Boolean   @default(false) @map("is_deleted")
-  createdAt        DateTime  @default(now()) @map("created_at")
-  updatedAt        DateTime  @updatedAt @map("updated_at")
-
-  // Relations
-  ratings          RideRating[]
-
-  @@index([userId])
-  @@index([status])
-  @@index([createdAt])
-  @@map("rides")
-}
-
-model RideRating {
-  id               Int       @id @default(autoincrement())
-  rideId           Int       @map("ride_id")
-  ride             Ride      @relation(fields: [rideId], references: [id], onDelete: Cascade)
-  userId           Int       @map("user_id")
-  user             User      @relation(fields: [userId], references: [id])
-  rating           Int       @db.SmallInt // 1-5
-  reviewText       String?   @map("review_text") @db.Text
-  cleanliness      Int?      @db.SmallInt // 1-5
-  driverBehavior   Int?      @map("driver_behavior") @db.SmallInt // 1-5
-  safetyRating     Int?      @map("safety_rating") @db.SmallInt // 1-5
-  createdAt        DateTime  @default(now()) @map("created_at")
-  updatedAt        DateTime  @updatedAt @map("updated_at")
-
-  @@unique([rideId, userId])
-  @@index([userId])
-  @@index([createdAt])
-  @@map("ride_ratings")
-}
-
-// ============================================
 // AGENT PORTAL TABLES
 // ============================================
 
@@ -680,18 +579,15 @@ model Agent {
   mobile          String    @db.VarChar(15)
   address         String?   @db.Text
   cityId          Int?      @map("city_id")
-  city            City?     @relation(fields: [cityId], references: [id])
   stateId         Int?      @map("state_id")
-  state           State?    @relation(fields: [stateId], references: [id])
   pincode         String?   @db.VarChar(10)
   profilePhoto    String?   @map("profile_photo") @db.VarChar(500)
   isActive        Boolean   @default(true) @map("is_active")
-  isDeleted       Boolean   @default(false) @map("is_deleted")
   approvalStatus  String    @default("pending") @map("approval_status") @db.VarChar(20)
   lastLogin       DateTime? @map("last_login")
   createdAt       DateTime  @default(now()) @map("created_at")
   updatedAt       DateTime  @updatedAt @map("updated_at")
-
+  
   // Relations
   vehicles        AgentVehicle[]
   availability    AgentAvailability[]

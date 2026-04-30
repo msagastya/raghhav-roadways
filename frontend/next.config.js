@@ -2,26 +2,11 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  output: 'standalone',
   images: {
     domains: ['localhost'],
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**.raghhav-roadways.com',
-      },
-    ],
   },
   env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:2026/api/v1',
-  },
-  serverRuntimeConfig: {
-    // Server-side only
-    apiUrl: process.env.BACKEND_URL || 'http://localhost:2026',
-  },
-  publicRuntimeConfig: {
-    // Shared between client and server
-    apiUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:2026/api/v1',
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1',
   },
   // Security headers
   headers: async () => {

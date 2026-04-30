@@ -15,7 +15,6 @@ const {
  * @route   GET /api/v1/parties/search
  * @desc    Search parties (autocomplete)
  * @access  Private
- * @reserved Mobile/Flutter app — not used by web frontend
  */
 router.get(
   '/search',

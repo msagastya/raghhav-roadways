@@ -40,12 +40,12 @@ const getAll = async (filters) => {
   ]);
 
   return {
-    data: records,
+    records,
     pagination: {
       page: parseInt(page),
       limit: parseInt(limit),
       total,
-      totalPages: Math.ceil(total / limit),
+      pages: Math.ceil(total / limit)
     }
   };
 };

@@ -1,14 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Edit, Trash2, DollarSign } from 'lucide-react';
+import Link from 'next/link';
+import { Plus, Eye, Trash2 } from 'lucide-react';
 import { paymentAPI } from '../../../lib/api';
-import PageHeader from '../../../components/ui/page-header';
-import FilterBar from '../../../components/ui/filter-bar';
-import DataTable from '../../../components/ui/data-table';
-import StatusBadge from '../../../components/ui/status-badge';
+import { Card, CardContent } from '../../../components/ui/card';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../../components/ui/table';
 import Button from '../../../components/ui/button';
 import useToast from '../../../hooks/useToast';
 import { formatDate, formatCurrency, getErrorMessage } from '../../../lib/utils';
@@ -17,105 +15,139 @@ export default function PaymentsPage() {
   const router = useRouter();
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [stats, setStats] = useState({ total: 0, pending: 0, completed: 0 });
   const { showError, showSuccess } = useToast();
 
-  useEffect(() => { fetchPayments(); }, []);
+  useEffect(() => {
+    fetchPayments();
+  }, []);
 
   const fetchPayments = async () => {
     try {
-      setLoading(true);
-      const response = await paymentAPI.getAll({ limit: 100 });
-      const data = response.data?.data?.data || [];
-      setPayments(data);
-      setStats({
-        total: data.length,
-        pending: data.filter((p) => p.status === 'PENDING').length,
-        completed: data.filter((p) => p.status === 'COMPLETED').length,
-      });
+      const response = await paymentAPI.getAll({ limit: 50 });
+      setPayments(response.data?.data?.payments || []);
     } catch (error) {
       showError(getErrorMessage(error));
+      setPayments([]);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleView = (payment) => {
+    router.push(`/payments/${payment.id}`);
+  };
+
   const handleDelete = async (payment) => {
-    if (!window.confirm(`Delete payment ${payment.paymentNumber}?`)) return;
+    if (!window.confirm(`Are you sure you want to delete payment ${payment.paymentNumber}?`)) {
+      return;
+    }
+
     try {
       await paymentAPI.delete(payment.id);
-      showSuccess('Payment deleted');
+      showSuccess('Payment deleted successfully');
       fetchPayments();
     } catch (error) {
       showError(getErrorMessage(error));
     }
   };
 
-  const columns = [
-    { accessor: 'paymentNumber', label: 'Payment#', render: (v) => <span className="font-mono font-bold text-primary-600 dark:text-primary-400">{v}</span> },
-    { accessor: 'paymentDate', label: 'Date', render: (v) => formatDate(v, 'dd/MMM') },
-    { accessor: 'partyName', label: 'Party', render: (v) => <span className="text-xs">{v}</span> },
-    { accessor: 'totalAmount', label: 'Amount', render: (v) => <span className="font-mono text-xs">{formatCurrency(v)}</span> },
-    { accessor: 'status', label: 'Status', render: (v) => <StatusBadge status={v?.toLowerCase()} size="xs" /> },
-  ];
-
-  const filtered = payments.filter(
-    (p) => p.paymentNumber?.toLowerCase().includes(search.toLowerCase()) ||
-           p.partyName?.toLowerCase().includes(search.toLowerCase())
-  );
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Money Flow"
-        subtitle="Track payments and collections"
-        icon={DollarSign}
-        stats={[
-          { label: 'Total', value: stats.total },
-          { label: 'Pending', value: stats.pending },
-          { label: 'Completed', value: stats.completed },
-        ]}
-        actionLabel="Record Payment"
-        onAction={() => router.push('/payments/new')}
-      />
-      <FilterBar placeholder="Search payment#, party..." onSearch={setSearch} activeFilterCount={search ? 1 : 0} />
-      <DataTable
-        columns={columns}
-        data={filtered}
-        loading={loading}
-        expandable
-        onRowClick={(row) => router.push(`/payments/${row.id}`)}
-        renderExpandedRow={(row) => (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div>
-              <p className="text-xs text-gray-500 dark:text-white/60 mb-1">Mode</p>
-              <p className="text-sm text-gray-900 dark:text-white">{row.paymentMode || '-'}</p>
-            </div>
-            <div>
-              <p className="text-xs text-gray-500 dark:text-white/60 mb-1">Reference</p>
-              <p className="text-sm text-gray-900 dark:text-white">{row.reference || '-'}</p>
-            </div>
-            <div>
-              <p className="text-xs text-gray-500 dark:text-white/60 mb-1">Invoice</p>
-              <p className="text-sm text-gray-900 dark:text-white">{row.invoiceNumber || '-'}</p>
-            </div>
-            <div className="flex gap-2">
-              <Link href={`/payments/${row.id}/edit`}>
-                <Button variant="secondary" size="sm" className="w-full">
-                  <Edit className="w-3 h-3" /> Edit
-                </Button>
-              </Link>
-              <button
-                onClick={(e) => { e.stopPropagation(); handleDelete(row); }}
-                className="flex-1 px-2 py-1 text-xs rounded-lg bg-red-500/20 text-red-600 dark:text-red-300 hover:bg-red-500/30 transition-colors"
-              >
-                <Trash2 className="w-3 h-3 inline mr-1" /> Delete
-              </button>
-            </div>
-          </div>
-        )}
-      />
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Payments</h1>
+          <p className="text-gray-600 mt-1">Manage all payment records</p>
+        </div>
+        <Link href="/payments/new">
+          <Button className="flex items-center gap-2">
+            <Plus className="w-4 h-4" />
+            Record Payment
+          </Button>
+        </Link>
+      </div>
+
+      <Card>
+        <CardContent className="p-6">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Payment Number</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Party</TableHead>
+                <TableHead>Invoice</TableHead>
+                <TableHead>Total Amount</TableHead>
+                <TableHead>Paid Amount</TableHead>
+                <TableHead>Balance</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {payments.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={9} className="text-center text-gray-500 py-8">
+                    No payments found
+                  </TableCell>
+                </TableRow>
+              ) : (
+                payments.map((payment) => {
+                  const getStatusBadge = (status) => {
+                    const styles = {
+                      Pending: 'bg-yellow-100 text-yellow-800',
+                      Partial: 'bg-blue-100 text-blue-800',
+                      Completed: 'bg-green-100 text-green-800',
+                    };
+                    return (
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${styles[status] || 'bg-gray-100 text-gray-800'}`}>
+                        {status}
+                      </span>
+                    );
+                  };
+
+                  return (
+                    <TableRow key={payment.id}>
+                      <TableCell className="font-medium">{payment.paymentNumber}</TableCell>
+                      <TableCell>{formatDate(payment.paymentDate)}</TableCell>
+                      <TableCell>{payment.partyName || '-'}</TableCell>
+                      <TableCell>{payment.invoiceNumber || '-'}</TableCell>
+                      <TableCell>{formatCurrency(payment.totalAmount)}</TableCell>
+                      <TableCell className="text-green-600 font-medium">{formatCurrency(payment.paidAmount)}</TableCell>
+                      <TableCell className="text-orange-600 font-medium">{formatCurrency(payment.balanceAmount)}</TableCell>
+                      <TableCell>{getStatusBadge(payment.paymentStatus)}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <button
+                            onClick={() => handleView(payment)}
+                            className="p-1.5 sm:p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
+                            title="View payment details"
+                          >
+                            <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(payment)}
+                            className="p-1.5 sm:p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
+                            title="Delete payment"
+                          >
+                            <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                          </button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 }

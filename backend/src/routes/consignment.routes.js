@@ -33,7 +33,6 @@ const upload = multer({
  * @route   GET /api/v1/consignments/summary/status
  * @desc    Get status summary
  * @access  Private
- * @reserved Mobile/Flutter app — not used by web frontend
  */
 router.get(
   '/summary/status',
@@ -46,7 +45,6 @@ router.get(
  * @route   GET /api/v1/consignments/summary/today
  * @desc    Get today's bookings
  * @access  Private
- * @reserved Mobile/Flutter app — not used by web frontend
  */
 router.get(
   '/summary/today',
@@ -59,7 +57,6 @@ router.get(
  * @route   GET /api/v1/consignments/summary/pending
  * @desc    Get pending deliveries
  * @access  Private
- * @reserved Mobile/Flutter app — not used by web frontend
  */
 router.get(
   '/summary/pending',
@@ -72,7 +69,6 @@ router.get(
  * @route   GET /api/v1/consignments/for-invoicing/:partyId
  * @desc    Get consignments ready for invoicing
  * @access  Private
- * @reserved Mobile/Flutter app — not used by web frontend
  */
 router.get(
   '/for-invoicing/:partyId',

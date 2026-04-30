@@ -1,23 +1,6 @@
 import { NextResponse } from 'next/server';
 
-// Define public routes that don't require authentication
-const publicRoutes = ['/login', '/signup'];
-
 export function middleware(request) {
-  const { pathname } = request.nextUrl;
-
-  // Check if the route is public
-  const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
-
-  // Get access token from cookies
-  const accessToken = request.cookies.get('accessToken')?.value;
-
-  // If authenticated and trying to access login/signup, redirect to dashboard
-  if (isPublicRoute && accessToken && pathname !== '/signup') {
-    const dashboardUrl = new URL('/consignments', request.url);
-    return NextResponse.redirect(dashboardUrl);
-  }
-
   return NextResponse.next();
 }
 

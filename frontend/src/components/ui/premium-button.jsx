@@ -9,12 +9,10 @@ export const PremiumButton = ({
   disabled = false,
   ...props
 }) => {
-  const baseClasses = 'relative overflow-hidden font-medium transition-all duration-200 rounded-lg';
-
   const variants = {
-    primary: 'bg-primary-500 hover:bg-primary-600 text-white shadow-lg shadow-primary-500/30',
-    secondary: 'bg-white/60 dark:bg-white/10 hover:bg-white/80 dark:hover:bg-white/20 text-gray-900 dark:text-white border border-black/6 dark:border-white/20',
-    danger: 'bg-red-500/20 hover:bg-red-500/30 text-red-700 dark:text-red-300 border border-red-500/30',
+    primary: 'bg-primary-600 hover:bg-primary-700 text-white shadow-lg shadow-primary-600/25',
+    secondary: 'bg-white/60 dark:bg-white/10 hover:bg-white/80 dark:hover:bg-white/20 text-gray-900 dark:text-white border border-white/30 dark:border-white/10',
+    danger: 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/25',
   };
 
   const sizes = {
@@ -26,30 +24,18 @@ export const PremiumButton = ({
   return (
     <motion.button
       className={cn(
-        baseClasses,
+        'inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-all duration-200',
         variants[variant],
         sizes[size],
-        disabled && 'opacity-50 cursor-not-allowed',
+        disabled && 'opacity-60 cursor-not-allowed',
         className
       )}
-      whileHover={!disabled ? { scale: 1.02, y: -2 } : {}}
+      whileHover={!disabled ? { scale: 1.02 } : {}}
       whileTap={!disabled ? { scale: 0.98 } : {}}
       disabled={disabled}
       {...props}
     >
-      <span className="relative z-10 flex items-center justify-center gap-2">
-        {children}
-      </span>
-
-      {/* Shimmer effect */}
-      {!disabled && (
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-          initial={{ x: '-100%' }}
-          whileHover={{ x: '100%' }}
-          transition={{ duration: 0.5 }}
-        />
-      )}
+      {children}
     </motion.button>
   );
 };
