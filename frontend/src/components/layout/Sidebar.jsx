@@ -70,7 +70,7 @@ export default function Sidebar({ isOpen }) {
         className={cn(
           'fixed left-0 top-0 h-full text-white z-40',
           'glass-sidebar transition-all duration-300 ease-in-out',
-          expanded ? 'w-64 sm:w-72' : 'w-0 md:w-3'
+          expanded ? 'w-64 sm:w-72' : 'w-0 md:w-20'
         )}
         initial={false}
         animate={{ x: 0 }}
@@ -79,11 +79,11 @@ export default function Sidebar({ isOpen }) {
       >
         <div className={cn(
           'flex flex-col h-full overflow-hidden transition-opacity duration-200',
-          expanded ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          isOpen || hovered || !expanded ? 'opacity-100' : 'opacity-0 pointer-events-none'
         )}>
           {/* Header / Logo */}
           <div
-            className={`flex items-center justify-between px-3 sm:px-4 lg:px-6 border-b border-white/10 bg-white/5 transition-all duration-300 ${expanded ? 'h-32 sm:h-36 flex-col py-4' : 'h-16 sm:h-20'}`}
+            className={`flex items-center justify-between border-b border-white/10 bg-white/5 transition-all duration-300 ${expanded ? 'h-32 sm:h-36 flex-col px-3 sm:px-4 lg:px-6 py-4' : 'h-24 px-2 py-3'}`}
           >
             <div className={`flex ${expanded ? 'flex-col items-center w-full' : 'items-center justify-center w-full'} gap-2`}>
               <motion.div
@@ -96,10 +96,21 @@ export default function Sidebar({ isOpen }) {
                   alt="Raghhav Roadways"
                   className={cn(
                     'object-contain drop-shadow-lg transition-all duration-300',
-                    expanded ? 'w-16 h-16 sm:w-20 sm:h-20 rounded-xl' : 'w-10 h-10 sm:w-12 sm:h-12 rounded-lg'
+                    expanded ? 'w-16 h-16 sm:w-20 sm:h-20 rounded-xl' : 'w-11 h-11 rounded-lg'
                   )}
                 />
               </motion.div>
+              {!expanded && (
+                <motion.div
+                  className="absolute top-[62px] left-1/2 -translate-x-1/2 text-[9px] font-brand font-bold tracking-wide text-center leading-[0.95] text-brand-100"
+                  initial={false}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <span className="block">RAGHHAV</span>
+                  <span className="block">ROADWAYS</span>
+                </motion.div>
+              )}
               {expanded && (
                 <motion.div
                   className="flex flex-col items-center space-y-0"
@@ -133,7 +144,7 @@ export default function Sidebar({ isOpen }) {
 
           {/* Navigation */}
           <nav className="flex-1 overflow-y-auto py-4 sm:py-6 custom-scrollbar">
-            <div className="space-y-1 px-2 sm:px-3">
+            <div className={cn('space-y-1', expanded ? 'px-2 sm:px-3' : 'px-2')}>
               {navigation.map((item, index) => {
                 const Icon = item.icon;
                 const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));

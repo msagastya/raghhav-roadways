@@ -66,7 +66,7 @@ export default function DashboardLayout({ children }) {
       <div
         className={cn(
           'transition-all duration-300 min-h-screen relative z-10',
-          sidebarHovered || sidebarOpen ? 'md:ml-72' : 'md:ml-0'
+          sidebarHovered || sidebarOpen ? 'md:ml-72' : 'md:ml-20'
         )}
       >
         <Header />
