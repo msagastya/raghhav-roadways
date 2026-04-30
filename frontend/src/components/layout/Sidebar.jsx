@@ -129,7 +129,7 @@ export default function Sidebar({ isOpen }) {
             </div>
             {expanded && (
               <motion.button
-                className="md:hidden p-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+                className="md:hidden absolute top-3 right-3 p-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
                 onClick={() => setSidebarOpen(false)}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
