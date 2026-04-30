@@ -20,7 +20,7 @@ import { cn } from '../../lib/utils';
 import useUIStore from '../../store/uiStore';
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: Home },
+  { name: 'Dashboard', href: '/dashboard', icon: Home },
   { name: 'Consignments', href: '/consignments', icon: FileText },
   { name: 'Invoices', href: '/invoices', icon: Receipt },
   { name: 'Payments', href: '/payments', icon: CreditCard },

@@ -3,14 +3,14 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
-import { reportAPI } from '../../lib/api';
-import StatsCards from '../../components/dashboard/StatsCards';
-import RevenueChart from '../../components/analytics/RevenueChart';
-import KPICards from '../../components/analytics/KPICards';
-import { Card, CardContent, CardHeader } from '../../components/ui/card';
-import { CardSkeleton } from '../../components/ui/skeleton';
-import useToast from '../../hooks/useToast';
-import { getErrorMessage } from '../../lib/utils';
+import { reportAPI } from '../../../lib/api';
+import StatsCards from '../../../components/dashboard/StatsCards';
+import RevenueChart from '../../../components/analytics/RevenueChart';
+import KPICards from '../../../components/analytics/KPICards';
+import { Card, CardContent, CardHeader } from '../../../components/ui/card';
+import { CardSkeleton } from '../../../components/ui/skeleton';
+import useToast from '../../../hooks/useToast';
+import { getErrorMessage } from '../../../lib/utils';
 import { Activity, TrendingUp, Clock, Zap, AlertTriangle, FileText, Truck } from 'lucide-react';
 
 export default function DashboardPage() {
