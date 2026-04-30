@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { clearAuthTokens } from './auth';
+import { clearAuthTokens, getAccessToken, getRefreshToken, setAuthTokens } from './auth';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:2026/api/v1';
 
@@ -17,8 +17,12 @@ const api = axios.create({
 // Request interceptor for logging/debugging
 api.interceptors.request.use(
   (config) => {
-    // Tokens are in httpOnly cookies - automatically sent by browser
-    // Do NOT manually add Authorization header from localStorage (security risk)
+    const token = getAccessToken();
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
     return config;
   },
   (error) => {
@@ -42,13 +46,18 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        // Refresh endpoint will set new cookies automatically
-        await axios.post(`${API_URL}/auth/refresh`, {}, {
+        const refreshToken = getRefreshToken();
+        const refreshResponse = await axios.post(`${API_URL}/auth/refresh`, {}, {
           withCredentials: true, // Send existing refresh token cookie
+          headers: refreshToken ? { Authorization: `Bearer ${refreshToken}` } : {},
         });
 
-        // Backend sets new accessToken cookie automatically
-        // Retry original request with new token
+        const tokens = refreshResponse.data?.data;
+        if (tokens?.accessToken) {
+          setAuthTokens(tokens.accessToken, tokens.refreshToken);
+          originalRequest.headers.Authorization = `Bearer ${tokens.accessToken}`;
+        }
+
         return api(originalRequest);
       } catch (refreshError) {
         // Refresh failed - clear auth state and redirect to login

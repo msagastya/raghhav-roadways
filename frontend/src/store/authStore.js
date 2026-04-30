@@ -21,11 +21,9 @@ const useAuthStore = create((set) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await api.post('/auth/login', { username, password });
-      // Backend sets accessToken & refreshToken as httpOnly cookies automatically
-      // Response body only contains { user } - tokens are NOT in the response body
-      const { user } = response.data.data;
+      const { user, accessToken, refreshToken } = response.data.data;
 
-      setAuthTokens(); // Mark as authenticated (tokens are in cookies)
+      setAuthTokens(accessToken, refreshToken);
       saveUser(user);
 
       set({ user, isAuthenticated: true, isLoading: false, error: null });

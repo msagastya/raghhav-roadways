@@ -39,13 +39,16 @@ const login = asyncHandler(async (req, res, next) => {
 
     logger.info(`User ${username} logged in successfully`);
 
-    // Send user info (but NOT tokens) in response body
+    // Send tokens as well because the frontend is hosted on a different domain
+    // from the API. Browser cookies set by Render are not visible to Vercel
+    // middleware/client code, so the SPA uses Authorization headers in production.
     res.status(200).json({
       success: true,
       message: 'Login successful',
       data: {
         user: result.user,
-        // Tokens are now in httpOnly cookies, not in response body
+        accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
       },
     });
   } catch (error) {
@@ -80,8 +83,10 @@ const logout = asyncHandler(async (req, res) => {
  * SECURITY: Gets refreshToken from httpOnly cookie, returns new accessToken in cookie
  */
 const refreshToken = asyncHandler(async (req, res) => {
-  // Get refresh token from cookie (more secure than from body)
-  const refreshTokenFromCookie = req.cookies.refreshToken;
+  // Get refresh token from cookie first, then Authorization header for the
+  // Vercel frontend because it runs on a different domain from Render.
+  const authHeader = req.headers.authorization;
+  const refreshTokenFromCookie = req.cookies.refreshToken || (authHeader && authHeader.split(' ')[1]);
 
   if (!refreshTokenFromCookie) {
     throw new ApiError(401, 'Refresh token not found');
@@ -104,7 +109,8 @@ const refreshToken = asyncHandler(async (req, res) => {
     success: true,
     message: 'Token refreshed successfully',
     data: {
-      // Don't send tokens in response body - they're in cookies
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
     },
   });
 });

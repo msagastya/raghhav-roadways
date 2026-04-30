@@ -12,12 +12,6 @@ export function middleware(request) {
   // Get access token from cookies
   const accessToken = request.cookies.get('accessToken')?.value;
 
-  // If trying to access protected route without token, redirect to login
-  if (!isPublicRoute && !accessToken) {
-    const loginUrl = new URL('/login', request.url);
-    return NextResponse.redirect(loginUrl);
-  }
-
   // If authenticated and trying to access login/signup, redirect to dashboard
   if (isPublicRoute && accessToken && pathname !== '/signup') {
     const dashboardUrl = new URL('/consignments', request.url);
