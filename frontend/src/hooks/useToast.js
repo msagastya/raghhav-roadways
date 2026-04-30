@@ -6,6 +6,9 @@ export default function useToast() {
   };
 
   const showError = (message) => {
+    if (!message || message === 'Network Error') {
+      return;
+    }
     toast.error(message);
   };
 

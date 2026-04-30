@@ -33,12 +33,22 @@ const navigation = [
 
 export default function Sidebar({ isOpen }) {
   const pathname = usePathname();
-  const { setSidebarOpen } = useUIStore();
+  const { setSidebarOpen, setSidebarHovered } = useUIStore();
   const [hovered, setHovered] = useState(false);
 
   // On desktop: sidebar expands on hover, collapses when not hovered
   // On mobile: controlled by isOpen (hamburger menu)
   const expanded = isOpen || hovered;
+
+  const handleMouseEnter = () => {
+    setHovered(true);
+    setSidebarHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    setHovered(false);
+    setSidebarHovered(false);
+  };
 
   return (
     <>
@@ -60,16 +70,17 @@ export default function Sidebar({ isOpen }) {
         className={cn(
           'fixed left-0 top-0 h-full text-white z-40',
           'glass-sidebar transition-all duration-300 ease-in-out',
-          // Mobile: hidden when closed, full when open
-          // Desktop: always visible — collapsed (icon-only) or expanded (hover)
-          expanded ? 'w-64 sm:w-72' : 'w-0 md:w-16 lg:w-20'
+          expanded ? 'w-64 sm:w-72' : 'w-0 md:w-3'
         )}
         initial={false}
         animate={{ x: 0 }}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
-        <div className="flex flex-col h-full overflow-hidden">
+        <div className={cn(
+          'flex flex-col h-full overflow-hidden transition-opacity duration-200',
+          expanded ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        )}>
           {/* Header / Logo */}
           <div
             className={`flex items-center justify-between px-3 sm:px-4 lg:px-6 border-b border-white/10 bg-white/5 transition-all duration-300 ${expanded ? 'h-32 sm:h-36 flex-col py-4' : 'h-16 sm:h-20'}`}

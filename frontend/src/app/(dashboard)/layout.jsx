@@ -10,7 +10,7 @@ import { cn } from '../../lib/utils';
 
 export default function DashboardLayout({ children }) {
   const { isAuthenticated, isLoading } = useAuth();
-  const { sidebarOpen } = useUIStore();
+  const { sidebarOpen, sidebarHovered } = useUIStore();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -66,8 +66,7 @@ export default function DashboardLayout({ children }) {
       <div
         className={cn(
           'transition-all duration-300 min-h-screen relative z-10',
-          // On desktop, always use collapsed sidebar margin (sidebar overlays on hover)
-          'md:ml-16 lg:ml-20'
+          sidebarHovered || sidebarOpen ? 'md:ml-72' : 'md:ml-0'
         )}
       >
         <Header />

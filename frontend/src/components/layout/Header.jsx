@@ -60,7 +60,7 @@ export default function Header() {
           <div className="flex items-center gap-2 sm:gap-3">
             <motion.button
               onClick={toggleSidebar}
-              className="p-2 rounded-xl bg-white/30 dark:bg-white/10 hover:bg-white/50 dark:hover:bg-white/20 border-2 border-white/20 dark:border-white/10 focus:outline-none transition-all"
+              className="md:hidden p-2 rounded-xl bg-white/30 dark:bg-white/10 hover:bg-white/50 dark:hover:bg-white/20 border-2 border-white/20 dark:border-white/10 focus:outline-none transition-all"
               whileHover={{ scale: 1.05, rotate: 90, y: -2 }}
               whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.2, type: 'spring' }}
