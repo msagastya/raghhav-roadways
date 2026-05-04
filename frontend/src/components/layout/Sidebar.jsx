@@ -14,7 +14,6 @@ import {
   BarChart3,
   Settings,
   Database,
-  X,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import useUIStore from '../../store/uiStore';
@@ -127,19 +126,6 @@ export default function Sidebar({ isOpen }) {
                 </motion.div>
               )}
             </div>
-            {expanded && (
-              <motion.button
-                className="md:hidden absolute top-3 right-3 p-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
-                onClick={() => setSidebarOpen(false)}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.2 }}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <X className="w-5 h-5 text-white" />
-              </motion.button>
-            )}
           </div>
 
           {/* Navigation */}
