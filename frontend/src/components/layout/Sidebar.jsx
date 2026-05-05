@@ -40,11 +40,18 @@ export default function Sidebar({ isOpen }) {
   const expanded = isOpen || hovered;
 
   const handleMouseEnter = () => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) return;
     setHovered(true);
     setSidebarHovered(true);
   };
 
   const handleMouseLeave = () => {
+    setHovered(false);
+    setSidebarHovered(false);
+  };
+
+  const handleNavigation = () => {
+    setSidebarOpen(false);
     setHovered(false);
     setSidebarHovered(false);
   };
@@ -139,7 +146,7 @@ export default function Sidebar({ isOpen }) {
                   <Link
                     key={item.name}
                     href={item.href}
-                    onClick={() => setSidebarOpen(false)}
+                    onClick={handleNavigation}
                   >
                     <motion.div
                       className={cn(
