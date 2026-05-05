@@ -136,7 +136,11 @@ export default function Sidebar({ isOpen }) {
                 const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
 
                 return (
-                  <Link key={item.name} href={item.href}>
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    onClick={() => setSidebarOpen(false)}
+                  >
                     <motion.div
                       className={cn(
                         'flex items-center py-2 sm:py-2.5 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200 relative overflow-hidden',
