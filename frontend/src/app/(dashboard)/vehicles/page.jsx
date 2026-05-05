@@ -16,6 +16,7 @@ export default function VehiclesPage() {
   const router = useRouter();
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [slowLoading, setSlowLoading] = useState(false);
   const { showError, showSuccess } = useToast();
 
   useEffect(() => {
@@ -23,6 +24,10 @@ export default function VehiclesPage() {
   }, []);
 
   const fetchVehicles = async () => {
+    setLoading(true);
+    setSlowLoading(false);
+    const slowTimer = window.setTimeout(() => setSlowLoading(true), 3500);
+
     try {
       const response = await vehicleAPI.getAll({ limit: 100 });
       setVehicles(response.data?.data?.vehicles || []);
@@ -30,7 +35,9 @@ export default function VehiclesPage() {
       showError(getErrorMessage(error));
       setVehicles([]);
     } finally {
+      window.clearTimeout(slowTimer);
       setLoading(false);
+      setSlowLoading(false);
     }
   };
 
@@ -52,25 +59,6 @@ export default function VehiclesPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <div className="space-y-2">
-            <div className="h-8 w-32 bg-gray-200 rounded animate-pulse"></div>
-            <div className="h-4 w-48 bg-gray-200 rounded animate-pulse"></div>
-          </div>
-          <div className="h-10 w-32 bg-gray-200 rounded animate-pulse"></div>
-        </div>
-        <Card animate={false}>
-          <CardContent className="p-6">
-            <TableSkeleton rows={10} columns={6} />
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
       <motion.div
@@ -85,13 +73,18 @@ export default function VehiclesPage() {
         </div>
       </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.1 }}
-      >
-        <Card animate={false}>
-          <CardContent className="p-6">
+      <Card animate={false}>
+        <CardContent className="p-4 sm:p-6">
+          {loading ? (
+            <div className="space-y-4">
+              {slowLoading && (
+                <div className="rounded-xl border border-primary-100 bg-primary-50 px-4 py-3 text-sm text-primary-800">
+                  Server is waking up. Vehicle records will appear automatically.
+                </div>
+              )}
+              <TableSkeleton rows={8} columns={6} />
+            </div>
+          ) : (
             <Table>
               <TableHeader>
                 <TableRow>
@@ -147,9 +140,9 @@ export default function VehiclesPage() {
                 )}
               </TableBody>
             </Table>
-          </CardContent>
-        </Card>
-      </motion.div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

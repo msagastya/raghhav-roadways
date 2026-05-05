@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Truck, Lock, User, ArrowRight, Sparkles } from 'lucide-react';
 import Input from '../../../components/ui/input';
 import Button from '../../../components/ui/button';
 import { Card, CardContent, CardHeader } from '../../../components/ui/card';
-import { authAPI } from '../../../lib/api';
+import { authAPI, warmupAPI } from '../../../lib/api';
 import useAuthStore from '../../../store/authStore';
 import useToast from '../../../hooks/useToast';
 import { getErrorMessage } from '../../../lib/utils';
@@ -53,7 +53,12 @@ export default function LoginPage() {
     password: '',
   });
   const [loading, setLoading] = useState(false);
+  const [slowLogin, setSlowLogin] = useState(false);
   const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    warmupAPI();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -80,6 +85,8 @@ export default function LoginPage() {
     }
 
     setLoading(true);
+    setSlowLogin(false);
+    const slowTimer = window.setTimeout(() => setSlowLogin(true), 3500);
     try {
       const response = await authAPI.login(formData);
       const { user, accessToken, refreshToken } = response.data.data;
@@ -92,7 +99,9 @@ export default function LoginPage() {
     } catch (error) {
       showError(getErrorMessage(error));
     } finally {
+      window.clearTimeout(slowTimer);
       setLoading(false);
+      setSlowLogin(false);
     }
   };
 
@@ -246,6 +255,12 @@ export default function LoginPage() {
               </Button>
             </motion.div>
           </motion.form>
+
+          {slowLogin && (
+            <p className="mt-3 text-center text-xs font-medium text-primary-700">
+              Server is waking up. This can take a few seconds on the first request.
+            </p>
+          )}
 
           <motion.div
             variants={itemVariants}

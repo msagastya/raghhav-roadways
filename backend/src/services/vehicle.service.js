@@ -39,29 +39,43 @@ const getVehicles = async (filters = {}) => {
     where.isActive = isActive === 'true' || isActive === true;
   }
 
-  // Get total count
-  const totalRecords = await prisma.vehicle.count({ where });
+  const pageNumber = parseInt(page);
+  const pageLimit = parseInt(limit);
 
-  // Get vehicles
-  const vehicles = await prisma.vehicle.findMany({
-    where,
-    skip,
-    take: parseInt(limit),
-    orderBy: { vehicleNo: 'asc' },
-    include: {
-      broker: {
-        select: {
-          id: true,
-          partyName: true,
-          mobile: true,
+  const [totalRecords, vehicles] = await Promise.all([
+    prisma.vehicle.count({ where }),
+    prisma.vehicle.findMany({
+      where,
+      skip,
+      take: pageLimit,
+      orderBy: { vehicleNo: 'asc' },
+      select: {
+        id: true,
+        vehicleNo: true,
+        vehicleType: true,
+        vehicleCapacity: true,
+        ownerType: true,
+        ownerName: true,
+        ownerMobile: true,
+        brokerId: true,
+        driverName: true,
+        driverMobile: true,
+        isActive: true,
+        createdAt: true,
+        broker: {
+          select: {
+            id: true,
+            partyName: true,
+            mobile: true,
+          },
         },
       },
-    },
-  });
+    }),
+  ]);
 
   return {
     vehicles,
-    pagination: getPaginationMeta(totalRecords, parseInt(page), parseInt(limit)),
+    pagination: getPaginationMeta(totalRecords, pageNumber, pageLimit),
   };
 };
 

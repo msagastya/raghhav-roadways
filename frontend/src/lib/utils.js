@@ -74,8 +74,14 @@ export function downloadFile(blob, filename) {
 
 // Handle API errors
 export function getErrorMessage(error) {
+  if (error.code === 'ECONNABORTED') {
+    return 'Server is taking too long to respond. Please try again.';
+  }
   if (error.response?.data?.message) {
     return error.response.data.message;
+  }
+  if (error.message === 'Network Error') {
+    return 'Connection problem. Please check again in a moment.';
   }
   if (error.message) {
     return error.message;

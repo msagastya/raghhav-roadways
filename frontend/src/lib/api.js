@@ -2,10 +2,33 @@ import axios from 'axios';
 import { clearAuthTokens, getAccessToken, getRefreshToken, setAuthTokens } from './auth';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:2026/api/v1';
+const API_TIMEOUT = 20000;
+const RETRY_DELAY = 700;
+
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const isRetryableGetError = (error) => {
+  const method = error.config?.method?.toLowerCase();
+  const status = error.response?.status;
+
+  return (
+    method === 'get' &&
+    !error.config?._retryGet &&
+    (error.code === 'ECONNABORTED' ||
+      error.message === 'Network Error' ||
+      !error.response ||
+      status === 408 ||
+      status === 429 ||
+      status === 502 ||
+      status === 503 ||
+      status === 504)
+  );
+};
 
 // Create axios instance with httpOnly cookie support
 const api = axios.create({
   baseURL: API_URL,
+  timeout: API_TIMEOUT,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -35,6 +58,12 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+
+    if (isRetryableGetError(error)) {
+      originalRequest._retryGet = true;
+      await wait(RETRY_DELAY);
+      return api(originalRequest);
+    }
 
     // If 401 (unauthorized), try to refresh token
     if (error.response?.status === 401 && !originalRequest._retry) {
@@ -69,6 +98,16 @@ api.interceptors.response.use(
 );
 
 export default api;
+
+export const warmupAPI = () => {
+  if (typeof window === 'undefined') return Promise.resolve();
+
+  return fetch(`${API_URL}/health`, {
+    method: 'GET',
+    cache: 'no-store',
+    credentials: 'include',
+  }).catch(() => null);
+};
 
 // API endpoints
 export const authAPI = {
