@@ -76,7 +76,7 @@ export default function Sidebar({ isOpen }) {
         className={cn(
           'fixed left-0 top-0 h-full text-white z-40',
           'glass-sidebar transition-all duration-300 ease-in-out',
-          expanded ? 'w-64 sm:w-72' : 'w-0 md:w-20'
+          expanded ? 'w-64 sm:w-72' : 'w-16 md:w-20'
         )}
         initial={false}
         animate={{ x: 0 }}
@@ -147,11 +147,12 @@ export default function Sidebar({ isOpen }) {
                     key={item.name}
                     href={item.href}
                     onClick={handleNavigation}
+                    className="block"
                   >
                     <motion.div
                       className={cn(
-                        'flex items-center py-2 sm:py-2.5 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200 relative overflow-hidden',
-                        expanded ? 'px-2 sm:px-3' : 'px-0 justify-center',
+                        'flex w-full items-center py-2 sm:py-2.5 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200 relative overflow-hidden',
+                        expanded ? 'px-2 sm:px-3' : 'min-h-10 px-0 justify-center',
                         isActive
                           ? 'bg-white/15 text-white shadow-lg shadow-primary-600/20 border-2 border-primary-400/30 backdrop-blur-sm'
                           : 'text-gray-300 hover:bg-white/10 hover:text-white border-2 border-transparent hover:border-white/15'

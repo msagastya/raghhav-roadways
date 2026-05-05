@@ -65,7 +65,7 @@ export default function DashboardLayout({ children }) {
       <Sidebar isOpen={sidebarOpen} />
       <div
         className={cn(
-          'transition-all duration-300 min-h-screen relative z-10',
+          'ml-16 transition-all duration-300 min-h-screen relative z-10',
           sidebarHovered || sidebarOpen ? 'md:ml-72' : 'md:ml-20'
         )}
       >

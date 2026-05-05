@@ -32,22 +32,22 @@ export default function MastersPage() {
 
       {/* Tabs */}
       <motion.div
-        className="border-b-2 border-gray-200 overflow-x-auto"
+        className="border-b-2 border-gray-200 pb-2 sm:overflow-x-auto sm:pb-0"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4, delay: 0.1 }}
       >
-        <nav className="-mb-0.5 flex space-x-4 sm:space-x-6 lg:space-x-8 min-w-max px-1">
+        <nav className="grid grid-cols-2 gap-2 px-1 sm:-mb-0.5 sm:flex sm:min-w-max sm:gap-0 sm:space-x-6 lg:space-x-8">
           {tabs.map((tab, index) => (
             <motion.button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`
-                relative py-3 sm:py-4 px-2 font-semibold text-xs sm:text-sm lg:text-base whitespace-nowrap transition-all
+                relative rounded-xl px-2 py-2.5 font-semibold text-xs transition-all sm:rounded-none sm:py-4 sm:text-sm lg:text-base
                 ${
                   activeTab === tab.id
-                    ? 'text-primary-600'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'bg-primary-50 text-primary-700 shadow-sm sm:bg-transparent sm:text-primary-600 sm:shadow-none'
+                    : 'bg-white/50 text-gray-500 hover:bg-white hover:text-gray-700 sm:bg-transparent sm:hover:bg-transparent'
                 }
               `}
               initial={{ opacity: 0, y: -10 }}
@@ -59,7 +59,7 @@ export default function MastersPage() {
               {tab.label}
               {activeTab === tab.id && (
                 <motion.div
-                  className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 to-primary-600 rounded-t-full shadow-lg shadow-primary-500/50"
+                  className="absolute bottom-0 left-2 right-2 h-0.5 bg-gradient-to-r from-primary-500 to-primary-600 rounded-t-full shadow-lg shadow-primary-500/50 sm:left-0 sm:right-0 sm:h-1"
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: 1 }}
                   transition={{ duration: 0.2 }}
