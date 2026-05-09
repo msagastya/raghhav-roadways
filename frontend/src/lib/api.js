@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { clearAuthTokens, getAccessToken, getRefreshToken, setAuthTokens } from './auth';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:2026/api/v1';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://raghhav-roadways.onrender.com/api/v1';
 const API_TIMEOUT = 20000;
 const RETRY_DELAY = 700;
 
