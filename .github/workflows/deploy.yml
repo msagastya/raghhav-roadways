@@ -1,4 +1,4 @@
-name: Deploy to Vercel
+name: CI
 
 on:
   push:
@@ -6,12 +6,7 @@ on:
   pull_request:
     branches: [master, main]
 
-env:
-  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-
 jobs:
-  # Lint and test backend
   backend-checks:
     name: Backend Lint & Verify
     runs-on: ubuntu-latest
@@ -31,15 +26,14 @@ jobs:
         working-directory: backend
         run: npm ci
 
-      - name: Lint code
+      - name: Generate Prisma client
         working-directory: backend
-        run: npm run lint || echo "Linting completed with warnings"
+        run: npx prisma generate
 
-      - name: Check TypeScript (if available)
+      - name: Check server entrypoint
         working-directory: backend
-        run: npm run typecheck || echo "Type checking skipped"
+        run: node --check src/server.js
 
-  # Lint and test frontend
   frontend-checks:
     name: Frontend Lint & Verify
     runs-on: ubuntu-latest
@@ -67,91 +61,4 @@ jobs:
         working-directory: frontend
         run: npm run build
         env:
-          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL_STAGING }}
-
-  # Deploy to Vercel
-  deploy:
-    name: Deploy to Vercel
-    needs: [backend-checks, frontend-checks]
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install Vercel CLI
-        run: npm install --global vercel@latest
-
-      - name: Pull Vercel environment information
-        run: vercel pull --yes --environment=production
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-
-      - name: Build project artifacts
-        run: vercel build --prod
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-
-      - name: Deploy project artifacts to Vercel
-        run: vercel deploy --prebuilt --prod
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-
-  # Health check after deployment
-  health-check:
-    name: Health Check
-    needs: deploy
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Wait for deployment
-        run: sleep 30
-
-      - name: Check backend health
-        run: |
-          max_attempts=10
-          attempt=1
-          while [ $attempt -le $max_attempts ]; do
-            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://${{ secrets.VERCEL_BACKEND_URL }}/api/v1/health)
-            if [ "$HTTP_CODE" = "200" ]; then
-              echo "✅ Backend health check passed"
-              exit 0
-            fi
-            echo "Attempt $attempt/$max_attempts - HTTP $HTTP_CODE"
-            sleep 5
-            attempt=$((attempt+1))
-          done
-          echo "❌ Health check failed after $max_attempts attempts"
-          exit 1
-
-      - name: Check frontend health
-        run: |
-          max_attempts=10
-          attempt=1
-          while [ $attempt -le $max_attempts ]; do
-            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://${{ secrets.VERCEL_FRONTEND_URL }})
-            if [ "$HTTP_CODE" = "200" ]; then
-              echo "✅ Frontend health check passed"
-              exit 0
-            fi
-            echo "Attempt $attempt/$max_attempts - HTTP $HTTP_CODE"
-            sleep 5
-            attempt=$((attempt+1))
-          done
-          echo "❌ Health check failed after $max_attempts attempts"
-          exit 1
-
-  # Notify on failure
-  notify-failure:
-    name: Notify on Failure
-    needs: [health-check]
-    if: failure()
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Notify deployment failure
-        run: |
-          echo "::error::Deployment failed. Check logs above for details."
-          exit 1
+          NEXT_PUBLIC_API_URL: https://raghhav-roadways.onrender.com/api/v1
