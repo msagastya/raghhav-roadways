@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Plus, Trash2 } from 'lucide-react';
 import { vehicleAPI } from '../../../lib/api';
 import { Card, CardContent } from '../../../components/ui/card';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../../components/ui/table';
@@ -42,7 +42,7 @@ export default function VehiclesPage() {
   };
 
   const handleEdit = (vehicle) => {
-    router.push(`/vehicles/edit/${vehicle.id}`);
+    router.push(`/vehicles/${vehicle.id}/edit`);
   };
 
   const handleDelete = async (vehicle) => {
@@ -71,6 +71,13 @@ export default function VehiclesPage() {
           <h1 className="text-2xl font-bold text-gray-900">Vehicles</h1>
           <p className="text-gray-600 mt-1">Manage all vehicle records</p>
         </div>
+        <button
+          onClick={() => router.push('/vehicles/new')}
+          className="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700"
+        >
+          <Plus className="h-4 w-4" />
+          New Vehicle
+        </button>
       </motion.div>
 
       <Card animate={false}>

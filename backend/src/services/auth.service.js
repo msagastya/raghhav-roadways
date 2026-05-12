@@ -141,17 +141,6 @@ const refreshAccessToken = async (refreshToken) => {
 const getUserById = async (userId) => {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    include: {
-      role: {
-        include: {
-          rolePermissions: {
-            include: {
-              permission: true,
-            },
-          },
-        },
-      },
-    },
     select: {
       id: true,
       username: true,
@@ -161,7 +150,20 @@ const getUserById = async (userId) => {
       isActive: true,
       lastLogin: true,
       createdAt: true,
-      role: true,
+      role: {
+        select: {
+          roleName: true,
+          rolePermissions: {
+            select: {
+              permission: {
+                select: {
+                  permissionCode: true,
+                },
+              },
+            },
+          },
+        },
+      },
     },
   });
 

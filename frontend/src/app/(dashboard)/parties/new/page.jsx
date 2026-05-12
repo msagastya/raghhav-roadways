@@ -32,12 +32,12 @@ export default function CreatePartyPage() {
   const onSubmit = async (data) => {
     try {
       setLoading(true);
-      const response = await partyAPI.create({
+      await partyAPI.create({
         ...data,
         creditLimit: parseFloat(data.creditLimit),
       });
       toast.success('Party created successfully!');
-      router.push(`/parties/${response.data.data.id}`);
+      router.push('/parties');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to create party');
     } finally {

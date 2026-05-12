@@ -17,6 +17,18 @@ router.get(
 );
 
 /**
+ * @route   GET /api/v1/reports/audit-logs
+ * @desc    Get audit logs
+ * @access  Private
+ */
+router.get(
+  '/audit-logs',
+  authenticateToken,
+  checkPermission('settings.audit_logs'),
+  reportController.getAuditLogs
+);
+
+/**
  * @route   GET /api/v1/reports/daily
  * @desc    Get daily report
  * @access  Private

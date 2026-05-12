@@ -3,7 +3,7 @@ const invoiceService = require('../services/invoice.service');
 const paymentService = require('../services/payment.service');
 const vehicleService = require('../services/vehicle.service');
 const prisma = require('../config/database');
-const { asyncHandler } = require('../middleware/errorHandler');
+const { asyncHandler, ApiError } = require('../middleware/errorHandler');
 const { formatDate } = require('../utils/helpers');
 
 /**
@@ -192,6 +192,78 @@ const getDashboardSummary = asyncHandler(async (req, res) => {
         })),
         paymentStatusDistribution: paymentSummary,
         consignmentStatusDistribution: statusSummary,
+      },
+    },
+  });
+});
+
+/**
+ * Get audit logs
+ * GET /api/v1/reports/audit-logs
+ */
+const getAuditLogs = asyncHandler(async (req, res) => {
+  const page = Math.max(parseInt(req.query.page || '1', 10), 1);
+  const limit = Math.min(Math.max(parseInt(req.query.limit || '20', 10), 1), 100);
+  const skip = (page - 1) * limit;
+  const search = req.query.search?.trim();
+  const startDate = req.query.startDate ? new Date(req.query.startDate) : null;
+  const endDate = req.query.endDate ? new Date(req.query.endDate) : null;
+
+  if (endDate) {
+    endDate.setHours(23, 59, 59, 999);
+  }
+
+  const where = {
+    ...(search && {
+      OR: [
+        { tableName: { contains: search, mode: 'insensitive' } },
+        { action: { contains: search, mode: 'insensitive' } },
+        ...(Number.isInteger(Number(search)) ? [{ recordId: Number(search) }] : []),
+        {
+          user: {
+            OR: [
+              { username: { contains: search, mode: 'insensitive' } },
+              { fullName: { contains: search, mode: 'insensitive' } },
+            ],
+          },
+        },
+      ],
+    }),
+    ...((startDate || endDate) && {
+      changedAt: {
+        ...(startDate && { gte: startDate }),
+        ...(endDate && { lte: endDate }),
+      },
+    }),
+  };
+
+  const [logs, total] = await Promise.all([
+    prisma.auditLog.findMany({
+      where,
+      skip,
+      take: limit,
+      orderBy: { changedAt: 'desc' },
+      include: {
+        user: {
+          select: {
+            username: true,
+            fullName: true,
+          },
+        },
+      },
+    }),
+    prisma.auditLog.count({ where }),
+  ]);
+
+  res.status(200).json({
+    success: true,
+    data: {
+      logs,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
       },
     },
   });
@@ -640,6 +712,7 @@ const generateActivityDescription = (log) => {
 
 module.exports = {
   getDashboardSummary,
+  getAuditLogs,
   getDailyReport,
   getMonthlyStatement,
   getVehicleSettlement,

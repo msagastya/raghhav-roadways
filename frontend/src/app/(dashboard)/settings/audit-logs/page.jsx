@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { FileText, User, Calendar, Clock } from 'lucide-react';
-import { Card, CardContent, CardHeader } from '../../../../components/ui/card';
+import { FileText, User, Clock } from 'lucide-react';
+import { Card, CardContent } from '../../../../components/ui/card';
 import Badge from '../../../../components/ui/badge';
 import Pagination from '../../../../components/ui/pagination';
 import { SearchBar } from '../../../../components/ui/search-filter';
 import { DateRangePicker } from '../../../../components/ui/date-picker';
 import { PageLoader } from '../../../../components/ui/loading';
+import { reportAPI } from '../../../../lib/api';
 import { format } from 'date-fns';
 
 export default function AuditLogsPage() {
@@ -20,10 +21,27 @@ export default function AuditLogsPage() {
   const [endDate, setEndDate] = useState(null);
 
   useEffect(() => {
-    // TODO: Fetch audit logs from API
-    setLoading(false);
-    // Placeholder data
-    setLogs([]);
+    const loadAuditLogs = async () => {
+      setLoading(true);
+      try {
+        const response = await reportAPI.getAuditLogs({
+          page: currentPage,
+          limit: 20,
+          search: searchTerm || undefined,
+          startDate: startDate ? format(startDate, 'yyyy-MM-dd') : undefined,
+          endDate: endDate ? format(endDate, 'yyyy-MM-dd') : undefined,
+        });
+        setLogs(response.data?.data?.logs || []);
+        setTotalPages(response.data?.data?.pagination?.totalPages || 1);
+      } catch (error) {
+        setLogs([]);
+        setTotalPages(1);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadAuditLogs();
   }, [currentPage, searchTerm, startDate, endDate]);
 
   const getActionColor = (action) => {

@@ -200,6 +200,7 @@ export const vehicleAPI = {
 
 export const reportAPI = {
   getDashboard: () => api.get('/reports/dashboard'),
+  getAuditLogs: (params) => api.get('/reports/audit-logs', { params }),
   getDaily: (date) => api.get('/reports/daily', { params: { date } }),
   getMonthlyStatement: (params) => api.get('/reports/monthly-statement', { params }),
   getVehicleSettlement: (params) => api.get('/reports/vehicle-settlement', { params }),

@@ -191,7 +191,7 @@ export default function ConsignmentsPage() {
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
-                            onClick={e => { e.stopPropagation(); router.push(`/consignments/edit/${c.id}`); }}
+                            onClick={e => { e.stopPropagation(); router.push(`/consignments/${c.id}/edit`); }}
                             className="p-1.5 text-gray-500 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
                             title="Edit"
                           >

@@ -29,9 +29,23 @@ function generateToken() {
  * CSRF protection middleware
  */
 const csrfProtection = (req, res, next) => {
-  // Skip CSRF validation for safe methods
+  const tokenFromCookie = req.cookies[CSRF_COOKIE_NAME];
+  const setTokenCookie = (token = generateToken()) => {
+    res.cookie(CSRF_COOKIE_NAME, token, {
+      httpOnly: false, // CSRF token needs to be readable by JS
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      path: '/',
+    });
+  };
+
+  // Safe methods do not mutate state. Send a token cookie for browser clients.
   const safeMethods = ['GET', 'HEAD', 'OPTIONS'];
   if (safeMethods.includes(req.method)) {
+    if (!tokenFromCookie) {
+      setTokenCookie();
+    }
     return next();
   }
 
@@ -49,26 +63,32 @@ const csrfProtection = (req, res, next) => {
     return next();
   }
 
+  // Bearer-token API clients are not vulnerable to browser CSRF because hostile
+  // pages cannot attach the Authorization header.
+  const hasBearerToken = /^Bearer\s+/i.test(req.headers.authorization || '');
+  if (hasBearerToken) {
+    return next();
+  }
+
   // Get token from request (header or body)
   const tokenFromRequest =
     req.headers[CSRF_HEADER_NAME.toLowerCase()] ||
     req.body?._csrf ||
     req.query?._csrf;
 
-  // Get token from cookie
-  const tokenFromCookie = req.cookies[CSRF_COOKIE_NAME];
-
-  // If no token in cookie, this is first request - generate one
+  // Cookie-authenticated unsafe requests must already carry the CSRF cookie.
   if (!tokenFromCookie) {
-    const newToken = generateToken();
-    res.cookie(CSRF_COOKIE_NAME, newToken, {
-      httpOnly: false, // CSRF token needs to be readable by JS
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
-      path: '/',
+    setTokenCookie();
+    logger.warn('CSRF cookie missing from unsafe request', {
+      method: req.method,
+      path: req.path,
+      ip: req.ip,
+      requestId: req.id,
     });
-    return next();
+    return res.status(403).json({
+      success: false,
+      error: 'CSRF token missing',
+    });
   }
 
   // For state-changing requests, validate token

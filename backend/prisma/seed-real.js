@@ -513,7 +513,7 @@ async function main() {
               fromLocation: row.loadFrom || '',
               toLocation: row.destination || '',
               contents: row.contents || '',
-              qtyInMt: qtyDecimal,
+              qtyInMt: qtyDecimal === null || qtyDecimal === undefined ? null : String(qtyDecimal),
               rateMt: null,
               amount: row.amount ? Number(row.amount) : 0,
             },
