@@ -26,6 +26,7 @@ const navigation = [
   { name: 'Parties', href: '/parties', icon: Users },
   { name: 'Vehicles', href: '/vehicles', icon: Truck },
   { name: 'Masters', href: '/masters', icon: Database },
+  { name: 'Analytics', href: '/analytics', icon: BarChart3 },
   { name: 'Reports', href: '/reports', icon: BarChart3 },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
