@@ -1,4 +1,5 @@
-const admin = require('firebase-admin');
+const { initializeApp, getApps, cert } = require('firebase-admin');
+const { getStorage } = require('firebase-admin/storage');
 const logger = require('../utils/logger');
 
 let bucket = null;
@@ -17,9 +18,9 @@ const initializeFirebase = () => {
       return null;
     }
 
-    if (admin.apps.length === 0) {
-      admin.initializeApp({
-        credential: admin.credential.cert({
+    if (getApps().length === 0) {
+      initializeApp({
+        credential: cert({
           projectId,
           clientEmail,
           privateKey,
@@ -29,7 +30,7 @@ const initializeFirebase = () => {
       logger.info('Firebase Admin SDK initialized successfully.');
     }
 
-    bucket = admin.storage().bucket();
+    bucket = getStorage().bucket();
     return bucket;
   } catch (error) {
     logger.error('Firebase initialization error:', error);
