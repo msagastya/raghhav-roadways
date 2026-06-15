@@ -1,6 +1,7 @@
 const invoiceService = require('../services/invoice.service');
 const pdfService = require('../services/pdf.service');
 const { asyncHandler } = require('../middleware/errorHandler');
+const pdfQueue = require('../services/pdfQueue');
 
 /**
  * Get all invoices
@@ -50,20 +51,24 @@ const createInvoice = asyncHandler(async (req, res) => {
     req.get('user-agent')
   );
 
-  // Generate PDF if requested
-  let pdfPath = null;
+  // Generate PDF in the background if requested
   if (req.body.generatePdf !== false) {
-    const invoiceWithDetails = await invoiceService.getInvoiceById(invoice.id);
-    pdfPath = await pdfService.generateInvoicePDF(invoiceWithDetails);
-
-    // Update invoice with PDF path
-    await invoiceService.updateInvoice(
-      invoice.id,
-      { pdfFilePath: pdfPath, pdfGenerated: true },
-      req.user.id,
-      req.ip,
-      req.get('user-agent')
-    );
+    const userId = req.user.id;
+    const ipAddress = req.ip;
+    const userAgent = req.get('user-agent');
+    
+    pdfQueue.enqueue(async () => {
+      const invoiceWithDetails = await invoiceService.getInvoiceById(invoice.id);
+      const generatedPath = await pdfService.generateInvoicePDF(invoiceWithDetails);
+      
+      await invoiceService.updateInvoice(
+        invoice.id,
+        { pdfFilePath: generatedPath, pdfGenerated: true },
+        userId,
+        ipAddress,
+        userAgent
+      );
+    }, `generate-invoice-${invoice.invoiceNumber || invoice.id}`);
   }
 
   res.status(201).json({
@@ -71,7 +76,7 @@ const createInvoice = asyncHandler(async (req, res) => {
     message: 'Invoice generated successfully',
     data: {
       ...invoice,
-      pdfUrl: pdfPath ? `/api/v1/invoices/${invoice.id}/download` : null,
+      pdfUrl: req.body.generatePdf !== false ? `/api/v1/invoices/${invoice.id}/download` : null,
     },
   });
 });
@@ -134,7 +139,12 @@ const downloadInvoice = asyncHandler(async (req, res) => {
     );
   }
 
-  // Get PDF file
+  // If pdfPath is a Firebase URL, redirect to it
+  if (pdfPath && (pdfPath.startsWith('http://') || pdfPath.startsWith('https://'))) {
+    return res.redirect(pdfPath);
+  }
+
+  // Get PDF file (local fallback)
   const pdfBuffer = await pdfService.getPDFFile(pdfPath);
 
   res.setHeader('Content-Type', 'application/pdf');

@@ -3,11 +3,16 @@ const { ApiError } = require('../middleware/errorHandler');
 const { generateCode, getPaginationMeta } = require('../utils/helpers');
 const { createAuditLog } = require('../utils/auditLog');
 const { AUDIT_ACTION } = require('../config/constants');
+const cache = require('../utils/cache');
 
 /**
  * Get all parties with pagination and filters
  */
 const getParties = async (filters = {}) => {
+  const cacheKey = `party_list_${JSON.stringify(filters)}`;
+  const cached = cache.get(cacheKey);
+  if (cached) return cached;
+
   const {
     page = 1,
     limit = 20,
@@ -66,16 +71,23 @@ const getParties = async (filters = {}) => {
     },
   });
 
-  return {
+  const result = {
     parties,
     pagination: getPaginationMeta(totalRecords, parseInt(page), parseInt(limit)),
   };
+
+  cache.set(cacheKey, result, 5 * 60 * 1000); // 5 mins TTL
+  return result;
 };
 
 /**
  * Get party by ID
  */
 const getPartyById = async (id) => {
+  const cacheKey = `party_id_${id}`;
+  const cached = cache.get(cacheKey);
+  if (cached) return cached;
+
   const party = await prisma.party.findUnique({
     where: { id: parseInt(id) },
     include: {
@@ -98,6 +110,7 @@ const getPartyById = async (id) => {
     throw new ApiError(404, 'Party not found');
   }
 
+  cache.set(cacheKey, party, 5 * 60 * 1000); // 5 mins TTL
   return party;
 };
 
@@ -155,6 +168,8 @@ const createParty = async (data, userId, ipAddress, userAgent) => {
     ipAddress,
     userAgent,
   });
+
+  cache.invalidatePrefix('party_');
 
   return party;
 };
@@ -216,6 +231,8 @@ const updateParty = async (id, data, userId, ipAddress, userAgent) => {
     userAgent,
   });
 
+  cache.invalidatePrefix('party_');
+
   return updatedParty;
 };
 
@@ -266,6 +283,8 @@ const deleteParty = async (id, userId, ipAddress, userAgent) => {
     ipAddress,
     userAgent,
   });
+
+  cache.invalidatePrefix('party_');
 
   return deletedParty;
 };

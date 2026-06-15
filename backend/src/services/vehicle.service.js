@@ -3,11 +3,16 @@ const { ApiError } = require('../middleware/errorHandler');
 const { getPaginationMeta } = require('../utils/helpers');
 const { createAuditLog } = require('../utils/auditLog');
 const { AUDIT_ACTION } = require('../config/constants');
+const cache = require('../utils/cache');
 
 /**
  * Get all vehicles with pagination and filters
  */
 const getVehicles = async (filters = {}) => {
+  const cacheKey = `vehicle_list_${JSON.stringify(filters)}`;
+  const cached = cache.get(cacheKey);
+  if (cached) return cached;
+
   const {
     page = 1,
     limit = 20,
@@ -73,16 +78,23 @@ const getVehicles = async (filters = {}) => {
     }),
   ]);
 
-  return {
+  const result = {
     vehicles,
     pagination: getPaginationMeta(totalRecords, pageNumber, pageLimit),
   };
+
+  cache.set(cacheKey, result, 5 * 60 * 1000); // 5 mins TTL
+  return result;
 };
 
 /**
  * Get vehicle by ID
  */
 const getVehicleById = async (id) => {
+  const cacheKey = `vehicle_id_${id}`;
+  const cached = cache.get(cacheKey);
+  if (cached) return cached;
+
   const vehicle = await prisma.vehicle.findUnique({
     where: { id: parseInt(id) },
     include: {
@@ -114,6 +126,7 @@ const getVehicleById = async (id) => {
     throw new ApiError(404, 'Vehicle not found');
   }
 
+  cache.set(cacheKey, vehicle, 5 * 60 * 1000); // 5 mins TTL
   return vehicle;
 };
 
@@ -161,6 +174,8 @@ const createVehicle = async (data, userId, ipAddress, userAgent) => {
     ipAddress,
     userAgent,
   });
+
+  cache.invalidatePrefix('vehicle_');
 
   return vehicle;
 };
@@ -226,6 +241,8 @@ const updateVehicle = async (id, data, userId, ipAddress, userAgent) => {
     userAgent,
   });
 
+  cache.invalidatePrefix('vehicle_');
+
   return updatedVehicle;
 };
 
@@ -276,6 +293,8 @@ const deleteVehicle = async (id, userId, ipAddress, userAgent) => {
     ipAddress,
     userAgent,
   });
+
+  cache.invalidatePrefix('vehicle_');
 
   return deletedVehicle;
 };

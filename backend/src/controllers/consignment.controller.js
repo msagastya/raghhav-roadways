@@ -2,6 +2,8 @@ const consignmentService = require('../services/consignment.service');
 const pdfService = require('../services/pdf.service');
 const { asyncHandler } = require('../middleware/errorHandler');
 const { ApiError } = require('../middleware/errorHandler');
+const firebaseStorage = require('../services/firebaseStorage.service');
+const pdfQueue = require('../services/pdfQueue');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs').promises;
@@ -56,22 +58,24 @@ const createConsignment = asyncHandler(async (req, res) => {
     req.get('user-agent')
   );
 
-  // Generate PDF if requested
-  let pdfPath = null;
+  // Generate PDF in the background if requested
   if (req.body.generatePdf) {
-    const consignmentWithDetails = await consignmentService.getConsignmentById(
-      consignment.id
-    );
-    pdfPath = await pdfService.generateConsignmentNotePDF(consignmentWithDetails);
-
-    // Update consignment with PDF path
-    await consignmentService.updateConsignment(
-      consignment.id,
-      { consignmentNotePath: pdfPath },
-      req.user.id,
-      req.ip,
-      req.get('user-agent')
-    );
+    const userId = req.user.id;
+    const ipAddress = req.ip;
+    const userAgent = req.get('user-agent');
+    
+    pdfQueue.enqueue(async () => {
+      const consignmentWithDetails = await consignmentService.getConsignmentById(consignment.id);
+      const generatedPath = await pdfService.generateConsignmentNotePDF(consignmentWithDetails);
+      
+      await consignmentService.updateConsignment(
+        consignment.id,
+        { consignmentNotePath: generatedPath },
+        userId,
+        ipAddress,
+        userAgent
+      );
+    }, `generate-note-GR-${consignment.grNumber || consignment.id}`);
   }
 
   res.status(201).json({
@@ -79,7 +83,7 @@ const createConsignment = asyncHandler(async (req, res) => {
     message: 'Consignment created successfully',
     data: {
       ...consignment,
-      pdfUrl: pdfPath ? `/api/v1/consignments/${consignment.id}/download-note` : null,
+      pdfUrl: req.body.generatePdf ? `/api/v1/consignments/${consignment.id}/download-note` : null,
     },
   });
 });
@@ -169,24 +173,23 @@ const uploadChallan = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Challan file is required');
   }
 
-  // Move file to appropriate location
   const fileName = `${req.params.id}_challan_${Date.now()}${path.extname(
     req.file.originalname
   )}`;
-  const filePath = path.join('challans', new Date().getFullYear().toString(), fileName);
-  const fullPath = path.join(__dirname, '../../storage', filePath);
+  const destinationPath = `challans/${new Date().getFullYear()}/${fileName}`;
 
-  // Ensure directory exists
-  const dir = path.dirname(fullPath);
-  await fs.mkdir(dir, { recursive: true });
-
-  // Move file
-  await fs.rename(req.file.path, fullPath);
+  // Upload to Firebase (cleans up local temp file automatically)
+  const uploadedPath = await firebaseStorage.uploadLocalFile(
+    req.file.path,
+    destinationPath,
+    req.file.mimetype,
+    true
+  );
 
   // Update consignment
   const consignment = await consignmentService.uploadChallan(
     req.params.id,
-    filePath,
+    uploadedPath,
     req.user.id,
     req.ip,
     req.get('user-agent')
@@ -196,7 +199,7 @@ const uploadChallan = asyncHandler(async (req, res) => {
     success: true,
     message: 'Challan uploaded successfully',
     data: {
-      filePath,
+      filePath: uploadedPath,
     },
   });
 });
@@ -221,7 +224,12 @@ const downloadConsignmentNote = asyncHandler(async (req, res) => {
     );
   }
 
-  // Get PDF file
+  // If pdfPath is a Firebase URL, redirect to it
+  if (pdfPath && (pdfPath.startsWith('http://') || pdfPath.startsWith('https://'))) {
+    return res.redirect(pdfPath);
+  }
+
+  // Get PDF file (local fallback)
   const pdfBuffer = await pdfService.getPDFFile(pdfPath);
 
   res.setHeader('Content-Type', 'application/pdf');

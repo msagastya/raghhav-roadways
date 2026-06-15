@@ -1,6 +1,8 @@
 const agentVehicleService = require('../services/agent.vehicle.service');
 const { asyncHandler } = require('../middleware/errorHandler');
 const logger = require('../utils/logger');
+const firebaseStorage = require('../services/firebaseStorage.service');
+const path = require('path');
 
 /**
  * Get all vehicles for agent
@@ -84,12 +86,24 @@ const uploadDocument = asyncHandler(async (req, res) => {
         });
     }
 
-    const filePath = `/uploads/vehicle-documents/${req.file.filename}`;
+    const fileName = `${req.params.id}_${req.params.type}_${Date.now()}${path.extname(
+        req.file.originalname
+    )}`;
+    const destinationPath = `vehicle-documents/${fileName}`;
+
+    // Upload to Firebase (cleans up local temp file automatically)
+    const uploadedPath = await firebaseStorage.uploadLocalFile(
+        req.file.path,
+        destinationPath,
+        req.file.mimetype,
+        true
+    );
+
     const vehicle = await agentVehicleService.uploadDocument(
         req.agent.id,
         parseInt(req.params.id),
         req.params.type,
-        filePath
+        uploadedPath
     );
 
     res.status(200).json({

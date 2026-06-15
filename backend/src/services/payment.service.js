@@ -4,6 +4,8 @@ const { generateCode, getPaginationMeta } = require('../utils/helpers');
 const { createAuditLog } = require('../utils/auditLog');
 const { AUDIT_ACTION } = require('../config/constants');
 const { updatePaymentStatus } = require('./invoice.service');
+const firebaseStorage = require('./firebaseStorage.service');
+const path = require('path');
 
 /**
  * Get all payments with pagination and filters
@@ -323,6 +325,18 @@ const addPaymentTransaction = async (paymentId, data, userId, ipAddress, userAge
   const newBalanceAmount = Number(payment.totalAmount) - newPaidAmount;
   const newStatus = newBalanceAmount === 0 ? 'Completed' : newPaidAmount > 0 ? 'Partial' : 'Pending';
 
+  let receiptUrl = null;
+  if (file) {
+    const fileName = `${paymentId}_receipt_${Date.now()}${path.extname(file.originalname)}`;
+    const destinationPath = `receipts/${new Date().getFullYear()}/${fileName}`;
+    receiptUrl = await firebaseStorage.uploadLocalFile(
+      file.path,
+      destinationPath,
+      file.mimetype,
+      true
+    );
+  }
+
   // Create transaction in database transaction
   const result = await prisma.$transaction(async (tx) => {
     // Create payment transaction
@@ -337,7 +351,7 @@ const addPaymentTransaction = async (paymentId, data, userId, ipAddress, userAge
         bankAccountNo: bankAccountNo || null,
         bankIfsc: bankIfsc || null,
         upiId: upiId || null,
-        receiptFilePath: file ? file.path : null,
+        receiptFilePath: receiptUrl,
         remarks: remarks || null,
         createdById: userId,
       },

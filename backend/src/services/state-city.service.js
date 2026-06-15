@@ -1,10 +1,15 @@
 const prisma = require('../config/database');
 const { ApiError } = require('../middleware/errorHandler');
+const cache = require('../utils/cache');
 
 /**
  * Get all states
  */
 const getStates = async () => {
+  const cacheKey = 'state-city_states';
+  const cached = cache.get(cacheKey);
+  if (cached) return cached;
+
   const states = await prisma.state.findMany({
     where: { isActive: true },
     orderBy: { stateName: 'asc' },
@@ -15,6 +20,7 @@ const getStates = async () => {
     }
   });
 
+  cache.set(cacheKey, states, 60 * 60 * 1000); // 1 hour TTL
   return states;
 };
 
@@ -22,6 +28,10 @@ const getStates = async () => {
  * Get cities by state
  */
 const getCitiesByState = async (stateId) => {
+  const cacheKey = `state-city_state_${stateId}`;
+  const cached = cache.get(cacheKey);
+  if (cached) return cached;
+
   const cities = await prisma.city.findMany({
     where: {
       stateId: parseInt(stateId),
@@ -37,6 +47,7 @@ const getCitiesByState = async (stateId) => {
     }
   });
 
+  cache.set(cacheKey, cities, 15 * 60 * 1000); // 15 mins TTL
   return cities;
 };
 
@@ -44,6 +55,10 @@ const getCitiesByState = async (stateId) => {
  * Get all cities with state info
  */
 const getAllCities = async () => {
+  const cacheKey = 'state-city_all_cities';
+  const cached = cache.get(cacheKey);
+  if (cached) return cached;
+
   const cities = await prisma.city.findMany({
     where: { isActive: true },
     orderBy: { cityName: 'asc' },
@@ -57,6 +72,7 @@ const getAllCities = async () => {
     }
   });
 
+  cache.set(cacheKey, cities, 30 * 60 * 1000); // 30 mins TTL
   return cities;
 };
 
@@ -91,6 +107,9 @@ const addCity = async (data) => {
       }
     }
   });
+
+  // Invalidate state-city cache
+  cache.invalidatePrefix('state-city_');
 
   return city;
 };

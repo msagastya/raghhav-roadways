@@ -2,6 +2,7 @@ const app = require('./app');
 const logger = require('./utils/logger');
 const prisma = require('./config/database');
 const { validateEnv } = require('./config/envValidation');
+const { initializeFirebase } = require('./config/firebase');
 
 // Validate environment variables on startup
 try {
@@ -28,6 +29,7 @@ const testDatabaseConnection = async () => {
 // Start server
 const startServer = async () => {
   await testDatabaseConnection();
+  initializeFirebase();
 
   const server = app.listen(PORT, () => {
     logger.info(`🚀 Server running on port ${PORT}`);

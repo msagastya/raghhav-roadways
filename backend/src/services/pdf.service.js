@@ -5,8 +5,44 @@ const path = require('path');
 const logger = require('../utils/logger');
 const { buildFilePath } = require('../utils/helpers');
 const { COMPANY } = require('../config/constants');
+const firebaseStorage = require('./firebaseStorage.service');
+
+let browserInstance = null;
+
+/**
+ * Get or initialize the shared Puppeteer browser instance
+ */
+const getBrowserInstance = async () => {
+  if (!browserInstance || !browserInstance.isConnected()) {
+    browserInstance = await puppeteer.launch({
+      headless: 'new',
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu',
+        '--no-first-run',
+        '--no-zygote',
+        '--single-process'
+      ],
+    });
+    
+    // Clean up on exit
+    const closeBrowser = async () => {
+      if (browserInstance) {
+        await browserInstance.close();
+        browserInstance = null;
+      }
+    };
+    process.on('exit', closeBrowser);
+    process.on('SIGINT', closeBrowser);
+    process.on('SIGTERM', closeBrowser);
+  }
+  return browserInstance;
+};
 
 // Handlebars helper: {{#times N}} ... {{/times}}
+
 handlebars.registerHelper('times', function (n, block) {
   let result = '';
   const count = parseInt(n) || 0;
@@ -89,47 +125,34 @@ const generateConsignmentNotePDF = async (consignment) => {
     const html = template(data);
 
     // Launch browser
-    const browser = await puppeteer.launch({
-      headless: 'new',
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
+    const browser = await getBrowserInstance();
 
     const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: 'networkidle0' });
+    try {
+      await page.setContent(html, { waitUntil: 'networkidle0' });
 
-    // Generate PDF
-    const pdfBuffer = await page.pdf({
-      format: 'A4',
-      printBackground: true,
-      margin: {
-        top: '10mm',
-        right: '10mm',
-        bottom: '10mm',
-        left: '10mm',
-      },
-    });
+      // Generate PDF
+      const pdfBuffer = await page.pdf({
+        format: 'A4',
+        printBackground: true,
+        margin: {
+          top: '10mm',
+          right: '10mm',
+          bottom: '10mm',
+          left: '10mm',
+        },
+      });
 
-    await browser.close();
+      // Save PDF to Firebase / fallback local
+      const fileName = `${consignment.grNumber}.pdf`;
+      const destinationPath = `consignment/${fileName}`;
+      const uploadUrl = await firebaseStorage.uploadBuffer(pdfBuffer, destinationPath, 'application/pdf');
 
-    // Save PDF
-    const fileName = `${consignment.grNumber}.pdf`;
-    const filePath = buildFilePath('consignment', fileName);
-    const fullPath = path.join(
-      __dirname,
-      '../../storage',
-      filePath
-    );
-
-    // Ensure directory exists
-    const dir = path.dirname(fullPath);
-    await fs.mkdir(dir, { recursive: true });
-
-    // Write file
-    await fs.writeFile(fullPath, pdfBuffer);
-
-    logger.info(`Consignment note PDF generated: ${filePath}`);
-
-    return filePath;
+      logger.info(`Consignment note PDF generated and uploaded: ${uploadUrl}`);
+      return uploadUrl;
+    } finally {
+      await page.close();
+    }
   } catch (error) {
     logger.error('Error generating consignment note PDF:', error);
     throw error;
@@ -222,43 +245,34 @@ const generateInvoicePDF = async (invoice) => {
     const html = template(data);
 
     // Launch browser
-    const browser = await puppeteer.launch({
-      headless: 'new',
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
+    const browser = await getBrowserInstance();
 
     const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: 'networkidle0' });
+    try {
+      await page.setContent(html, { waitUntil: 'networkidle0' });
 
-    // Generate PDF
-    const pdfBuffer = await page.pdf({
-      format: 'A4',
-      printBackground: true,
-      margin: {
-        top: '10mm',
-        right: '10mm',
-        bottom: '10mm',
-        left: '10mm',
-      },
-    });
+      // Generate PDF
+      const pdfBuffer = await page.pdf({
+        format: 'A4',
+        printBackground: true,
+        margin: {
+          top: '10mm',
+          right: '10mm',
+          bottom: '10mm',
+          left: '10mm',
+        },
+      });
 
-    await browser.close();
+      // Save PDF to Firebase / fallback local
+      const fileName = `${invoice.invoiceNumber}.pdf`;
+      const destinationPath = `invoice/${fileName}`;
+      const uploadUrl = await firebaseStorage.uploadBuffer(pdfBuffer, destinationPath, 'application/pdf');
 
-    // Save PDF
-    const fileName = `${invoice.invoiceNumber}.pdf`;
-    const filePath = buildFilePath('invoice', fileName);
-    const fullPath = path.join(__dirname, '../../storage', filePath);
-
-    // Ensure directory exists
-    const dir = path.dirname(fullPath);
-    await fs.mkdir(dir, { recursive: true });
-
-    // Write file
-    await fs.writeFile(fullPath, pdfBuffer);
-
-    logger.info(`Invoice PDF generated: ${filePath}`);
-
-    return filePath;
+      logger.info(`Invoice PDF generated and uploaded: ${uploadUrl}`);
+      return uploadUrl;
+    } finally {
+      await page.close();
+    }
   } catch (error) {
     logger.error('Error generating invoice PDF:', error);
     throw error;
