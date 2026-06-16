@@ -1,4 +1,4 @@
-const { initializeApp, getApps, cert } = require('firebase-admin');
+const { initializeApp, getApps, cert } = require('firebase-admin/app');
 const { getStorage } = require('firebase-admin/storage');
 const logger = require('../utils/logger');
 
