@@ -110,7 +110,7 @@ export default function LoginPage() {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="w-full max-w-lg mx-auto"
+      className="w-full max-w-xl mx-auto"
     >
       {/* Decorative Elements - Hidden on larger screens to reduce clutter */}
       <motion.div
