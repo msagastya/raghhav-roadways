@@ -2,7 +2,7 @@ import axios from 'axios';
 import { clearAuthTokens, getAccessToken, getRefreshToken, setAuthTokens } from './auth';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://raghhav-roadways.onrender.com/api/v1';
-const API_TIMEOUT = 20000;
+const API_TIMEOUT = 120000;
 const RETRY_DELAY = 700;
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

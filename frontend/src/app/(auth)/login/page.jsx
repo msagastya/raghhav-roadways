@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Truck, Lock, User, ArrowRight, Sparkles } from 'lucide-react';
 import Input from '../../../components/ui/input';
 import Button from '../../../components/ui/button';
@@ -256,11 +256,21 @@ export default function LoginPage() {
             </motion.div>
           </motion.form>
 
-          {slowLogin && (
-            <p className="mt-3 text-center text-xs font-medium text-primary-700">
-              Server is waking up. This can take a few seconds on the first request.
-            </p>
-          )}
+          <div className="h-8 mt-3 relative flex items-center justify-center">
+            <AnimatePresence initial={false}>
+              {slowLogin && (
+                <motion.p
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  transition={{ duration: 0.2 }}
+                  className="text-center text-xs font-medium text-primary-700 absolute w-full"
+                >
+                  Server is waking up. This can take a few seconds on the first request.
+                </motion.p>
+              )}
+            </AnimatePresence>
+          </div>
 
           <motion.div
             variants={itemVariants}
