@@ -9,8 +9,7 @@ const envSchema = Joi.object({
   API_VERSION: Joi.string().default('v1'),
 
   // Database
-  DATABASE_URL: Joi.string().description('PostgreSQL connection string (optional)'),
-  GOOGLE_SHEET_API_URL: Joi.string().required().description('Google Sheets API Web App URL'),
+  DATABASE_URL: Joi.string().required().description('PostgreSQL connection string'),
 
   // JWT Configuration
   JWT_SECRET: Joi.string()

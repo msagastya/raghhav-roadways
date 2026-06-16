@@ -1,31 +1,37 @@
 const bcrypt = require('bcryptjs');
+const prisma = require('../config/database');
 const { generateAccessToken, generateRefreshToken } = require('../config/jwt');
 const { ApiError } = require('../middleware/errorHandler');
 const logger = require('../utils/logger');
-const googleSheetsService = require('./googleSheets.service');
-
-const ADMIN_PERMISSIONS = [
-  'view_consignments', 'create_consignment', 'update_consignment', 'delete_consignment',
-  'view_invoices', 'create_invoice', 'update_invoice', 'delete_invoice',
-  'view_payments', 'create_payment', 'approve_amendment',
-  'view_parties', 'create_party', 'update_party', 'delete_party',
-  'view_vehicles', 'create_vehicle', 'update_vehicle', 'delete_vehicle',
-  'view_reports'
-];
 
 /**
  * Login user
+ * @param {string} username
+ * @param {string} password
+ * @returns {Object} - tokens and user info
  */
 const login = async (username, password) => {
-  const user = await googleSheetsService.findFirst('users', { username });
+  // Find user with role and permissions
+  const user = await prisma.user.findUnique({
+    where: { username },
+    include: {
+      role: {
+        include: {
+          rolePermissions: {
+            include: {
+              permission: true,
+            },
+          },
+        },
+      },
+    },
+  });
 
   if (!user) {
     throw new ApiError(401, 'Invalid username or password');
   }
 
-  // Google sheets reads booleans as string 'TRUE' / 'FALSE' or raw booleans
-  const isActive = String(user.isActive).toUpperCase() === 'TRUE' || user.isActive === true;
-  if (!isActive) {
+  if (!user.isActive) {
     throw new ApiError(401, 'Your account has been deactivated');
   }
 
@@ -44,14 +50,16 @@ const login = async (username, password) => {
   }
 
   // Extract permissions
-  const permissions = ADMIN_PERMISSIONS;
+  const permissions = user.role.rolePermissions.map(
+    (rp) => rp.permission.permissionCode
+  );
 
   // Create token payload
   const tokenPayload = {
     userId: user.id,
     username: user.username,
     roleId: user.roleId,
-    roleName: 'Admin',
+    roleName: user.role.roleName,
   };
 
   // Generate tokens
@@ -59,7 +67,10 @@ const login = async (username, password) => {
   const refreshToken = generateRefreshToken(tokenPayload);
 
   // Update last login
-  await googleSheetsService.update('users', 'id', user.id, { lastLogin: new Date().toISOString() });
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { lastLogin: new Date() },
+  });
 
   logger.info(`User ${username} logged in successfully`);
 
@@ -72,7 +83,7 @@ const login = async (username, password) => {
       email: user.email,
       fullName: user.fullName,
       mobile: user.mobile,
-      role: 'Admin',
+      role: user.role.roleName,
       permissions,
     },
   };
@@ -80,6 +91,8 @@ const login = async (username, password) => {
 
 /**
  * Refresh access token
+ * @param {string} refreshToken
+ * @returns {Object} - new tokens
  */
 const refreshAccessToken = async (refreshToken) => {
   const { verifyRefreshToken } = require('../config/jwt');
@@ -87,20 +100,27 @@ const refreshAccessToken = async (refreshToken) => {
   try {
     const decoded = verifyRefreshToken(refreshToken);
 
-    const user = await googleSheetsService.findFirst('users', { id: decoded.userId });
+    // Get user to verify still active
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      include: {
+        role: true,
+      },
+    });
 
-    const isActive = String(user?.isActive).toUpperCase() === 'TRUE' || user?.isActive === true;
-    if (!user || !isActive) {
+    if (!user || !user.isActive) {
       throw new ApiError(401, 'User not found or inactive');
     }
 
+    // Create new token payload
     const tokenPayload = {
       userId: user.id,
       username: user.username,
       roleId: user.roleId,
-      roleName: 'Admin',
+      roleName: user.role.roleName,
     };
 
+    // Generate new tokens
     const newAccessToken = generateAccessToken(tokenPayload);
     const newRefreshToken = generateRefreshToken(tokenPayload);
 
@@ -115,30 +135,63 @@ const refreshAccessToken = async (refreshToken) => {
 
 /**
  * Get user by ID
+ * @param {number} userId
+ * @returns {Object} - user details
  */
 const getUserById = async (userId) => {
-  const user = await googleSheetsService.findFirst('users', { id: userId });
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      username: true,
+      email: true,
+      fullName: true,
+      mobile: true,
+      isActive: true,
+      lastLogin: true,
+      createdAt: true,
+      role: {
+        select: {
+          roleName: true,
+          rolePermissions: {
+            select: {
+              permission: {
+                select: {
+                  permissionCode: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
 
   if (!user) {
     throw new ApiError(404, 'User not found');
   }
 
+  const permissions = user.role.rolePermissions.map(
+    (rp) => rp.permission.permissionCode
+  );
+
   return {
-    id: user.id,
-    username: user.username,
-    email: user.email,
-    fullName: user.fullName,
-    mobile: user.mobile,
-    roleName: 'Admin',
-    permissions: ADMIN_PERMISSIONS,
+    ...user,
+    roleName: user.role.roleName,
+    permissions,
   };
 };
 
 /**
  * Change password
+ * @param {number} userId
+ * @param {string} oldPassword
+ * @param {string} newPassword
  */
 const changePassword = async (userId, oldPassword, newPassword) => {
-  const user = await googleSheetsService.findFirst('users', { id: userId });
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
 
   if (!user) {
     throw new ApiError(404, 'User not found');
@@ -154,19 +207,28 @@ const changePassword = async (userId, oldPassword, newPassword) => {
   const hashedPassword = await bcrypt.hash(newPassword, 10);
 
   // Update password
-  await googleSheetsService.update('users', 'id', userId, { passwordHash: hashedPassword });
+  await prisma.user.update({
+    where: { id: userId },
+    data: { passwordHash: hashedPassword },
+  });
 
   logger.info(`User ${user.username} changed password`);
 };
 
 /**
  * Sign up new user
+ * @param {Object} userData
+ * @returns {Object} - created user info
  */
 const signup = async (userData) => {
   const { username, email, password, fullName, mobile } = userData;
 
-  const users = await googleSheetsService.readAll('users');
-  const existingUser = users.find(u => u.username === username || u.email === email);
+  // Check if user already exists
+  const existingUser = await prisma.user.findFirst({
+    where: {
+      OR: [{ username }, { email }],
+    },
+  });
 
   if (existingUser) {
     if (existingUser.username === username) {
@@ -177,28 +239,43 @@ const signup = async (userData) => {
     }
   }
 
+  // Hash password
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const user = await googleSheetsService.insert('users', {
-    username,
-    email,
-    passwordHash: hashedPassword,
-    fullName,
-    mobile,
-    roleId: 2,
-    isActive: false,
-    approvalStatus: 'pending',
+  // Get default viewer role
+  const viewerRole = await prisma.role.findFirst({
+    where: { roleName: 'Viewer' },
+  });
+
+  if (!viewerRole) {
+    throw new ApiError(500, 'Default role not found');
+  }
+
+  // Create user with pending approval
+  const user = await prisma.user.create({
+    data: {
+      username,
+      email,
+      passwordHash: hashedPassword,
+      fullName,
+      mobile,
+      roleId: viewerRole.id,
+      isActive: false,
+      approvalStatus: 'pending',
+    },
+    select: {
+      id: true,
+      username: true,
+      email: true,
+      fullName: true,
+      mobile: true,
+      createdAt: true,
+    },
   });
 
   logger.info(`New user signed up: ${username}`);
 
-  return {
-    id: user.id,
-    username: user.username,
-    email: user.email,
-    fullName: user.fullName,
-    mobile: user.mobile,
-  };
+  return user;
 };
 
 module.exports = {
