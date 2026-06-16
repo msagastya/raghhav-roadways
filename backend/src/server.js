@@ -1,6 +1,5 @@
 const app = require('./app');
 const logger = require('./utils/logger');
-const prisma = require('./config/database');
 const { validateEnv } = require('./config/envValidation');
 const { initializeFirebase } = require('./config/firebase');
 
@@ -15,20 +14,8 @@ try {
 
 const PORT = process.env.PORT || 5000;
 
-// Test database connection
-const testDatabaseConnection = async () => {
-  try {
-    await prisma.$connect();
-    logger.info('✅ Database connected successfully');
-  } catch (error) {
-    logger.error('❌ Database connection failed:', error);
-    process.exit(1);
-  }
-};
-
 // Start server
 const startServer = async () => {
-  await testDatabaseConnection();
   initializeFirebase();
 
   const server = app.listen(PORT, () => {
@@ -43,9 +30,6 @@ const startServer = async () => {
 
     server.close(async () => {
       logger.info('HTTP server closed');
-
-      await prisma.$disconnect();
-      logger.info('Database connection closed');
 
       logger.info('✅ Graceful shutdown completed');
       process.exit(0);
