@@ -1,0 +1,3 @@
+id,username,email,password_hash,full_name,mobile,role_id,is_active,last_login,created_at,updated_at,approval_status,is_deleted,profile_photo_url,verified_email,verified_phone
+"2","admin2","admin2@raghhavroadways.com","$2a$10$F.eVJWE1w5r..75RtnGQ2O8K7gdtSReqdOTQG5rRxV6AkNH/pOXlq","Admin User 2","9727466478","2","true",2026-04-29T20:53:30.151Z,2026-04-27T09:26:17.099Z,2026-04-29T20:53:30.152Z,"approved","false",,"false","false"
+"1","admin1","admin1@raghhavroadways.com","$2a$10$F.eVJWE1w5r..75RtnGQ2O8K7gdtSReqdOTQG5rRxV6AkNH/pOXlq","Admin User 1","9727466477","1","true",2026-05-16T12:40:35.979Z,2026-04-27T09:26:17.099Z,2026-05-16T12:40:35.980Z,"approved","false",,"false","false"

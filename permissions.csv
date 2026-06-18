@@ -1,0 +1,27 @@
+id,permission_code,module,action,description,updated_at
+"1","consignment.create","consignment","create","Create new consignment",2026-04-27T09:26:17.099Z
+"2","consignment.view","consignment","view","View consignment details",2026-04-27T09:26:17.099Z
+"3","consignment.edit","consignment","edit","Edit consignment",2026-04-27T09:26:17.099Z
+"4","consignment.delete","consignment","delete","Delete consignment",2026-04-27T09:26:17.099Z
+"5","consignment.status_update","consignment","status_update","Update consignment status",2026-04-27T09:26:17.099Z
+"6","invoice.create","invoice","create","Generate invoice",2026-04-27T09:26:17.099Z
+"7","invoice.view","invoice","view","View invoice",2026-04-27T09:26:17.099Z
+"8","invoice.edit","invoice","edit","Edit invoice",2026-04-27T09:26:17.099Z
+"9","invoice.delete","invoice","delete","Delete invoice",2026-04-27T09:26:17.099Z
+"10","payment.create","payment","create","Record payment",2026-04-27T09:26:17.099Z
+"11","payment.view","payment","view","View payments",2026-04-27T09:26:17.099Z
+"12","payment.approve_amendment","payment","approve","Approve payment amendments",2026-04-27T09:26:17.099Z
+"13","master.party.view","master","view","View party details",2026-04-27T09:26:17.099Z
+"14","master.party.create","master","create","Add new party",2026-04-27T09:26:17.099Z
+"15","master.party.edit","master","edit","Edit party details",2026-04-27T09:26:17.099Z
+"16","master.party.delete","master","delete","Delete party",2026-04-27T09:26:17.099Z
+"17","master.vehicle.view","master","view","View vehicle details",2026-04-27T09:26:17.099Z
+"18","master.vehicle.create","master","create","Add new vehicle",2026-04-27T09:26:17.099Z
+"19","master.vehicle.edit","master","edit","Edit vehicle details",2026-04-27T09:26:17.099Z
+"20","master.vehicle.delete","master","delete","Delete vehicle",2026-04-27T09:26:17.099Z
+"21","report.daily","report","view","View daily reports",2026-04-27T09:26:17.099Z
+"22","report.monthly","report","view","View monthly reports",2026-04-27T09:26:17.099Z
+"23","report.export","report","export","Export reports",2026-04-27T09:26:17.099Z
+"24","settings.users","settings","manage","Manage users",2026-04-27T09:26:17.099Z
+"25","settings.roles","settings","manage","Manage roles and permissions",2026-04-27T09:26:17.099Z
+"26","settings.audit_logs","settings","view","View audit logs",2026-04-27T09:26:17.099Z

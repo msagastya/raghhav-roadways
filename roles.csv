@@ -1,0 +1,5 @@
+id,role_name,description,created_at,updated_at
+"1","Super Admin","Full system access including user management",2026-04-27T09:26:17.099Z,2026-04-27T09:26:17.099Z
+"2","Admin","All features except user management",2026-04-27T09:26:17.099Z,2026-04-27T09:26:17.099Z
+"3","Manager","View and edit consignments, limited reports",2026-04-27T09:26:17.099Z,2026-04-27T09:26:17.099Z
+"4","Viewer","Read-only access to all data",2026-04-27T09:26:17.099Z,2026-04-27T09:26:17.099Z
