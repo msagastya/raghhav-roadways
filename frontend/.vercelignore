@@ -1,0 +1,26 @@
+# Build artifacts
+node_modules/
+.next/
+build/
+dist/
+coverage/
+
+# Environment
+.env.local
+.env.*.local
+
+# Version control
+.git/
+.gitignore
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Dependencies
+npm-debug.log
+yarn-error.log
+
+# Cache
+.cache/
+.vercel/
