@@ -8,7 +8,7 @@ coverage/
 # Documentation & files
 *.md
 docs/
-invoices/
+backend/storage/invoices/
 test/
 tests/
 
