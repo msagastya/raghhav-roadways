@@ -158,6 +158,13 @@ export const invoiceAPI = {
   update: (id, data) => api.patch(`/invoices/${id}`, data),
   delete: (id) => api.delete(`/invoices/${id}`),
   download: (id) => api.get(`/invoices/${id}/download`, { responseType: 'blob' }),
+  sync: (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post('/invoices/sync', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
 };
 
 export const paymentAPI = {
@@ -188,6 +195,7 @@ export const partyAPI = {
   create: (data) => api.post('/parties', data),
   update: (id, data) => api.patch(`/parties/${id}`, data),
   delete: (id) => api.delete(`/parties/${id}`),
+  downloadLedger: (id, params) => api.get(`/parties/${id}/ledger/download`, { params }),
 };
 
 export const vehicleAPI = {

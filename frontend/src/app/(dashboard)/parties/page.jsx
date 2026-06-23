@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Plus, Users, Building2, ArrowRight, Edit, Trash2, X } from 'lucide-react';
+import { Plus, Users, Building2, ArrowRight, Edit, Trash2, X, Download, FileText } from 'lucide-react';
 import { partyAPI, mastersAPI } from '../../../lib/api';
 import { Card, CardContent, CardHeader } from '../../../components/ui/card';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../../components/ui/table';
@@ -45,6 +45,7 @@ export default function PartiesPage() {
   const [formData, setFormData] = useState(initialFormData);
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
+  const [downloadingId, setDownloadingId] = useState(null);
   const { showSuccess, showError } = useToast();
 
   useEffect(() => {
@@ -175,6 +176,25 @@ export default function PartiesPage() {
       fetchParties();
     } catch (error) {
       showError(getErrorMessage(error));
+    }
+  };
+
+  const handleDownloadLedger = async (party) => {
+    setDownloadingId(party.id);
+    try {
+      // By default, let's just get the full ledger. We could add date pickers later.
+      const response = await partyAPI.downloadLedger(party.id);
+      const url = response.data?.data?.url;
+      if (url) {
+        window.open(url, '_blank');
+        showSuccess('Ledger downloaded successfully');
+      } else {
+        showError('Could not generate ledger');
+      }
+    } catch (error) {
+      showError(getErrorMessage(error));
+    } finally {
+      setDownloadingId(null);
     }
   };
 
@@ -362,6 +382,18 @@ export default function PartiesPage() {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
+                            <button
+                              onClick={() => handleDownloadLedger(party)}
+                              disabled={downloadingId === party.id}
+                              className="p-1.5 sm:p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-colors disabled:opacity-50"
+                              title="Download Ledger PDF"
+                            >
+                              {downloadingId === party.id ? (
+                                <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin rounded-full border-2 border-green-600 border-t-transparent" />
+                              ) : (
+                                <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                              )}
+                            </button>
                             <button
                               onClick={() => openEditModal(party)}
                               className="p-1.5 sm:p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"

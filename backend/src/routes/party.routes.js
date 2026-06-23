@@ -38,6 +38,20 @@ router.get(
 );
 
 /**
+ * @route   GET /api/v1/parties/:id/ledger/download
+ * @desc    Download party ledger PDF
+ * @access  Private
+ */
+router.get(
+  '/:id/ledger/download',
+  authenticateToken,
+  checkPermission('master.party.view'),
+  partyIdValidation,
+  validate,
+  partyController.downloadLedger
+);
+
+/**
  * @route   GET /api/v1/parties/:id
  * @desc    Get party by ID
  * @access  Private

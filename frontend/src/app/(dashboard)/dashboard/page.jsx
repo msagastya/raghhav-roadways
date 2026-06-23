@@ -4,14 +4,19 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
 import { reportAPI } from '../../../lib/api';
+import dynamic from 'next/dynamic';
 import StatsCards from '../../../components/dashboard/StatsCards';
-import RevenueChart from '../../../components/analytics/RevenueChart';
 import KPICards from '../../../components/analytics/KPICards';
 import { Card, CardContent, CardHeader } from '../../../components/ui/card';
 import { CardSkeleton } from '../../../components/ui/skeleton';
 import useToast from '../../../hooks/useToast';
 import { getErrorMessage } from '../../../lib/utils';
 import { Activity, TrendingUp, Clock, Zap, AlertTriangle, FileText, Truck } from 'lucide-react';
+
+const RevenueChart = dynamic(() => import('../../../components/analytics/RevenueChart'), {
+  ssr: false,
+  loading: () => <CardSkeleton />
+});
 
 export default function DashboardPage() {
   const [dashboardData, setDashboardData] = useState(null);

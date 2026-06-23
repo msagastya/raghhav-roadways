@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -98,9 +99,12 @@ export default function Sidebar({ isOpen }) {
                 whileHover={{ scale: 1.1 }}
                 transition={{ duration: 0.3 }}
               >
-                <img
+                <Image
                   src="/logo.png"
                   alt="Raghhav Roadways"
+                  width={80}
+                  height={80}
+                  priority={true}
                   className={cn(
                     'object-contain drop-shadow-lg transition-all duration-300',
                     expanded ? 'w-16 h-16 sm:w-20 sm:h-20 rounded-xl' : 'w-11 h-11 rounded-lg'

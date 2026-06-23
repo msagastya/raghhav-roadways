@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Truck, Lock, User, ArrowRight, Sparkles } from 'lucide-react';
 import Input from '../../../components/ui/input';
@@ -144,9 +145,12 @@ export default function LoginPage() {
                 animate={{ scale: [1, 1.1, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
               />
-              <img
+              <Image
                 src="/logo.png"
                 alt="Raghhav Roadways Logo"
+                width={144}
+                height={144}
+                priority={true}
                 className="w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-32 lg:h-32 object-contain rounded-2xl shadow-2xl relative z-10 border-2 border-white/50"
               />
             </motion.div>

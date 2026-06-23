@@ -1,0 +1,783 @@
+olevba 0.60.2 on Python 3.14.5 - http://decalage.info/python/oletools
+===============================================================================
+FILE: RAGHHAV ROADWAYS/Macro.xlsm
+Type: OpenXML
+WARNING  For now, VBA stomping cannot be detected for files in memory
+-------------------------------------------------------------------------------
+VBA MACRO ThisWorkbook.cls 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/ThisWorkbook'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+(empty macro)
+-------------------------------------------------------------------------------
+VBA MACRO Sheet1.cls 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/Sheet1'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+(empty macro)
+-------------------------------------------------------------------------------
+VBA MACRO Module1.bas 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/Module1'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+' =========================================================
+' MAIN PROCEDURE
+' =========================================================
+Sub GenerateInvoiceAndPDF_Test()
+
+    Dim wb As Workbook
+    Dim wsBill As Worksheet, wsOrder As Worksheet, wsInv As Worksheet
+    Dim tblBill As ListObject, tblOrder As ListObject, tblInv As ListObject
+
+    Dim billInput As String
+    Dim billStart As Long, billEnd As Long, billNum As Long
+    Dim billNoMatch As String
+
+    Dim billRow As ListRow
+    Dim orderRows As Collection
+    Dim r As ListRow, i As Long
+
+    Dim srcCols As Variant, destCols As Variant
+
+    Dim orderCount As Long, extraCount As Long
+    Dim totalLines As Long, rowsToInsert As Long
+
+    Dim tableFirstRow As Long, insertSheetRow As Long, lastTableRow As Long
+    Dim rowIndex As Long
+
+    Dim grCharge As Double
+    Dim totalAmount As Double
+
+    Dim filePath As String, pdfPath As String
+
+    ' ---------------- COLUMN MAPPING ----------------
+    srcCols = Array("GR No", "Date", "Vehicle No", "Load From", "Destination", _
+                    "Contents", "Qty in MT", "Rate MT", "Amount")
+
+    destCols = Array("GR No.", "DATE", "VEHICLE NO.", "LOAD FROM", "DESTINATION", _
+                     "CONTENTS", "QTY IN MT.", "RATE MT.", "AMOUNT")
+
+    ' ---------------- BASIC MAC SAFETY ----------------
+    If ThisWorkbook.Path = "" Then
+        MsgBox "Please save this workbook before running the macro.", vbExclamation
+        Exit Sub
+    End If
+
+    ' ---------------- OPEN / ATTACH Bill.xlsx (MAC SAFE) ----------------
+    filePath = ThisWorkbook.Path & "/Bill.xlsx"
+    Set wb = Nothing
+
+    ' Try already-open workbooks (Mac-safe loop)
+    For Each wb In Application.Workbooks
+        If LCase(wb.Name) = "bill.xlsx" Then Exit For
+    Next wb
+
+    ' If not open, try opening from same folder
+    If wb Is Nothing Then
+        On Error Resume Next
+        Set wb = Workbooks.Open(filePath)
+        On Error GoTo 0
+    End If
+
+    If wb Is Nothing Then
+        MsgBox "Unable to open Bill.xlsx. Ensure it is in the same folder.", vbCritical
+        Exit Sub
+    End If
+
+    ' ---------------- SET REFERENCES ----------------
+    Set wsBill = wb.Sheets("Bill Details")
+    Set wsOrder = wb.Sheets("Order Details")
+    Set wsInv = wb.Sheets("INVOICE")
+
+    Set tblBill = wsBill.ListObjects("BillDetails")
+    Set tblOrder = wsOrder.ListObjects("OrderDetails")
+    Set tblInv = wsInv.ListObjects("Table33")
+
+    ' ---------------- INPUT ----------------
+    billInput = Trim(InputBox("Enter Bill No or range (e.g. 125 or 100-120):", "Invoice Generator"))
+    If billInput = "" Then GoTo Cleanup
+
+    If Not ParseBillInput(billInput, billStart, billEnd) Then
+        MsgBox "Invalid bill number or range.", vbExclamation
+        GoTo Cleanup
+    End If
+
+    ' ================= MAIN LOOP =================
+    For billNum = billStart To billEnd
+
+        billNoMatch = Format(billNum, "000")
+        Set billRow = Nothing
+
+        For Each r In tblBill.ListRows
+            If Format(Val(r.Range.Cells(1, tblBill.ListColumns("Bill No").Index).Value), "000") = billNoMatch Then
+                Set billRow = r
+                Exit For
+            End If
+        Next r
+
+        If billRow Is Nothing Then GoTo NextBill
+
+        ' -------- RESET INVOICE --------
+        wsInv.Range("I4,I5,C3,C4,C5").Value = ""
+        If Not tblInv.DataBodyRange Is Nothing Then tblInv.DataBodyRange.ClearContents
+
+        ' -------- HEADER --------
+        wsInv.Range("I4").Value = billNoMatch
+        wsInv.Range("I5").Value = billRow.Range.Cells(1, tblBill.ListColumns("Bill Date").Index).Value
+        wsInv.Range("C3").Value = billRow.Range.Cells(1, tblBill.ListColumns("Party Name").Index).Value
+        wsInv.Range("C4").Value = billRow.Range.Cells(1, tblBill.ListColumns("Party Address").Index).Value
+        wsInv.Range("C5").Value = billRow.Range.Cells(1, tblBill.ListColumns("Party GST No").Index).Value
+
+        ' -------- COLLECT ORDERS --------
+        Set orderRows = New Collection
+        For Each r In tblOrder.ListRows
+            If Format(Val(r.Range.Cells(1, tblOrder.ListColumns("Bill No").Index).Value), "000") = billNoMatch Then
+                orderRows.Add r
+            End If
+        Next r
+
+        orderCount = 0
+        extraCount = 0
+
+        For Each r In orderRows
+            If HasFilledCells(r, 1, 6) Then orderCount = orderCount + 1
+            If Trim(r.Range.Cells(1, tblOrder.ListColumns("Extra Content").Index).Value) <> "" _
+            Or Trim(r.Range.Cells(1, tblOrder.ListColumns("Extra Charges").Index).Value) <> "" Then
+                extraCount = extraCount + 1
+            End If
+        Next r
+
+        totalLines = orderCount + extraCount
+        rowsToInsert = 0
+
+        ' -------- EXPAND TEMPLATE --------
+        If totalLines > 6 Then
+            rowsToInsert = totalLines - 6
+            tableFirstRow = tblInv.DataBodyRange.Row
+            insertSheetRow = tableFirstRow + 3
+
+            For i = 1 To rowsToInsert
+                wsInv.Rows(insertSheetRow).Insert Shift:=xlDown
+                wsInv.Rows(insertSheetRow + 1).Copy
+                wsInv.Rows(insertSheetRow).PasteSpecial xlPasteFormats
+                wsInv.Rows(insertSheetRow).RowHeight = wsInv.Rows(insertSheetRow + 1).RowHeight
+            Next i
+            Application.CutCopyMode = False
+        End If
+
+        ' -------- NORMAL LINES --------
+        rowIndex = 1
+        For Each r In orderRows
+            If HasFilledCells(r, 1, 6) Then
+                For i = LBound(srcCols) To UBound(srcCols)
+                    tblInv.ListRows(rowIndex).Range.Cells(1, tblInv.ListColumns(destCols(i)).Index).Value = _
+                        r.Range.Cells(1, tblOrder.ListColumns(srcCols(i)).Index).Value
+                Next i
+                rowIndex = rowIndex + 1
+            End If
+        Next r
+
+        rowIndex = rowIndex + 1   ' spacer
+
+        ' -------- EXTRA CHARGES --------
+        For Each r In orderRows
+            If Trim(r.Range.Cells(1, tblOrder.ListColumns("Extra Content").Index).Value) <> "" _
+            Or Trim(r.Range.Cells(1, tblOrder.ListColumns("Extra Charges").Index).Value) <> "" Then
+
+                tblInv.ListRows(rowIndex).Range.Cells(1, tblInv.ListColumns("CONTENTS").Index).Value = _
+                    r.Range.Cells(1, tblOrder.ListColumns("Extra Content").Index).Value
+
+                tblInv.ListRows(rowIndex).Range.Cells(1, tblInv.ListColumns("AMOUNT").Index).Value = _
+                    r.Range.Cells(1, tblOrder.ListColumns("Extra Charges").Index).Value
+
+                rowIndex = rowIndex + 1
+            End If
+        Next r
+
+        ' -------- TOTALS --------
+        lastTableRow = tblInv.DataBodyRange.Rows(tblInv.DataBodyRange.Rows.Count).Row
+
+        grCharge = 0
+        For Each r In orderRows
+            If IsNumeric(r.Range.Cells(1, tblOrder.ListColumns("GR Charge").Index).Value) Then
+                grCharge = grCharge + Val(r.Range.Cells(1, tblOrder.ListColumns("GR Charge").Index).Value)
+            End If
+        Next r
+
+        wsInv.Cells(lastTableRow + 1, "I").Value = grCharge
+        totalAmount = wsInv.Cells(lastTableRow + 2, "I").Value
+
+        wsInv.Range(wsInv.Cells(lastTableRow + 3, "B"), _
+                    wsInv.Cells(lastTableRow + 3, "I")).Value = _
+                    ConvertNumberToWords(totalAmount) & " Only"
+
+        ' -------- EXPORT PDF (MAC SAFE) --------
+        pdfPath = ThisWorkbook.Path & "/Bill Test/INVOICE" & billNoMatch & "-RAGHHAVROADWAYS.pdf"
+        wsInv.PageSetup.PaperSize = xlPaperA5
+        wsInv.ExportAsFixedFormat xlTypePDF, pdfPath
+
+        ' -------- RESTORE TEMPLATE --------
+        If rowsToInsert > 0 Then
+            wsInv.Rows(insertSheetRow & ":" & insertSheetRow + rowsToInsert - 1).Delete Shift:=xlUp
+        End If
+
+NextBill:
+    Next billNum
+
+    MsgBox "Invoice generation completed successfully.", vbInformation
+
+Cleanup:
+    On Error Resume Next
+    wb.Close False
+    On Error GoTo 0
+
+End Sub
+
+Private Function ParseBillInput(ByVal txt As String, ByRef startNo As Long, ByRef endNo As Long) As Boolean
+    Dim parts() As String
+    txt = Replace(Trim(txt), " ", "")
+
+    If InStr(txt, "-") > 0 Then
+        parts = Split(txt, "-")
+        If UBound(parts) <> 1 Then Exit Function
+        If Not IsNumeric(parts(0)) Or Not IsNumeric(parts(1)) Then Exit Function
+        startNo = CLng(parts(0))
+        endNo = CLng(parts(1))
+        If startNo <= 0 Or endNo <= 0 Or startNo > endNo Then Exit Function
+    Else
+        If Not IsNumeric(txt) Then Exit Function
+        startNo = CLng(txt)
+        If startNo <= 0 Then Exit Function
+        endNo = startNo
+    End If
+
+    ParseBillInput = True
+End Function
+
+Function HasFilledCells(r As ListRow, startCol As Integer, endCol As Integer) As Boolean
+    Dim i As Long
+    For i = startCol To endCol
+        If Trim(r.Range.Cells(1, i).Value) <> "" Then
+            HasFilledCells = True
+            Exit Function
+        End If
+    Next i
+End Function
+
+' Number to words functions remain same as before (not repeated here for brevity)
+
+
+Function ConvertNumberToWords(ByVal MyNumber As Variant) As String
+    Dim Units As Variant
+    Dim Paise As String
+    Dim IntegerPart As String, DecimalPart As String
+    Dim Num As Double
+    
+    On Error GoTo HandleError
+    
+    ' Remove commas and trim
+    MyNumber = Replace(Trim(MyNumber), ",", "")
+    
+    ' Validate number
+    If Not IsNumeric(MyNumber) Then GoTo HandleError
+    
+    ' Format to 2 decimal places
+    Num = CDbl(MyNumber)
+    MyNumber = Format(Num, "0.00")
+    
+    ' Split into rupees and paise
+    If InStr(1, MyNumber, ".") > 0 Then
+        IntegerPart = Trim(Left(MyNumber, InStr(1, MyNumber, ".") - 1))
+        DecimalPart = Trim(Mid(MyNumber, InStr(1, MyNumber, ".") + 1))
+    Else
+        IntegerPart = Trim(MyNumber)
+        DecimalPart = "00"
+    End If
+
+    ' Convert rupees part
+    Dim Words As String
+    Words = ConvertWholeNumberToWords(CLng(IntegerPart))
+    
+    ' Convert paise part
+    If CInt(DecimalPart) > 0 Then
+        Paise = " and " & ConvertTens(DecimalPart) & " Paise"
+    Else
+        Paise = ""
+    End If
+    
+    ConvertNumberToWords = Application.WorksheetFunction.Proper(Words & " Rupees" & Paise)
+    Exit Function
+
+HandleError:
+    ConvertNumberToWords = "Conversion Error"
+End Function
+
+Private Function ConvertWholeNumberToWords(ByVal Number As Long) As String
+    Dim Words As String
+    Dim UnitsArray As Variant
+    Dim PlaceArray As Variant
+    Dim TempNum As String
+
+    UnitsArray = Array("", "Thousand", "Lakh", "Crore")
+    PlaceArray = Array(0, 3, 5, 7, 9) ' Indian style grouping (3,2,2,...)
+    
+    TempNum = Right("0000000000" & CStr(Number), 10)
+    
+    Dim parts(4) As String
+    parts(0) = Mid(TempNum, 8, 3) ' Hundreds
+    parts(1) = Mid(TempNum, 6, 2) ' Thousands
+    parts(2) = Mid(TempNum, 4, 2) ' Lakhs
+    parts(3) = Mid(TempNum, 2, 2) ' Crores
+
+    Dim i As Integer
+    For i = 3 To 0 Step -1
+        If Val(parts(i)) > 0 Then
+            Words = Words & ConvertHundreds(parts(i)) & " " & UnitsArray(i) & " "
+        End If
+    Next i
+    
+    ConvertWholeNumberToWords = Trim(Words)
+End Function
+
+Private Function ConvertHundreds(ByVal MyNumber As String) As String
+    Dim Result As String
+    Dim Num As Integer
+
+    MyNumber = Right("00" & Trim(MyNumber), 3)
+    
+    If Val(Left(MyNumber, 1)) > 0 Then
+        Result = GetDigit(Left(MyNumber, 1)) & " Hundred "
+    End If
+    
+    If Val(Right(MyNumber, 2)) > 0 Then
+        Result = Result & ConvertTens(Right(MyNumber, 2))
+    End If
+    
+    ConvertHundreds = Trim(Result)
+End Function
+
+Private Function ConvertTens(ByVal MyTens As String) As String
+    Dim Result As String
+    Dim TArray As Variant, DArray As Variant
+
+    TArray = Array("", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety")
+    DArray = Array("Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen")
+    
+    If Val(Left(MyTens, 1)) = 1 Then
+        Result = DArray(Val(Right(MyTens, 1)))
+    Else
+        Result = TArray(Val(Left(MyTens, 1)))
+        If Val(Right(MyTens, 1)) > 0 Then
+            Result = Result & " " & GetDigit(Right(MyTens, 1))
+        End If
+    End If
+    
+    ConvertTens = Trim(Result)
+End Function
+
+Private Function GetDigit(ByVal Digit As String) As String
+    Select Case Val(Digit)
+        Case 1: GetDigit = "One"
+        Case 2: GetDigit = "Two"
+        Case 3: GetDigit = "Three"
+        Case 4: GetDigit = "Four"
+        Case 5: GetDigit = "Five"
+        Case 6: GetDigit = "Six"
+        Case 7: GetDigit = "Seven"
+        Case 8: GetDigit = "Eight"
+        Case 9: GetDigit = "Nine"
+        Case Else: GetDigit = ""
+    End Select
+End Function
+
+
+-------------------------------------------------------------------------------
+VBA MACRO Module3.bas 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/Module3'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+' =========================================================
+' MAIN PROCEDURE
+' =========================================================
+Sub GenerateInvoiceAndPDF()
+
+    Dim wb As Workbook
+    Dim wsBill As Worksheet, wsOrder As Worksheet, wsInv As Worksheet
+    Dim tblBill As ListObject, tblOrder As ListObject, tblInv As ListObject
+
+    Dim billInput As String
+    Dim billStart As Long, billEnd As Long, billNum As Long
+    Dim billNoMatch As String
+
+    Dim billRow As ListRow
+    Dim orderRows As Collection
+    Dim r As ListRow, i As Long
+
+    Dim srcCols As Variant, destCols As Variant
+
+    Dim orderCount As Long, extraCount As Long
+    Dim totalLines As Long, rowsToInsert As Long
+
+    Dim tableFirstRow As Long, insertSheetRow As Long, lastTableRow As Long
+    Dim rowIndex As Long
+
+    Dim grCharge As Double
+    Dim totalAmount As Double
+
+    Dim filePath As String, pdfPath As String
+
+    ' ---------------- COLUMN MAPPING ----------------
+    srcCols = Array("GR No", "Date", "Vehicle No", "Load From", "Destination", _
+                    "Contents", "Qty in MT", "Rate MT", "Amount")
+
+    destCols = Array("GR No.", "DATE", "VEHICLE NO.", "LOAD FROM", "DESTINATION", _
+                     "CONTENTS", "QTY IN MT.", "RATE MT.", "AMOUNT")
+
+    ' ---------------- BASIC MAC SAFETY ----------------
+    If ThisWorkbook.Path = "" Then
+        MsgBox "Please save this workbook before running the macro.", vbExclamation
+        Exit Sub
+    End If
+
+    ' ---------------- OPEN / ATTACH Bill.xlsx (MAC SAFE) ----------------
+    filePath = ThisWorkbook.Path & "/Bill.xlsx"
+    Set wb = Nothing
+
+    ' Try already-open workbooks (Mac-safe loop)
+    For Each wb In Application.Workbooks
+        If LCase(wb.Name) = "bill.xlsx" Then Exit For
+    Next wb
+
+    ' If not open, try opening from same folder
+    If wb Is Nothing Then
+        On Error Resume Next
+        Set wb = Workbooks.Open(filePath)
+        On Error GoTo 0
+    End If
+
+    If wb Is Nothing Then
+        MsgBox "Unable to open Bill.xlsx. Ensure it is in the same folder.", vbCritical
+        Exit Sub
+    End If
+
+    ' ---------------- SET REFERENCES ----------------
+    Set wsBill = wb.Sheets("Bill Details")
+    Set wsOrder = wb.Sheets("Order Details")
+    Set wsInv = wb.Sheets("INVOICE")
+
+    Set tblBill = wsBill.ListObjects("BillDetails")
+    Set tblOrder = wsOrder.ListObjects("OrderDetails")
+    Set tblInv = wsInv.ListObjects("Table33")
+
+    ' ---------------- INPUT ----------------
+    billInput = Trim(InputBox("Enter Bill No or range (e.g. 125 or 100-120):", "Invoice Generator"))
+    If billInput = "" Then GoTo Cleanup
+
+    If Not ParseBillInput(billInput, billStart, billEnd) Then
+        MsgBox "Invalid bill number or range.", vbExclamation
+        GoTo Cleanup
+    End If
+
+    ' ================= MAIN LOOP =================
+    For billNum = billStart To billEnd
+
+        billNoMatch = Format(billNum, "000")
+        Set billRow = Nothing
+
+        For Each r In tblBill.ListRows
+            If Format(Val(r.Range.Cells(1, tblBill.ListColumns("Bill No").Index).Value), "000") = billNoMatch Then
+                Set billRow = r
+                Exit For
+            End If
+        Next r
+
+        If billRow Is Nothing Then GoTo NextBill
+
+        ' -------- RESET INVOICE --------
+        wsInv.Range("I4,I5,C3,C4,C5").Value = ""
+        If Not tblInv.DataBodyRange Is Nothing Then tblInv.DataBodyRange.ClearContents
+
+        ' -------- HEADER --------
+        wsInv.Range("I4").Value = billNoMatch
+        wsInv.Range("I5").Value = billRow.Range.Cells(1, tblBill.ListColumns("Bill Date").Index).Value
+        wsInv.Range("C3").Value = billRow.Range.Cells(1, tblBill.ListColumns("Party Name").Index).Value
+        wsInv.Range("C4").Value = billRow.Range.Cells(1, tblBill.ListColumns("Party Address").Index).Value
+        wsInv.Range("C5").Value = billRow.Range.Cells(1, tblBill.ListColumns("Party GST No").Index).Value
+
+        ' -------- COLLECT ORDERS --------
+        Set orderRows = New Collection
+        For Each r In tblOrder.ListRows
+            If Format(Val(r.Range.Cells(1, tblOrder.ListColumns("Bill No").Index).Value), "000") = billNoMatch Then
+                orderRows.Add r
+            End If
+        Next r
+
+        orderCount = 0
+        extraCount = 0
+
+        For Each r In orderRows
+            If HasFilledCells(r, 1, 6) Then orderCount = orderCount + 1
+            If Trim(r.Range.Cells(1, tblOrder.ListColumns("Extra Content").Index).Value) <> "" _
+            Or Trim(r.Range.Cells(1, tblOrder.ListColumns("Extra Charges").Index).Value) <> "" Then
+                extraCount = extraCount + 1
+            End If
+        Next r
+
+        totalLines = orderCount + extraCount
+        rowsToInsert = 0
+
+        ' -------- EXPAND TEMPLATE --------
+        If totalLines > 6 Then
+            rowsToInsert = totalLines - 6
+            tableFirstRow = tblInv.DataBodyRange.Row
+            insertSheetRow = tableFirstRow + 3
+
+            For i = 1 To rowsToInsert
+                wsInv.Rows(insertSheetRow).Insert Shift:=xlDown
+                wsInv.Rows(insertSheetRow + 1).Copy
+                wsInv.Rows(insertSheetRow).PasteSpecial xlPasteFormats
+                wsInv.Rows(insertSheetRow).RowHeight = wsInv.Rows(insertSheetRow + 1).RowHeight
+            Next i
+            Application.CutCopyMode = False
+        End If
+
+        ' -------- NORMAL LINES --------
+        rowIndex = 1
+        For Each r In orderRows
+            If HasFilledCells(r, 1, 6) Then
+                For i = LBound(srcCols) To UBound(srcCols)
+                    tblInv.ListRows(rowIndex).Range.Cells(1, tblInv.ListColumns(destCols(i)).Index).Value = _
+                        r.Range.Cells(1, tblOrder.ListColumns(srcCols(i)).Index).Value
+                Next i
+                rowIndex = rowIndex + 1
+            End If
+        Next r
+
+        rowIndex = rowIndex + 1   ' spacer
+
+        ' -------- EXTRA CHARGES --------
+        For Each r In orderRows
+            If Trim(r.Range.Cells(1, tblOrder.ListColumns("Extra Content").Index).Value) <> "" _
+            Or Trim(r.Range.Cells(1, tblOrder.ListColumns("Extra Charges").Index).Value) <> "" Then
+
+                tblInv.ListRows(rowIndex).Range.Cells(1, tblInv.ListColumns("CONTENTS").Index).Value = _
+                    r.Range.Cells(1, tblOrder.ListColumns("Extra Content").Index).Value
+
+                tblInv.ListRows(rowIndex).Range.Cells(1, tblInv.ListColumns("AMOUNT").Index).Value = _
+                    r.Range.Cells(1, tblOrder.ListColumns("Extra Charges").Index).Value
+
+                rowIndex = rowIndex + 1
+            End If
+        Next r
+
+        ' -------- TOTALS --------
+        lastTableRow = tblInv.DataBodyRange.Rows(tblInv.DataBodyRange.Rows.Count).Row
+
+        grCharge = 0
+        For Each r In orderRows
+            If IsNumeric(r.Range.Cells(1, tblOrder.ListColumns("GR Charge").Index).Value) Then
+                grCharge = grCharge + Val(r.Range.Cells(1, tblOrder.ListColumns("GR Charge").Index).Value)
+            End If
+        Next r
+
+        wsInv.Cells(lastTableRow + 1, "I").Value = grCharge
+        totalAmount = wsInv.Cells(lastTableRow + 2, "I").Value
+
+        wsInv.Range(wsInv.Cells(lastTableRow + 3, "B"), _
+                    wsInv.Cells(lastTableRow + 3, "I")).Value = _
+                    ConvertNumberToWords(totalAmount) & " Only"
+
+        ' -------- EXPORT PDF (MAC SAFE) --------
+        pdfPath = ThisWorkbook.Path & "/Bill/INVOICE" & billNoMatch & "-RAGHHAVROADWAYS.pdf"
+        wsInv.PageSetup.PaperSize = xlPaperA5
+        wsInv.ExportAsFixedFormat xlTypePDF, pdfPath
+
+        ' -------- RESTORE TEMPLATE --------
+        If rowsToInsert > 0 Then
+            wsInv.Rows(insertSheetRow & ":" & insertSheetRow + rowsToInsert - 1).Delete Shift:=xlUp
+        End If
+
+NextBill:
+    Next billNum
+
+    MsgBox "Invoice generation completed successfully.", vbInformation
+
+Cleanup:
+    On Error Resume Next
+    wb.Close False
+    On Error GoTo 0
+
+End Sub
+
+Private Function ParseBillInput(ByVal txt As String, ByRef startNo As Long, ByRef endNo As Long) As Boolean
+    Dim parts() As String
+    txt = Replace(Trim(txt), " ", "")
+
+    If InStr(txt, "-") > 0 Then
+        parts = Split(txt, "-")
+        If UBound(parts) <> 1 Then Exit Function
+        If Not IsNumeric(parts(0)) Or Not IsNumeric(parts(1)) Then Exit Function
+        startNo = CLng(parts(0))
+        endNo = CLng(parts(1))
+        If startNo <= 0 Or endNo <= 0 Or startNo > endNo Then Exit Function
+    Else
+        If Not IsNumeric(txt) Then Exit Function
+        startNo = CLng(txt)
+        If startNo <= 0 Then Exit Function
+        endNo = startNo
+    End If
+
+    ParseBillInput = True
+End Function
+
+Function HasFilledCells(r As ListRow, startCol As Integer, endCol As Integer) As Boolean
+    Dim i As Long
+    For i = startCol To endCol
+        If Trim(r.Range.Cells(1, i).Value) <> "" Then
+            HasFilledCells = True
+            Exit Function
+        End If
+    Next i
+End Function
+
+' Number to words functions remain same as before (not repeated here for brevity)
+
+
+Function ConvertNumberToWords(ByVal MyNumber As Variant) As String
+    Dim Units As Variant
+    Dim Paise As String
+    Dim IntegerPart As String, DecimalPart As String
+    Dim Num As Double
+    
+    On Error GoTo HandleError
+    
+    ' Remove commas and trim
+    MyNumber = Replace(Trim(MyNumber), ",", "")
+    
+    ' Validate number
+    If Not IsNumeric(MyNumber) Then GoTo HandleError
+    
+    ' Format to 2 decimal places
+    Num = CDbl(MyNumber)
+    MyNumber = Format(Num, "0.00")
+    
+    ' Split into rupees and paise
+    If InStr(1, MyNumber, ".") > 0 Then
+        IntegerPart = Trim(Left(MyNumber, InStr(1, MyNumber, ".") - 1))
+        DecimalPart = Trim(Mid(MyNumber, InStr(1, MyNumber, ".") + 1))
+    Else
+        IntegerPart = Trim(MyNumber)
+        DecimalPart = "00"
+    End If
+
+    ' Convert rupees part
+    Dim Words As String
+    Words = ConvertWholeNumberToWords(CLng(IntegerPart))
+    
+    ' Convert paise part
+    If CInt(DecimalPart) > 0 Then
+        Paise = " and " & ConvertTens(DecimalPart) & " Paise"
+    Else
+        Paise = ""
+    End If
+    
+    ConvertNumberToWords = Application.WorksheetFunction.Proper(Words & " Rupees" & Paise)
+    Exit Function
+
+HandleError:
+    ConvertNumberToWords = "Conversion Error"
+End Function
+
+Private Function ConvertWholeNumberToWords(ByVal Number As Long) As String
+    Dim Words As String
+    Dim UnitsArray As Variant
+    Dim PlaceArray As Variant
+    Dim TempNum As String
+
+    UnitsArray = Array("", "Thousand", "Lakh", "Crore")
+    PlaceArray = Array(0, 3, 5, 7, 9) ' Indian style grouping (3,2,2,...)
+    
+    TempNum = Right("0000000000" & CStr(Number), 10)
+    
+    Dim parts(4) As String
+    parts(0) = Mid(TempNum, 8, 3) ' Hundreds
+    parts(1) = Mid(TempNum, 6, 2) ' Thousands
+    parts(2) = Mid(TempNum, 4, 2) ' Lakhs
+    parts(3) = Mid(TempNum, 2, 2) ' Crores
+
+    Dim i As Integer
+    For i = 3 To 0 Step -1
+        If Val(parts(i)) > 0 Then
+            Words = Words & ConvertHundreds(parts(i)) & " " & UnitsArray(i) & " "
+        End If
+    Next i
+    
+    ConvertWholeNumberToWords = Trim(Words)
+End Function
+
+Private Function ConvertHundreds(ByVal MyNumber As String) As String
+    Dim Result As String
+    Dim Num As Integer
+
+    MyNumber = Right("00" & Trim(MyNumber), 3)
+    
+    If Val(Left(MyNumber, 1)) > 0 Then
+        Result = GetDigit(Left(MyNumber, 1)) & " Hundred "
+    End If
+    
+    If Val(Right(MyNumber, 2)) > 0 Then
+        Result = Result & ConvertTens(Right(MyNumber, 2))
+    End If
+    
+    ConvertHundreds = Trim(Result)
+End Function
+
+Private Function ConvertTens(ByVal MyTens As String) As String
+    Dim Result As String
+    Dim TArray As Variant, DArray As Variant
+
+    TArray = Array("", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety")
+    DArray = Array("Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen")
+    
+    If Val(Left(MyTens, 1)) = 1 Then
+        Result = DArray(Val(Right(MyTens, 1)))
+    Else
+        Result = TArray(Val(Left(MyTens, 1)))
+        If Val(Right(MyTens, 1)) > 0 Then
+            Result = Result & " " & GetDigit(Right(MyTens, 1))
+        End If
+    End If
+    
+    ConvertTens = Trim(Result)
+End Function
+
+Private Function GetDigit(ByVal Digit As String) As String
+    Select Case Val(Digit)
+        Case 1: GetDigit = "One"
+        Case 2: GetDigit = "Two"
+        Case 3: GetDigit = "Three"
+        Case 4: GetDigit = "Four"
+        Case 5: GetDigit = "Five"
+        Case 6: GetDigit = "Six"
+        Case 7: GetDigit = "Seven"
+        Case 8: GetDigit = "Eight"
+        Case 9: GetDigit = "Nine"
+        Case Else: GetDigit = ""
+    End Select
+End Function
+
+
+
+
++----------+--------------------+---------------------------------------------+
+|Type      |Keyword             |Description                                  |
++----------+--------------------+---------------------------------------------+
+|Suspicious|OPEN                |May open a file                              |
+|Suspicious|Hex Strings         |Hex-encoded strings were detected, may be    |
+|          |                    |used to obfuscate strings (option --decode to|
+|          |                    |see all)                                     |
+|Suspicious|Base64 Strings      |Base64-encoded strings were detected, may be |
+|          |                    |used to obfuscate strings (option --decode to|
+|          |                    |see all)                                     |
+|Suspicious|VBA Stomping        |VBA Stomping was detected: the VBA source    |
+|          |                    |code and P-code are different, this may have |
+|          |                    |been used to hide malicious code             |
++----------+--------------------+---------------------------------------------+
+VBA Stomping detection is experimental: please report any false positive/negative at https://github.com/decalage2/oletools/issues
+

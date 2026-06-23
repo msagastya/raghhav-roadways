@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Search, Download, Eye, Trash2, FileText } from 'lucide-react';
+import { Plus, Search, Download, Eye, Trash2, FileText, UploadCloud } from 'lucide-react';
 import { invoiceAPI } from '../../../lib/api';
 import useToast from '../../../hooks/useToast';
 import { formatDate, formatCurrency, getErrorMessage } from '../../../lib/utils';
@@ -24,9 +24,12 @@ export default function InvoicesPage() {
 
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [downloadingId, setDownloadingId] = useState(null);
+
+  const fileInputRef = useRef(null);
 
   useEffect(() => { fetchInvoices(); }, []);
 
@@ -38,6 +41,25 @@ export default function InvoicesPage() {
       showError(getErrorMessage(err));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const res = await invoiceAPI.sync(file);
+      showSuccess(res.data?.message || 'Invoices synced successfully');
+      fetchInvoices();
+    } catch (err) {
+      showError(getErrorMessage(err));
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -71,18 +93,25 @@ export default function InvoicesPage() {
     }
   };
 
+  // Debounce search
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
   const filtered = useMemo(() => {
     let list = invoices;
     if (statusFilter !== 'All') list = list.filter(i => i.paymentStatus === statusFilter);
-    if (search.trim()) {
-      const q = search.toLowerCase();
+    if (debouncedSearch.trim()) {
+      const q = debouncedSearch.toLowerCase();
       list = list.filter(i =>
         i.invoiceNumber?.toLowerCase().includes(q) ||
         i.partyName?.toLowerCase().includes(q)
       );
     }
     return list;
-  }, [invoices, statusFilter, search]);
+  }, [invoices, statusFilter, debouncedSearch]);
 
   const totals = useMemo(() => ({
     total: invoices.reduce((s, i) => s + Number(i.totalAmount || 0), 0),
@@ -103,12 +132,29 @@ export default function InvoicesPage() {
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Invoices / Bills</h1>
           <p className="text-sm text-gray-500 mt-0.5">{invoices.length} total bills</p>
         </div>
-        <Link href="/invoices/new">
-          <button className="flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-semibold text-sm px-4 py-2.5 rounded-xl shadow-sm hover:shadow-md transition-all">
-            <Plus className="w-4 h-4" />
-            New Bill
+        <div className="flex items-center gap-3">
+          <input
+            type="file"
+            accept=".xlsx"
+            ref={fileInputRef}
+            onChange={handleUpload}
+            className="hidden"
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            className="flex items-center gap-2 bg-white/80 dark:bg-white/10 hover:bg-white dark:hover:bg-white/20 text-gray-900 dark:text-white border border-black/10 dark:border-white/10 font-semibold text-sm px-4 py-2.5 rounded-xl shadow-sm hover:shadow-md transition-all disabled:opacity-50"
+          >
+            {uploading ? <div className="w-4 h-4 animate-spin rounded-full border-2 border-primary-500 border-t-transparent" /> : <UploadCloud className="w-4 h-4 text-primary-500" />}
+            {uploading ? 'Syncing...' : 'Sync Excel'}
           </button>
-        </Link>
+          <Link href="/invoices/new">
+            <button className="flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-semibold text-sm px-4 py-2.5 rounded-xl shadow-sm hover:shadow-md transition-all">
+              <Plus className="w-4 h-4" />
+              New Bill
+            </button>
+          </Link>
+        </div>
       </motion.div>
 
       {/* Summary strip */}

@@ -107,6 +107,17 @@ const searchParties = asyncHandler(async (req, res) => {
   });
 });
 
+const downloadLedger = asyncHandler(async (req, res) => {
+  const ledgerService = require('../services/ledger.service');
+  const { startDate, endDate } = req.query;
+  const url = await ledgerService.generateLedgerPDF(req.params.id, startDate, endDate);
+  
+  res.status(200).json({
+    success: true,
+    data: { url }
+  });
+});
+
 module.exports = {
   getParties,
   getPartyById,
@@ -114,4 +125,5 @@ module.exports = {
   updateParty,
   deleteParty,
   searchParties,
+  downloadLedger,
 };

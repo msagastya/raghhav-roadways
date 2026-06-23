@@ -1,5 +1,6 @@
 const invoiceService = require('../services/invoice.service');
 const pdfService = require('../services/pdf.service');
+const excelSyncService = require('../services/excelSync.service');
 const { asyncHandler } = require('../middleware/errorHandler');
 const pdfQueue = require('../services/pdfQueue');
 
@@ -181,6 +182,32 @@ const getPaymentSummary = asyncHandler(async (req, res) => {
   });
 });
 
+/**
+ * Sync invoices from Excel file
+ * POST /api/v1/invoices/sync
+ */
+const syncInvoices = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ success: false, message: 'Please upload an Excel file' });
+  }
+
+  const result = await excelSyncService.syncExcel(req.file.path, req.user.id);
+
+  // Clean up uploaded file
+  const fs = require('fs');
+  try {
+    fs.unlinkSync(req.file.path);
+  } catch (err) {
+    console.error('Failed to clean up uploaded excel file', err);
+  }
+
+  res.status(200).json({
+    success: true,
+    message: `Successfully synced ${result.importedInvoices} invoices and created ${result.newParties} new parties.`,
+    data: result
+  });
+});
+
 module.exports = {
   getInvoices,
   getInvoiceById,
@@ -190,4 +217,5 @@ module.exports = {
   downloadInvoice,
   getOverdueInvoices,
   getPaymentSummary,
+  syncInvoices,
 };

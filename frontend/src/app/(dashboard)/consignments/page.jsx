@@ -52,11 +52,18 @@ export default function ConsignmentsPage() {
     }
   };
 
+  // Debounce search
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
   const filtered = useMemo(() => {
     let list = consignments;
     if (statusFilter !== 'All') list = list.filter(c => c.status === statusFilter);
-    if (search.trim()) {
-      const q = search.toLowerCase();
+    if (debouncedSearch.trim()) {
+      const q = debouncedSearch.toLowerCase();
       list = list.filter(c =>
         c.grNumber?.toLowerCase().includes(q) ||
         c.vehicleNumber?.toLowerCase().includes(q) ||
@@ -66,7 +73,7 @@ export default function ConsignmentsPage() {
       );
     }
     return list;
-  }, [consignments, statusFilter, search]);
+  }, [consignments, statusFilter, debouncedSearch]);
 
   return (
     <div className="space-y-5 pb-10">

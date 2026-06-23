@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
 const invoiceController = require('../controllers/invoice.controller');
 const { authenticateToken } = require('../middleware/auth');
 const { checkPermission } = require('../middleware/permissions');
@@ -10,6 +12,19 @@ const {
   getInvoicesValidation,
   invoiceIdValidation,
 } = require('../validations/invoice.validation');
+
+/**
+ * @route   POST /api/v1/invoices/sync
+ * @desc    Sync invoices from Bill.xlsx
+ * @access  Private
+ */
+router.post(
+  '/sync',
+  authenticateToken,
+  checkPermission('invoice.create'),
+  upload.single('file'),
+  invoiceController.syncInvoices
+);
 
 /**
  * @route   GET /api/v1/invoices/overdue
