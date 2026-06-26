@@ -1,4 +1,5 @@
 const logger = require('../utils/logger');
+const cacheService = require('./cache.service');
 
 const GOOGLE_SHEET_API_URL = process.env.GOOGLE_SHEET_API_URL;
 
@@ -32,10 +33,14 @@ async function executeRequest(payload) {
 }
 
 /**
- * Get all records from a worksheet
+ * Get all records from a worksheet (with caching)
  */
 async function readAll(sheet) {
-  return await executeRequest({ action: 'readAll', sheet });
+  const cacheKey = `sheet_${sheet}_all`;
+  
+  return await cacheService.getOrSet(cacheKey, async () => {
+    return await executeRequest({ action: 'readAll', sheet });
+  }, 300); // 5 minutes cache TTL
 }
 
 /**
@@ -60,24 +65,37 @@ async function findFirst(sheet, filters = {}) {
 }
 
 /**
+ * Helper to invalidate cache for a sheet
+ */
+function invalidateSheetCache(sheet) {
+  cacheService.del(`sheet_${sheet}_all`);
+}
+
+/**
  * Insert record into worksheet
  */
 async function insert(sheet, data) {
-  return await executeRequest({ action: 'insert', sheet, data });
+  const result = await executeRequest({ action: 'insert', sheet, data });
+  invalidateSheetCache(sheet);
+  return result;
 }
 
 /**
  * Update record matching ID
  */
 async function update(sheet, idKey, idValue, data) {
-  return await executeRequest({ action: 'update', sheet, idKey, idValue, data });
+  const result = await executeRequest({ action: 'update', sheet, idKey, idValue, data });
+  invalidateSheetCache(sheet);
+  return result;
 }
 
 /**
  * Delete record matching ID
  */
 async function deleteRecord(sheet, idKey, idValue) {
-  return await executeRequest({ action: 'delete', sheet, idKey, idValue });
+  const result = await executeRequest({ action: 'delete', sheet, idKey, idValue });
+  invalidateSheetCache(sheet);
+  return result;
 }
 
 module.exports = {

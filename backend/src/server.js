@@ -3,6 +3,7 @@ const logger = require('./utils/logger');
 const prisma = require('./config/database');
 const { validateEnv } = require('./config/envValidation');
 const { initializeFirebase } = require('./config/firebase');
+const { startKeepAlive } = require('./utils/keepAlive');
 
 // Validate environment variables on startup
 try {
@@ -35,6 +36,9 @@ const startServer = async () => {
     logger.info(`🚀 Server running on port ${PORT}`);
     logger.info(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
     logger.info(`🔗 API URL: http://localhost:${PORT}/api/v1`);
+    
+    // Start keep-alive ping for the deployed Render server
+    startKeepAlive(process.env.PUBLIC_API_URL || 'https://raghhav-roadways.onrender.com/api/v1/health');
   });
 
   // Graceful shutdown
