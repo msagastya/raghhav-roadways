@@ -77,7 +77,7 @@ const login = async (usernameOrEmail, password) => {
     data: { lastLogin: new Date() },
   });
 
-  logger.info(`User ${username} logged in successfully`);
+  logger.info(`User ${user.username} logged in successfully`);
 
   return {
     accessToken,
