@@ -2,15 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { Edit, Plus, Trash2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Edit, Plus, Trash2, Truck } from 'lucide-react';
 import { vehicleAPI } from '../../../lib/api';
-import { Card, CardContent } from '../../../components/ui/card';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../../components/ui/table';
-import { TableSkeleton } from '../../../components/ui/skeleton';
-import Badge from '../../../components/ui/badge';
 import useToast from '../../../hooks/useToast';
-import { getErrorMessage } from '../../../lib/utils';
+import { getErrorMessage, cn } from '../../../lib/utils';
 
 export default function VehiclesPage() {
   const router = useRouter();
@@ -60,96 +56,147 @@ export default function VehiclesPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-10 animate-warp-in">
       <motion.div
-        className="flex justify-between items-center"
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-1"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Vehicles</h1>
-          <p className="text-gray-600 mt-1">Manage all vehicle records</p>
+        <div className="flex items-center gap-4">
+          <div className="p-3 bg-brand-500/10 backdrop-blur-md rounded-2xl border border-brand-500/30 shadow-[0_0_15px_rgba(0,212,255,0.2)]">
+            <Truck className="w-6 h-6 text-brand-500" />
+          </div>
+          <div>
+            <h1 className="text-2xl lg:text-3xl font-orbitron font-bold text-white tracking-widest uppercase drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
+              VEHICLE <span className="text-brand-500">FLEET</span>
+            </h1>
+            <p className="text-brand-500/70 font-orbitron mt-1 text-xs tracking-[0.3em] uppercase">
+              {vehicles.length} Total Vehicles
+            </p>
+          </div>
         </div>
         <button
           onClick={() => router.push('/vehicles/new')}
-          className="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700"
+          className="neon-button border-brand-500/50 shadow-[0_0_15px_rgba(0,212,255,0.2)] w-full sm:w-auto justify-center"
         >
-          <Plus className="h-4 w-4" />
-          New Vehicle
+          <Plus className="w-4 h-4" />
+          NEW VEHICLE
         </button>
       </motion.div>
 
-      <Card animate={false}>
-        <CardContent className="p-4 sm:p-6">
-          {loading ? (
-            <div className="space-y-4">
-              {slowLoading && (
-                <div className="rounded-xl border border-primary-100 bg-primary-50 px-4 py-3 text-sm text-primary-800">
-                  Server is waking up. Vehicle records will appear automatically.
-                </div>
-              )}
-              <TableSkeleton rows={8} columns={6} />
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.3 }}
+        className="glass-panel overflow-hidden border-slate-800"
+      >
+        <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/50">
+          <h3 className="text-sm font-orbitron font-bold text-slate-300 tracking-widest">ALL VEHICLES</h3>
+        </div>
+        
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-24">
+            <div className="w-12 h-12 rounded-full border-2 border-brand-500/20 border-t-brand-500 animate-spin mb-4" />
+            <p className="text-xs font-orbitron text-brand-500 tracking-widest uppercase animate-pulse">Initializing Data Stream...</p>
+            {slowLoading && (
+              <p className="text-[10px] font-orbitron text-slate-500 mt-2 tracking-widest uppercase animate-pulse text-center max-w-sm">
+                Server cluster waking up. Link will establish shortly.
+              </p>
+            )}
+          </div>
+        ) : vehicles.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24">
+            <div className="w-16 h-16 rounded-full bg-slate-900/50 border border-slate-800 flex items-center justify-center mb-4">
+              <Truck className="w-8 h-8 text-slate-600" />
             </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Vehicle Number</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Owner Type</TableHead>
-                  <TableHead>Owner Name</TableHead>
-                  <TableHead>Driver Name</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {vehicles.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center text-gray-500 py-8">
-                      No vehicles found
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  vehicles.map((vehicle, index) => (
-                    <TableRow key={vehicle.id} animate={true} index={index}>
-                      <TableCell className="font-medium">{vehicle.vehicleNo}</TableCell>
-                      <TableCell>{vehicle.vehicleType || '-'}</TableCell>
-                      <TableCell>{vehicle.ownerType}</TableCell>
-                      <TableCell>{vehicle.ownerName || '-'}</TableCell>
-                      <TableCell>{vehicle.driverName || '-'}</TableCell>
-                      <TableCell>
-                        <Badge variant={vehicle.isActive ? 'success' : 'danger'}>
+            <p className="text-sm font-orbitron font-bold text-slate-400 tracking-widest uppercase">No Vehicles Found</p>
+            <button
+              onClick={() => router.push('/vehicles/new')}
+              className="mt-4 neon-button border-brand-500/50 shadow-[0_0_15px_rgba(0,212,255,0.2)]"
+            >
+              <Plus className="w-4 h-4" />
+              REGISTER VEHICLE
+            </button>
+          </div>
+        ) : (
+          <div className="overflow-x-auto custom-scrollbar">
+            <table className="min-w-full text-sm">
+              <thead>
+                <tr className="border-b border-slate-800 bg-slate-900/80">
+                  <th className="px-5 py-4 text-left text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">Vehicle No</th>
+                  <th className="px-5 py-4 text-left text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">Type</th>
+                  <th className="px-5 py-4 text-left text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">Owner Type</th>
+                  <th className="px-5 py-4 text-left text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">Owner Name</th>
+                  <th className="px-5 py-4 text-left text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">Driver Name</th>
+                  <th className="px-5 py-4 text-center text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">Status</th>
+                  <th className="px-5 py-4 text-right text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800/50 bg-slate-950/20">
+                <AnimatePresence>
+                  {vehicles.map((vehicle, index) => (
+                    <motion.tr
+                      key={vehicle.id}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ delay: index * 0.03 }}
+                      className="hover:bg-slate-800/50 transition-colors group"
+                    >
+                      <td className="px-5 py-4 font-orbitron font-bold text-brand-500 whitespace-nowrap">
+                        {vehicle.vehicleNo}
+                      </td>
+                      <td className="px-5 py-4 text-slate-300 font-sans whitespace-nowrap">
+                        {vehicle.vehicleType || '-'}
+                      </td>
+                      <td className="px-5 py-4 text-slate-300 font-sans whitespace-nowrap">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-sm text-[9px] font-orbitron font-bold tracking-widest uppercase border bg-slate-800 text-slate-300 border-slate-700">
+                          {vehicle.ownerType}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4 text-white font-sans font-medium whitespace-nowrap">
+                        {vehicle.ownerName || '-'}
+                      </td>
+                      <td className="px-5 py-4 text-white font-sans font-medium whitespace-nowrap">
+                        {vehicle.driverName || '-'}
+                      </td>
+                      <td className="px-5 py-4 text-center">
+                        <span className={cn(
+                          "inline-flex items-center px-2.5 py-1 rounded-sm text-[9px] font-orbitron font-bold tracking-widest uppercase border",
+                          vehicle.isActive
+                            ? 'bg-primary-500/10 text-primary-500 border-primary-500/30'
+                            : 'bg-red-500/10 text-red-500 border-red-500/30'
+                        )}>
                           {vehicle.isActive ? 'Active' : 'Inactive'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
+                        </span>
+                      </td>
+                      <td className="px-5 py-4">
+                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => handleEdit(vehicle)}
-                            className="p-1.5 sm:p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
+                            className="p-2 text-slate-400 hover:text-brand-500 hover:bg-brand-500/10 hover:border-brand-500/30 border border-transparent rounded-lg transition-all"
                             title="Edit vehicle"
                           >
-                            <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                            <Edit className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDelete(vehicle)}
-                            className="p-1.5 sm:p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
+                            className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-500/10 hover:border-red-500/30 border border-transparent rounded-lg transition-all"
                             title="Delete vehicle"
                           >
-                            <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+                      </td>
+                    </motion.tr>
+                  ))}
+                </AnimatePresence>
+              </tbody>
+            </table>
+          </div>
+        )}
+      </motion.div>
     </div>
   );
 }

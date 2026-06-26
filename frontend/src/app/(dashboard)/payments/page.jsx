@@ -3,13 +3,11 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Plus, Eye, Trash2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Plus, Eye, Trash2, IndianRupee, FileText } from 'lucide-react';
 import { paymentAPI } from '../../../lib/api';
-import { Card, CardContent } from '../../../components/ui/card';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../../components/ui/table';
-import Button from '../../../components/ui/button';
 import useToast from '../../../hooks/useToast';
-import { formatDate, formatCurrency, getErrorMessage } from '../../../lib/utils';
+import { formatDate, formatCurrency, getErrorMessage, cn } from '../../../lib/utils';
 
 export default function PaymentsPage() {
   const router = useRouter();
@@ -51,103 +49,156 @@ export default function PaymentsPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Payments</h1>
-          <p className="text-gray-600 mt-1">Manage all payment records</p>
+    <div className="space-y-6 pb-10 animate-warp-in">
+      <motion.div
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-1"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <div className="flex items-center gap-4">
+          <div className="p-3 bg-primary-500/10 backdrop-blur-md rounded-2xl border border-primary-500/30 shadow-[0_0_15px_rgba(0,255,136,0.2)]">
+            <IndianRupee className="w-6 h-6 text-primary-500" />
+          </div>
+          <div>
+            <h1 className="text-2xl lg:text-3xl font-orbitron font-bold text-white tracking-widest uppercase drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
+              PAYMENT <span className="text-primary-500">LEDGER</span>
+            </h1>
+            <p className="text-primary-500/70 font-orbitron mt-1 text-xs tracking-[0.3em] uppercase">
+              {payments.length} Total Records
+            </p>
+          </div>
         </div>
-        <Link href="/payments/new">
-          <Button className="flex items-center gap-2">
+        <Link href="/payments/new" className="w-full sm:w-auto">
+          <button className="neon-button border-primary-500/50 shadow-[0_0_15px_rgba(0,255,136,0.2)] w-full justify-center">
             <Plus className="w-4 h-4" />
-            Record Payment
-          </Button>
+            RECORD PAYMENT
+          </button>
         </Link>
-      </div>
+      </motion.div>
 
-      <Card>
-        <CardContent className="p-6">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Payment Number</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Party</TableHead>
-                <TableHead>Invoice</TableHead>
-                <TableHead>Total Amount</TableHead>
-                <TableHead>Paid Amount</TableHead>
-                <TableHead>Balance</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {payments.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={9} className="text-center text-gray-500 py-8">
-                    No payments found
-                  </TableCell>
-                </TableRow>
-              ) : (
-                payments.map((payment) => {
-                  const getStatusBadge = (status) => {
-                    const styles = {
-                      Pending: 'bg-yellow-100 text-yellow-800',
-                      Partial: 'bg-blue-100 text-blue-800',
-                      Completed: 'bg-green-100 text-green-800',
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.3 }}
+        className="glass-panel overflow-hidden border-slate-800"
+      >
+        <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/50">
+          <h3 className="text-sm font-orbitron font-bold text-slate-300 tracking-widest">TRANSACTION HISTORY</h3>
+        </div>
+        
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-24">
+            <div className="w-12 h-12 rounded-full border-2 border-primary-500/20 border-t-primary-500 animate-spin mb-4" />
+            <p className="text-xs font-orbitron text-primary-500 tracking-widest uppercase animate-pulse">Initializing Data Stream...</p>
+          </div>
+        ) : payments.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24">
+            <div className="w-16 h-16 rounded-full bg-slate-900/50 border border-slate-800 flex items-center justify-center mb-4">
+              <FileText className="w-8 h-8 text-slate-600" />
+            </div>
+            <p className="text-sm font-orbitron font-bold text-slate-400 tracking-widest uppercase">No Payments Found</p>
+            <Link href="/payments/new">
+              <button className="mt-4 neon-button border-primary-500/50 shadow-[0_0_15px_rgba(0,255,136,0.2)]">
+                <Plus className="w-4 h-4" />
+                INITIATE PAYMENT
+              </button>
+            </Link>
+          </div>
+        ) : (
+          <div className="overflow-x-auto custom-scrollbar">
+            <table className="min-w-full text-sm">
+              <thead>
+                <tr className="border-b border-slate-800 bg-slate-900/80">
+                  <th className="px-5 py-4 text-left text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">Payment No</th>
+                  <th className="px-5 py-4 text-left text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">Date</th>
+                  <th className="px-5 py-4 text-left text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">Party</th>
+                  <th className="px-5 py-4 text-left text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">Invoice</th>
+                  <th className="px-5 py-4 text-right text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">Total Amount</th>
+                  <th className="px-5 py-4 text-right text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">Paid Amount</th>
+                  <th className="px-5 py-4 text-right text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">Balance</th>
+                  <th className="px-5 py-4 text-center text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">Status</th>
+                  <th className="px-5 py-4 text-right text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800/50 bg-slate-950/20">
+                <AnimatePresence>
+                  {payments.map((payment, index) => {
+                    const getStatusStyle = (status) => {
+                      switch (status) {
+                        case 'Completed': return 'bg-primary-500/10 text-primary-500 border-primary-500/30 shadow-[0_0_10px_rgba(0,255,136,0.2)]';
+                        case 'Partial': return 'bg-brand-500/10 text-brand-500 border-brand-500/30 shadow-[0_0_10px_rgba(0,212,255,0.2)]';
+                        case 'Pending': return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30 shadow-[0_0_10px_rgba(234,179,8,0.2)]';
+                        default: return 'bg-slate-800 text-slate-400 border-slate-700';
+                      }
                     };
-                    return (
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${styles[status] || 'bg-gray-100 text-gray-800'}`}>
-                        {status}
-                      </span>
-                    );
-                  };
 
-                  return (
-                    <TableRow key={payment.id}>
-                      <TableCell className="font-medium">{payment.paymentNumber}</TableCell>
-                      <TableCell>{formatDate(payment.paymentDate)}</TableCell>
-                      <TableCell>{payment.partyName || '-'}</TableCell>
-                      <TableCell>{payment.invoiceNumber || '-'}</TableCell>
-                      <TableCell>{formatCurrency(payment.totalAmount)}</TableCell>
-                      <TableCell className="text-green-600 font-medium">{formatCurrency(payment.paidAmount)}</TableCell>
-                      <TableCell className="text-orange-600 font-medium">{formatCurrency(payment.balanceAmount)}</TableCell>
-                      <TableCell>{getStatusBadge(payment.paymentStatus)}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <button
-                            onClick={() => handleView(payment)}
-                            className="p-1.5 sm:p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
-                            title="View payment details"
-                          >
-                            <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(payment)}
-                            className="p-1.5 sm:p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
-                            title="Delete payment"
-                          >
-                            <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                          </button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                    return (
+                      <motion.tr
+                        key={payment.id}
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ delay: index * 0.03 }}
+                        className="hover:bg-slate-800/50 transition-colors group"
+                      >
+                        <td className="px-5 py-4 font-orbitron font-bold text-primary-500 whitespace-nowrap">
+                          {payment.paymentNumber}
+                        </td>
+                        <td className="px-5 py-4 text-slate-300 font-sans whitespace-nowrap">
+                          {formatDate(payment.paymentDate)}
+                        </td>
+                        <td className="px-5 py-4 text-white font-sans font-medium whitespace-nowrap">
+                          {payment.partyName || '-'}
+                        </td>
+                        <td className="px-5 py-4 text-slate-400 font-orbitron tracking-wider whitespace-nowrap">
+                          {payment.invoiceNumber || '-'}
+                        </td>
+                        <td className="px-5 py-4 text-right font-orbitron font-bold text-slate-300 tracking-wider">
+                          {formatCurrency(payment.totalAmount)}
+                        </td>
+                        <td className="px-5 py-4 text-right font-orbitron font-bold text-primary-500 tracking-wider drop-shadow-[0_0_5px_rgba(0,255,136,0.3)]">
+                          {formatCurrency(payment.paidAmount)}
+                        </td>
+                        <td className="px-5 py-4 text-right font-orbitron font-bold text-red-500 tracking-wider drop-shadow-[0_0_5px_rgba(239,68,68,0.3)]">
+                          {formatCurrency(payment.balanceAmount)}
+                        </td>
+                        <td className="px-5 py-4 text-center">
+                          <span className={cn(
+                            "inline-flex items-center px-2.5 py-1 rounded-sm text-[9px] font-orbitron font-bold tracking-widest uppercase border",
+                            getStatusStyle(payment.paymentStatus)
+                          )}>
+                            {payment.paymentStatus}
+                          </span>
+                        </td>
+                        <td className="px-5 py-4">
+                          <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={() => handleView(payment)}
+                              className="p-2 text-slate-400 hover:text-brand-500 hover:bg-brand-500/10 hover:border-brand-500/30 border border-transparent rounded-lg transition-all"
+                              title="View payment details"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(payment)}
+                              className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-500/10 hover:border-red-500/30 border border-transparent rounded-lg transition-all"
+                              title="Delete payment"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </motion.tr>
+                    );
+                  })}
+                </AnimatePresence>
+              </tbody>
+            </table>
+          </div>
+        )}
+      </motion.div>
     </div>
   );
 }

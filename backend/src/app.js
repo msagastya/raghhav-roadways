@@ -126,8 +126,9 @@ app.use(csrfProtection);
 // API routes
 app.use('/api/v1', routes);
 
-// Serve static files (for PDF downloads)
+// Serve static files (for PDF downloads and UI)
 app.use('/storage', express.static('storage'));
+app.use(express.static('public'));
 
 // Root route
 app.get('/', (req, res) => {

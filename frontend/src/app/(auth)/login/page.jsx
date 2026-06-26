@@ -4,45 +4,12 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Truck, Lock, User, ArrowRight, Sparkles } from 'lucide-react';
-import Input from '../../../components/ui/input';
-import Button from '../../../components/ui/button';
-import { Card, CardContent, CardHeader } from '../../../components/ui/card';
+import { Truck, Lock, User, ArrowRight, Sparkles, AlertCircle } from 'lucide-react';
 import { authAPI, warmupAPI } from '../../../lib/api';
 import useAuthStore from '../../../store/authStore';
 import useToast from '../../../hooks/useToast';
 import { getErrorMessage } from '../../../lib/utils';
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.2
-    }
-  }
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: 'easeOut' }
-  }
-};
-
-const floatingVariants = {
-  animate: {
-    y: [-5, 5, -5],
-    transition: {
-      duration: 4,
-      repeat: Infinity,
-      ease: 'easeInOut'
-    }
-  }
-};
+import { cn } from '../../../lib/utils';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -107,207 +74,116 @@ export default function LoginPage() {
   };
 
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="w-full max-w-xl mx-auto"
-    >
-      {/* Decorative Elements - Hidden on larger screens to reduce clutter */}
-      <motion.div
-        className="absolute top-10 left-10 w-16 h-16 md:w-20 md:h-20 lg:w-16 lg:h-16 bg-primary-400/20 rounded-full blur-xl"
-        animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
-        transition={{ duration: 4, repeat: Infinity }}
-      />
-      <motion.div
-        className="absolute bottom-10 right-10 w-24 h-24 md:w-32 md:h-32 lg:w-24 lg:h-24 bg-brand-400/20 rounded-full blur-xl"
-        animate={{ scale: [1.2, 1, 1.2], opacity: [0.5, 0.3, 0.5] }}
-        transition={{ duration: 5, repeat: Infinity }}
-      />
+    <div className="w-full max-w-md mx-auto relative animate-warp-in z-10">
+      <div className="absolute inset-0 bg-primary-500/10 blur-[80px] rounded-full z-[-1]"></div>
+      
+      <div className="bg-slate-950/95 backdrop-blur-xl border border-primary-500/30 rounded-3xl p-8 sm:p-10 relative overflow-hidden shadow-[0_0_40px_rgba(0,255,136,0.15)]">
+        
+        {/* Animated Corner Chrome Brackets */}
+        <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-primary-500 rounded-tl-3xl opacity-50"></div>
+        <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-primary-500 rounded-tr-3xl opacity-50"></div>
+        <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-primary-500 rounded-bl-3xl opacity-50"></div>
+        <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-primary-500 rounded-br-3xl opacity-50"></div>
+        
+        {/* Animated Top Bar Glow */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-primary-500 shadow-[0_0_15px_rgba(0,255,136,1)] animate-neon-pulse" />
 
-      <Card className="w-full relative overflow-hidden backdrop-blur-sm bg-white/90">
-        {/* Gradient Border Effect */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-500/10 via-transparent to-brand-500/10 pointer-events-none" />
-
-        <CardHeader className="text-center relative">
+        <div className="text-center mb-8 relative">
           <motion.div
-            variants={itemVariants}
-            className="flex flex-col items-center mb-6"
+            className="w-20 h-20 mx-auto mb-4 bg-slate-900 border border-primary-500/40 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(0,255,136,0.2)]"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
           >
-            {/* Animated Logo */}
-            <motion.div
-              variants={floatingVariants}
-              animate="animate"
-              className="relative"
-            >
-              <motion.div
-                className="absolute inset-0 bg-primary-400/30 rounded-2xl blur-xl"
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              />
-              <Image
-                src="/logo.png"
-                alt="Raghhav Roadways Logo"
-                width={144}
-                height={144}
-                priority={true}
-                className="w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-32 lg:h-32 object-contain rounded-2xl shadow-2xl relative z-10 border-2 border-white/50"
-              />
-            </motion.div>
-
-            {/* Animated Title */}
-            <motion.div
-              variants={itemVariants}
-              className="space-y-0 mt-4"
-            >
-              <motion.h1
-                className="text-3xl sm:text-4xl md:text-5xl lg:text-4xl font-brand font-bold tracking-wider uppercase leading-tight"
-                style={{
-                  background: 'linear-gradient(135deg, #1a4d2e 0%, #2d6b45 50%, #1a4d2e 100%)',
-                  backgroundClip: 'text',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                }}
-              >
-                RAGHHAV
-              </motion.h1>
-              <motion.h1
-                className="text-3xl sm:text-4xl md:text-5xl lg:text-4xl font-brand font-bold tracking-wider uppercase leading-tight"
-                style={{
-                  background: 'linear-gradient(135deg, #1a4d2e 0%, #2d6b45 50%, #1a4d2e 100%)',
-                  backgroundClip: 'text',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                }}
-              >
-                ROADWAYS
-              </motion.h1>
-            </motion.div>
+            <span className="text-3xl font-orbitron font-bold text-primary-500">R</span>
           </motion.div>
+          <h2 className="text-2xl sm:text-3xl font-orbitron font-bold text-white tracking-widest uppercase mb-1">
+            Raghhav <span className="text-brand-500">Roadways</span>
+          </h2>
+          <p className="text-xs font-orbitron text-primary-500/80 tracking-[0.3em] uppercase">
+            Security Access
+          </p>
+        </div>
 
-          <motion.div
-            variants={itemVariants}
-            className="flex items-center justify-center gap-2"
-          >
-            <Truck className="w-4 h-4 text-primary-500" />
-            <p className="text-gray-600 text-sm font-medium">Transport Management System</p>
-            <Sparkles className="w-4 h-4 text-primary-500" />
-          </motion.div>
-        </CardHeader>
-
-        <CardContent className="relative">
-          <motion.form
-            variants={containerVariants}
-            onSubmit={handleSubmit}
-            className="space-y-5"
-          >
-            <motion.div variants={itemVariants}>
-              <Input
-                label="Username"
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-1">
+            <label className="text-xs font-orbitron text-slate-400 tracking-wider uppercase ml-1">Username</label>
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-500/70" />
+              <input
+                type="text"
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
-                error={errors.username}
-                required
-                autoFocus
-                placeholder="Enter your username"
+                className="w-full bg-slate-900/50 border border-slate-700 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-primary-500 focus:shadow-[0_0_15px_rgba(0,255,136,0.2)] transition-all font-sans"
+                placeholder="Enter identifier..."
+                autoComplete="off"
               />
-            </motion.div>
+            </div>
+            {errors.username && <p className="text-red-500 text-xs mt-1 ml-1">{errors.username}</p>}
+          </div>
 
-            <motion.div variants={itemVariants}>
-              <Input
-                label="Password"
+          <div className="space-y-1">
+            <label className="text-xs font-orbitron text-slate-400 tracking-wider uppercase ml-1">Passcode</label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-500/70" />
+              <input
                 type="password"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                error={errors.password}
-                required
-                placeholder="Enter your password"
+                className="w-full bg-slate-900/50 border border-slate-700 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-primary-500 focus:shadow-[0_0_15px_rgba(0,255,136,0.2)] transition-all font-sans"
+                placeholder="••••••••"
               />
-            </motion.div>
-
-            <motion.div variants={itemVariants}>
-              <Button
-                type="submit"
-                className="w-full group relative overflow-hidden"
-                disabled={loading}
-              >
-                <span className="relative z-10 flex items-center justify-center gap-2">
-                  {loading ? (
-                    <>
-                      <motion.div
-                        className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                      />
-                      Signing in...
-                    </>
-                  ) : (
-                    <>
-                      Sign In
-                      <motion.div
-                        initial={{ x: 0 }}
-                        whileHover={{ x: 5 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <ArrowRight className="w-4 h-4" />
-                      </motion.div>
-                    </>
-                  )}
-                </span>
-              </Button>
-            </motion.div>
-          </motion.form>
-
-          <div className="h-8 mt-3 relative flex items-center justify-center">
-            <AnimatePresence initial={false}>
-              {slowLogin && (
-                <motion.p
-                  initial={{ opacity: 0, y: -5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -5 }}
-                  transition={{ duration: 0.2 }}
-                  className="text-center text-xs font-medium text-primary-700 absolute w-full"
-                >
-                  Server is waking up. This can take a few seconds on the first request.
-                </motion.p>
-              )}
-            </AnimatePresence>
+            </div>
+            {errors.password && <p className="text-red-500 text-xs mt-1 ml-1">{errors.password}</p>}
           </div>
 
-          <motion.div
-            variants={itemVariants}
-            className="mt-6 text-center"
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-primary-500/10 border border-primary-500/50 text-primary-500 hover:bg-primary-500/20 hover:shadow-[0_0_20px_rgba(0,255,136,0.4)] rounded-xl py-3.5 font-orbitron font-bold tracking-widest uppercase transition-all flex items-center justify-center gap-2 group mt-2"
           >
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-gray-500">New to Raghhav Roadways?</span>
-              </div>
-            </div>
-            <motion.a
-              href="/signup"
-              className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              Create an account
-              <ArrowRight className="w-4 h-4" />
-            </motion.a>
-          </motion.div>
-        </CardContent>
-      </Card>
+            {loading ? (
+              <span className="flex items-center gap-2">
+                <motion.div
+                  className="w-4 h-4 border-2 border-primary-500/30 border-t-primary-500 rounded-full"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                />
+                Authenticating...
+              </span>
+            ) : (
+              <span className="flex items-center gap-2">
+                Sign In
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </span>
+            )}
+          </button>
+        </form>
 
-      {/* Footer */}
-      <motion.p
-        variants={itemVariants}
-        className="mt-6 text-center text-xs text-gray-500"
-      >
-        Secure login powered by advanced encryption
-      </motion.p>
-    </motion.div>
+        <div className="h-6 mt-4 relative flex items-center justify-center">
+          <AnimatePresence initial={false}>
+            {slowLogin && (
+              <motion.p
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                transition={{ duration: 0.2 }}
+                className="text-center text-[10px] font-orbitron text-brand-500 tracking-wider absolute w-full"
+              >
+                SYSTEM WAKING UP... PLEASE HOLD
+              </motion.p>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+      
+      <div className="mt-8 text-center">
+        <p className="text-[10px] font-orbitron text-slate-500 tracking-[0.2em] uppercase flex items-center justify-center gap-2">
+          <Lock className="w-3 h-3" /> Encrypted Connection
+        </p>
+      </div>
+    </div>
   );
 }

@@ -2,19 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { Plus, Users, Building2, ArrowRight, Edit, Trash2, X, Download, FileText } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Plus, Users, Building2, Edit, Trash2, Download, FileText, Search, Info } from 'lucide-react';
 import { partyAPI, mastersAPI } from '../../../lib/api';
-import { Card, CardContent, CardHeader } from '../../../components/ui/card';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../../components/ui/table';
 import { TableSkeleton } from '../../../components/ui/skeleton';
-import Button from '../../../components/ui/button';
-import Badge from '../../../components/ui/badge';
 import Modal from '../../../components/ui/modal';
-import Input from '../../../components/ui/input';
-import Select from '../../../components/ui/select';
 import useToast from '../../../hooks/useToast';
-import { getErrorMessage } from '../../../lib/utils';
+import { getErrorMessage, cn } from '../../../lib/utils';
 
 const initialFormData = {
   partyName: '',
@@ -40,6 +35,7 @@ export default function PartiesPage() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ total: 0, active: 0, inactive: 0, withGSTIN: 0 });
   const [filter, setFilter] = useState('all');
+  const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState(initialFormData);
@@ -131,6 +127,10 @@ export default function PartiesPage() {
         email: partyData.email || '',
         contactPerson: partyData.contactPerson || '',
         isActive: partyData.isActive !== false,
+        isVehicleOwner: partyData.isVehicleOwner || false,
+        isBroker: partyData.isBroker || false,
+        isReceivable: partyData.isReceivable || false,
+        isPayable: partyData.isPayable || false,
       });
 
       if (partyData.stateId) {
@@ -198,102 +198,94 @@ export default function PartiesPage() {
     }
   };
 
-  // Filter parties based on selected filter
+  // Filter parties based on selected filter and search
   const filteredParties = parties.filter(party => {
-    if (filter === 'all') return true;
-    if (filter === 'active') return party.isActive;
-    if (filter === 'inactive') return !party.isActive;
-    if (filter === 'withGSTIN') return party.gstin && party.gstin.trim() !== '';
-    return true;
+    let matchFilter = true;
+    if (filter === 'active') matchFilter = party.isActive;
+    if (filter === 'inactive') matchFilter = !party.isActive;
+    if (filter === 'withGSTIN') matchFilter = party.gstin && party.gstin.trim() !== '';
+
+    let matchSearch = true;
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      matchSearch = (party.partyName?.toLowerCase() || '').includes(q) ||
+                    (party.partyCode?.toLowerCase() || '').includes(q) ||
+                    (party.gstin?.toLowerCase() || '').includes(q) ||
+                    (party.mobile?.toLowerCase() || '').includes(q);
+    }
+
+    return matchFilter && matchSearch;
   });
 
   const getFilterTitle = () => {
-    if (filter === 'all') return 'All Parties';
-    if (filter === 'active') return 'Active Parties';
-    if (filter === 'inactive') return 'Inactive Parties';
-    if (filter === 'withGSTIN') return 'Parties with GSTIN';
-    return 'All Parties';
+    if (filter === 'all') return 'ALL PARTIES';
+    if (filter === 'active') return 'ACTIVE PARTIES';
+    if (filter === 'inactive') return 'INACTIVE PARTIES';
+    if (filter === 'withGSTIN') return 'PARTIES WITH GSTIN';
+    return 'ALL PARTIES';
   };
 
-  if (loading) {
-    return (
-      <div className="space-y-4 sm:space-y-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-          <div className="space-y-2">
-            <div className="h-8 w-32 bg-gray-200 rounded animate-pulse"></div>
-            <div className="h-4 w-56 bg-gray-200 rounded animate-pulse"></div>
-          </div>
-          <div className="h-10 w-32 bg-gray-200 rounded animate-pulse"></div>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          {[1, 2, 3, 4].map(i => (
-            <div key={i} className="h-24 bg-gray-200 rounded-xl animate-pulse"></div>
-          ))}
-        </div>
-        <Card animate={false}>
-          <CardContent className="p-4 sm:p-6">
-            <TableSkeleton rows={10} columns={7} />
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-6 pb-10 animate-warp-in">
       {/* Header */}
       <motion.div
-        className="space-y-3 px-1"
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-1"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div className="flex items-center gap-4">
+          <div className="p-3 bg-brand-500/10 backdrop-blur-md rounded-2xl border border-brand-500/30 shadow-[0_0_15px_rgba(0,212,255,0.2)]">
+            <Users className="w-6 h-6 text-brand-500" />
+          </div>
           <div>
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 drop-shadow-sm">Parties</h1>
-            <p className="text-gray-600 mt-1 text-xs sm:text-sm lg:text-base">Manage consignors and consignees</p>
-          </div>
-          <div className="flex gap-2 w-full sm:w-auto">
-            <Link href="/masters" className="flex-1 sm:flex-none">
-              <Button variant="outline" className="w-full sm:w-auto flex items-center gap-2">
-                <Building2 className="w-4 h-4" />
-                <span className="text-xs sm:text-sm">Manage Masters</span>
-              </Button>
-            </Link>
-            <Button onClick={openAddModal} className="flex-1 sm:flex-none flex items-center gap-2">
-              <Plus className="w-4 h-4" />
-              <span className="text-xs sm:text-sm">Add Party</span>
-            </Button>
-          </div>
-        </div>
-
-        {/* Info Note */}
-        <motion.div
-          className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2 }}
-        >
-          <div className="flex gap-2 items-start">
-            <div className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-blue-100 flex items-center justify-center mt-0.5">
-              <span className="text-blue-600 text-xs sm:text-sm font-bold">i</span>
-            </div>
-            <p className="text-xs sm:text-sm text-blue-800 flex-1">
-              <strong className="font-semibold">Party Type:</strong> A party can be marked as <strong>Consignor</strong> (sender),
-              <strong> Consignee</strong> (receiver), or <strong>Both</strong>. The same party can send and receive goods
-              at different times.
+            <h1 className="text-2xl lg:text-3xl font-orbitron font-bold text-white tracking-widest uppercase drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
+              PARTY <span className="text-brand-500">DIRECTORY</span>
+            </h1>
+            <p className="text-brand-500/70 font-orbitron mt-1 text-xs tracking-[0.3em] uppercase">
+              Manage Consignors & Consignees
             </p>
           </div>
-        </motion.div>
+        </div>
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <Link href="/masters" className="flex-1 sm:flex-none">
+            <button className="neon-button-outline w-full justify-center">
+              <Building2 className="w-4 h-4" />
+              MASTERS
+            </button>
+          </Link>
+          <button onClick={openAddModal} className="neon-button flex-1 sm:flex-none justify-center border-brand-500/50 shadow-[0_0_15px_rgba(0,212,255,0.2)]">
+            <Plus className="w-4 h-4" />
+            NEW PARTY
+          </button>
+        </div>
+      </motion.div>
+
+      {/* Info Note */}
+      <motion.div
+        className="glass-panel p-4 border-brand-500/30 flex items-start gap-3 relative overflow-hidden"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        <div className="absolute inset-0 bg-brand-500/5 pointer-events-none" />
+        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-brand-500/20 border border-brand-500/50 flex items-center justify-center shadow-[0_0_10px_rgba(0,212,255,0.2)]">
+          <Info className="w-3.5 h-3.5 text-brand-500" />
+        </div>
+        <p className="text-xs sm:text-sm text-slate-300 flex-1 font-sans leading-relaxed relative z-10">
+          <strong className="text-white font-semibold">Party Type:</strong> A party can be marked as <strong className="text-brand-400 font-semibold">Consignor</strong> (sender),
+          <strong className="text-brand-400 font-semibold"> Consignee</strong> (receiver), or <strong className="text-brand-400 font-semibold">Both</strong>. The same party can send and receive goods
+          at different times.
+        </p>
       </motion.div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Total Parties', value: stats.total, icon: Users, bg: 'bg-blue-100', iconColor: 'text-blue-600', filterKey: 'all' },
-          { label: 'Active', value: stats.active, icon: Building2, bg: 'bg-green-100', iconColor: 'text-green-600', filterKey: 'active' },
-          { label: 'Inactive', value: stats.inactive, icon: Building2, bg: 'bg-red-100', iconColor: 'text-red-600', filterKey: 'inactive' },
-          { label: 'With GSTIN', value: stats.withGSTIN, icon: Users, bg: 'bg-purple-100', iconColor: 'text-purple-600', filterKey: 'withGSTIN' }
+          { label: 'TOTAL DIRECTORY', value: stats.total, icon: Users, color: 'text-brand-500', bg: 'bg-brand-500/10 border-brand-500/30', glow: 'shadow-[0_0_15px_rgba(0,212,255,0.15)]', filterKey: 'all' },
+          { label: 'ACTIVE PARTIES', value: stats.active, icon: Building2, color: 'text-primary-500', bg: 'bg-primary-500/10 border-primary-500/30', glow: 'shadow-[0_0_15px_rgba(0,255,136,0.15)]', filterKey: 'active' },
+          { label: 'INACTIVE', value: stats.inactive, icon: Building2, color: 'text-red-500', bg: 'bg-red-500/10 border-red-500/30', glow: 'shadow-[0_0_15px_rgba(239,68,68,0.15)]', filterKey: 'inactive' },
+          { label: 'WITH GSTIN', value: stats.withGSTIN, icon: Users, color: 'text-purple-500', bg: 'bg-purple-500/10 border-purple-500/30', glow: 'shadow-[0_0_15px_rgba(168,85,247,0.15)]', filterKey: 'withGSTIN' }
         ].map((stat, index) => {
           const Icon = stat.icon;
           const isActive = filter === stat.filterKey;
@@ -304,337 +296,439 @@ export default function PartiesPage() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.4, delay: 0.1 + index * 0.05 }}
               onClick={() => setFilter(stat.filterKey)}
+              className={cn(
+                "glass-panel relative overflow-hidden group cursor-pointer border transition-all",
+                isActive ? cn(stat.bg, stat.glow, "ring-1 ring-white/20") : "border-slate-800 hover:border-slate-600"
+              )}
             >
-              <Card animate={false} hover3d={true} className={`group cursor-pointer transition-all ${isActive ? 'ring-2 ring-offset-2 ring-blue-500' : ''}`}>
-                <CardContent className="p-3 sm:p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs sm:text-sm font-semibold text-gray-600 truncate">{stat.label}</p>
-                      <p className="text-lg sm:text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
-                    </div>
-                    <motion.div
-                      className={`p-2 sm:p-2.5 rounded-xl ${stat.bg} flex-shrink-0 shadow-md`}
-                      whileHover={{ scale: 1.15, rotate: 360 }}
-                      transition={{ duration: 0.6, type: 'spring' }}
-                    >
-                      <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${stat.iconColor}`} />
-                    </motion.div>
+              <div className="p-4 relative z-10">
+                {!isActive && <div className={cn("absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-300", stat.bg)} />}
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-orbitron text-slate-400 uppercase tracking-widest truncate">{stat.label}</p>
+                    <p className="text-2xl sm:text-3xl font-orbitron font-bold text-white mt-2 tracking-wider">{stat.value}</p>
                   </div>
-                </CardContent>
-              </Card>
+                  <motion.div
+                    className={cn("p-2 sm:p-3 rounded-xl border flex-shrink-0 backdrop-blur-md", isActive ? stat.bg : "bg-slate-900 border-slate-700")}
+                    whileHover={{ scale: 1.15, rotate: 360 }}
+                    transition={{ duration: 0.6, type: 'spring' }}
+                  >
+                    <Icon className={cn("w-5 h-5", isActive ? stat.color : "text-slate-400")} />
+                  </motion.div>
+                </div>
+              </div>
             </motion.div>
           );
         })}
       </div>
+
+      {/* Toolbar & Search */}
+      <motion.div
+        className="flex flex-col md:flex-row md:items-center gap-4"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, delay: 0.25 }}
+      >
+        <div className="flex items-center gap-2 glass-panel border-slate-700 rounded-xl px-4 py-2.5 flex-1 focus-within:border-brand-500/50 focus-within:shadow-[0_0_10px_rgba(0,212,255,0.1)] transition-all">
+          <Search className="w-4 h-4 text-slate-400 flex-shrink-0" />
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search party by name, code, GSTIN, mobile..."
+            className="flex-1 bg-transparent text-sm font-sans outline-none text-white placeholder:text-slate-500 placeholder:font-orbitron placeholder:tracking-widest placeholder:text-xs"
+          />
+        </div>
+      </motion.div>
 
       {/* Parties Table */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.3 }}
+        className="glass-panel overflow-hidden border-slate-800"
       >
-        <Card animate={false} hover3d={true}>
-          <CardHeader>
-            <h3 className="text-base sm:text-lg font-bold text-gray-900">{getFilterTitle()}</h3>
-          </CardHeader>
-          <CardContent className="p-0 sm:p-6">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-xs sm:text-sm">Code</TableHead>
-                    <TableHead className="text-xs sm:text-sm">Name</TableHead>
-                    <TableHead className="text-xs sm:text-sm hidden md:table-cell">Type</TableHead>
-                    <TableHead className="text-xs sm:text-sm hidden lg:table-cell">GSTIN</TableHead>
-                    <TableHead className="text-xs sm:text-sm hidden sm:table-cell">Mobile</TableHead>
-                    <TableHead className="text-xs sm:text-sm">Status</TableHead>
-                    <TableHead className="text-xs sm:text-sm text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredParties.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={7} className="text-center text-gray-500 py-8">
-                        <div className="flex flex-col items-center gap-3">
-                          <Users className="w-12 h-12 text-gray-300" />
-                          <p className="text-sm">No parties found</p>
-                          <Button onClick={openAddModal} size="sm" className="flex items-center gap-2">
-                            <Plus className="w-4 h-4" />
-                            Add First Party
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    filteredParties.map((party, index) => (
-                      <TableRow key={party.id} animate={true} index={index}>
-                        <TableCell className="font-medium text-xs sm:text-sm">{party.partyCode}</TableCell>
-                        <TableCell className="text-xs sm:text-sm">{party.partyName}</TableCell>
-                        <TableCell className="text-xs sm:text-sm hidden md:table-cell">
-                          <Badge variant="secondary">{party.partyType}</Badge>
-                        </TableCell>
-                        <TableCell className="text-xs sm:text-sm hidden lg:table-cell">{party.gstin || '-'}</TableCell>
-                        <TableCell className="text-xs sm:text-sm hidden sm:table-cell">{party.mobile || '-'}</TableCell>
-                        <TableCell>
-                          <Badge variant={party.isActive ? 'success' : 'danger'} className="text-xs">
-                            {party.isActive ? 'Active' : 'Inactive'}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <button
-                              onClick={() => handleDownloadLedger(party)}
-                              disabled={downloadingId === party.id}
-                              className="p-1.5 sm:p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-colors disabled:opacity-50"
-                              title="Download Ledger PDF"
-                            >
-                              {downloadingId === party.id ? (
-                                <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin rounded-full border-2 border-green-600 border-t-transparent" />
-                              ) : (
-                                <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                              )}
-                            </button>
-                            <button
-                              onClick={() => openEditModal(party)}
-                              className="p-1.5 sm:p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
-                              title="Edit party"
-                            >
-                              <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(party)}
-                              className="p-1.5 sm:p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
-                              title="Delete party"
-                            >
-                              <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                            </button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
+        <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/50">
+          <h3 className="text-sm font-orbitron font-bold text-slate-300 tracking-widest">{getFilterTitle()}</h3>
+        </div>
+        
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-24">
+            <div className="w-12 h-12 rounded-full border-2 border-brand-500/20 border-t-brand-500 animate-spin mb-4" />
+            <p className="text-xs font-orbitron text-brand-500 tracking-widest uppercase animate-pulse">Scanning Records...</p>
+          </div>
+        ) : filteredParties.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24">
+            <div className="w-16 h-16 rounded-full bg-slate-900/50 border border-slate-800 flex items-center justify-center mb-4">
+              <Users className="w-8 h-8 text-slate-600" />
             </div>
-          </CardContent>
-        </Card>
+            <p className="text-sm font-orbitron font-bold text-slate-400 tracking-widest uppercase">No Parties Found</p>
+            <Button onClick={openAddModal} className="mt-4 neon-button border-brand-500/50">
+              <Plus className="w-4 h-4" />
+              ADD PARTY
+            </Button>
+          </div>
+        ) : (
+          <div className="overflow-x-auto custom-scrollbar">
+            <table className="min-w-full text-sm">
+              <thead>
+                <tr className="border-b border-slate-800 bg-slate-900/80">
+                  <th className="px-5 py-4 text-left text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">Code</th>
+                  <th className="px-5 py-4 text-left text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">Name</th>
+                  <th className="px-5 py-4 text-left text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest hidden md:table-cell">Type</th>
+                  <th className="px-5 py-4 text-left text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest hidden lg:table-cell">GSTIN</th>
+                  <th className="px-5 py-4 text-left text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest hidden sm:table-cell">Mobile</th>
+                  <th className="px-5 py-4 text-center text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">Status</th>
+                  <th className="px-5 py-4 text-right text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800/50 bg-slate-950/20">
+                <AnimatePresence>
+                  {filteredParties.map((party, index) => (
+                    <motion.tr
+                      key={party.id}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ delay: index * 0.03 }}
+                      className="hover:bg-slate-800/50 transition-colors group"
+                    >
+                      <td className="px-5 py-4 font-orbitron font-bold text-brand-500 whitespace-nowrap">
+                        {party.partyCode}
+                      </td>
+                      <td className="px-5 py-4 text-white font-sans font-medium whitespace-nowrap">
+                        {party.partyName}
+                      </td>
+                      <td className="px-5 py-4 hidden md:table-cell">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-sm text-[9px] font-orbitron font-bold tracking-widest uppercase border bg-slate-800 text-slate-300 border-slate-700">
+                          {party.partyType}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4 text-slate-400 font-orbitron tracking-wider hidden lg:table-cell">
+                        {party.gstin || '-'}
+                      </td>
+                      <td className="px-5 py-4 text-slate-400 font-orbitron tracking-wider hidden sm:table-cell">
+                        {party.mobile || '-'}
+                      </td>
+                      <td className="px-5 py-4 text-center">
+                        <span className={cn(
+                          "inline-flex items-center px-2.5 py-1 rounded-sm text-[9px] font-orbitron font-bold tracking-widest uppercase border",
+                          party.isActive 
+                            ? 'bg-primary-500/10 text-primary-500 border-primary-500/30' 
+                            : 'bg-red-500/10 text-red-500 border-red-500/30'
+                        )}>
+                          {party.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4">
+                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={() => handleDownloadLedger(party)}
+                            disabled={downloadingId === party.id}
+                            className="p-2 text-slate-400 hover:text-primary-500 hover:bg-primary-500/10 hover:border-primary-500/30 border border-transparent rounded-lg transition-all disabled:opacity-50"
+                            title="Download Ledger PDF"
+                          >
+                            {downloadingId === party.id ? (
+                              <div className="w-4 h-4 animate-spin rounded-full border-2 border-primary-500 border-t-transparent" />
+                            ) : (
+                              <FileText className="w-4 h-4" />
+                            )}
+                          </button>
+                          <button
+                            onClick={() => openEditModal(party)}
+                            className="p-2 text-slate-400 hover:text-brand-500 hover:bg-brand-500/10 hover:border-brand-500/30 border border-transparent rounded-lg transition-all"
+                            title="Edit party"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(party)}
+                            className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-500/10 hover:border-red-500/30 border border-transparent rounded-lg transition-all"
+                            title="Delete party"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </motion.tr>
+                  ))}
+                </AnimatePresence>
+              </tbody>
+            </table>
+          </div>
+        )}
       </motion.div>
 
       {/* Add/Edit Party Modal */}
       <Modal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        title={editingId ? 'Edit Party' : 'Add New Party'}
+        title={editingId ? 'EDIT RECORD' : 'NEW RECORD'}
       >
         <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-[10px] font-orbitron font-bold tracking-widest uppercase text-slate-400 mb-2">
                 Party Name <span className="text-red-500">*</span>
               </label>
-              <Input
+              <input
                 value={formData.partyName}
                 onChange={(e) => setFormData({ ...formData, partyName: e.target.value })}
                 placeholder="Enter party name"
+                className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white font-sans text-sm outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/50 transition-all placeholder:text-slate-600"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-[10px] font-orbitron font-bold tracking-widest uppercase text-slate-400 mb-2">
                 Party Code
               </label>
-              <Input
+              <input
                 value={formData.partyCode}
                 onChange={(e) => setFormData({ ...formData, partyCode: e.target.value })}
                 placeholder="Enter party code"
+                className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white font-sans text-sm outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/50 transition-all placeholder:text-slate-600"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-[10px] font-orbitron font-bold tracking-widest uppercase text-slate-400 mb-2">
               Party Type <span className="text-red-500">*</span>
             </label>
-            <Select
+            <select
               value={formData.partyType}
               onChange={(e) => setFormData({ ...formData, partyType: e.target.value })}
+              className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white font-sans text-sm outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/50 transition-all"
             >
-              <option value="Consignor">Consignor (Sender)</option>
-              <option value="Consignee">Consignee (Receiver)</option>
-              <option value="Both">Both</option>
-            </Select>
+              <option value="Consignor" className="bg-slate-900 text-white">Consignor (Sender)</option>
+              <option value="Consignee" className="bg-slate-900 text-white">Consignee (Receiver)</option>
+              <option value="Both" className="bg-slate-900 text-white">Both</option>
+            </select>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-[10px] font-orbitron font-bold tracking-widest uppercase text-slate-400 mb-2">
               Address
             </label>
-            <Input
+            <input
               value={formData.address}
               onChange={(e) => setFormData({ ...formData, address: e.target.value })}
               placeholder="Enter address"
+              className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white font-sans text-sm outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/50 transition-all placeholder:text-slate-600"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-[10px] font-orbitron font-bold tracking-widest uppercase text-slate-400 mb-2">
                 State
               </label>
-              <Select value={formData.stateId} onChange={handleStateChange}>
-                <option value="">Select State</option>
+              <select 
+                value={formData.stateId} 
+                onChange={handleStateChange}
+                className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white font-sans text-sm outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/50 transition-all"
+              >
+                <option value="" className="bg-slate-900 text-slate-500">Select State</option>
                 {states.map((state) => (
-                  <option key={state.id} value={state.id}>
+                  <option key={state.id} value={state.id} className="bg-slate-900 text-white">
                     {state.stateName}
                   </option>
                 ))}
-              </Select>
+              </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-[10px] font-orbitron font-bold tracking-widest uppercase text-slate-400 mb-2">
                 City
               </label>
-              <Select
+              <select
                 value={formData.cityId}
                 onChange={(e) => setFormData({ ...formData, cityId: e.target.value })}
                 disabled={!formData.stateId}
+                className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white font-sans text-sm outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <option value="">{!formData.stateId ? 'Select State First' : 'Select City'}</option>
+                <option value="" className="bg-slate-900 text-slate-500">{!formData.stateId ? 'Select State First' : 'Select City'}</option>
                 {cities.map((city) => (
-                  <option key={city.id} value={city.id}>
+                  <option key={city.id} value={city.id} className="bg-slate-900 text-white">
                     {city.cityName}
                   </option>
                 ))}
-              </Select>
+              </select>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-[10px] font-orbitron font-bold tracking-widest uppercase text-slate-400 mb-2">
                 Pincode
               </label>
-              <Input
+              <input
                 value={formData.pincode}
                 onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
                 placeholder="Enter pincode"
+                className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white font-sans text-sm outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/50 transition-all placeholder:text-slate-600"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-[10px] font-orbitron font-bold tracking-widest uppercase text-slate-400 mb-2">
                 GSTIN
               </label>
-              <Input
+              <input
                 value={formData.gstin}
                 onChange={(e) => setFormData({ ...formData, gstin: e.target.value })}
                 placeholder="Enter GSTIN"
+                className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white font-sans text-sm outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/50 transition-all placeholder:text-slate-600 uppercase"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-[10px] font-orbitron font-bold tracking-widest uppercase text-slate-400 mb-2">
                 Mobile
               </label>
-              <Input
+              <input
                 value={formData.mobile}
                 onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
                 placeholder="Enter mobile number"
+                className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white font-sans text-sm outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/50 transition-all placeholder:text-slate-600"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-[10px] font-orbitron font-bold tracking-widest uppercase text-slate-400 mb-2">
                 Email
               </label>
-              <Input
+              <input
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="Enter email"
+                className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white font-sans text-sm outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/50 transition-all placeholder:text-slate-600"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-[10px] font-orbitron font-bold tracking-widest uppercase text-slate-400 mb-2">
               Contact Person
             </label>
-            <Input
+            <input
               value={formData.contactPerson}
               onChange={(e) => setFormData({ ...formData, contactPerson: e.target.value })}
               placeholder="Enter contact person name"
+              className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white font-sans text-sm outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/50 transition-all placeholder:text-slate-600"
             />
           </div>
 
           <div>
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={formData.isActive}
-                onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <span className="text-sm font-medium text-gray-700">Active</span>
+            <label className="flex items-center gap-3 cursor-pointer group">
+              <div className="relative flex items-center justify-center">
+                <input
+                  type="checkbox"
+                  checked={formData.isActive}
+                  onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                  className="peer appearance-none w-5 h-5 border-2 border-slate-600 rounded-md checked:bg-brand-500 checked:border-brand-500 transition-all bg-slate-900/50"
+                />
+                <div className="absolute inset-0 opacity-0 peer-checked:opacity-100 flex items-center justify-center text-slate-900 pointer-events-none transition-opacity">
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 14 14" fill="none">
+                    <path d="M3 8L6 11L11 3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+              <span className="text-[10px] font-orbitron font-bold tracking-widest uppercase text-slate-300 group-hover:text-white transition-colors">Record Active</span>
             </label>
           </div>
 
           {/* Party Categories */}
-          <div className="border-t pt-4">
-            <h3 className="text-sm font-semibold text-gray-900 mb-3">Party Categories</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={formData.isVehicleOwner}
-                  onChange={(e) => setFormData({ ...formData, isVehicleOwner: e.target.checked })}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                />
-                <span className="text-sm text-gray-700">Vehicle Owner</span>
+          <div className="border-t border-slate-800 pt-5 mt-2">
+            <h3 className="text-[10px] font-orbitron font-bold tracking-widest uppercase text-brand-500 mb-4">Functional Roles</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <div className="relative flex items-center justify-center">
+                  <input
+                    type="checkbox"
+                    checked={formData.isVehicleOwner}
+                    onChange={(e) => setFormData({ ...formData, isVehicleOwner: e.target.checked })}
+                    className="peer appearance-none w-4 h-4 border-2 border-slate-600 rounded-sm checked:bg-brand-500 checked:border-brand-500 transition-all bg-slate-900/50"
+                  />
+                  <div className="absolute inset-0 opacity-0 peer-checked:opacity-100 flex items-center justify-center text-slate-900 pointer-events-none transition-opacity">
+                    <svg className="w-3 h-3" viewBox="0 0 14 14" fill="none">
+                      <path d="M3 8L6 11L11 3.5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                </div>
+                <span className="text-xs font-sans text-slate-300 group-hover:text-white transition-colors">Vehicle Owner</span>
               </label>
 
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={formData.isBroker}
-                  onChange={(e) => setFormData({ ...formData, isBroker: e.target.checked })}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                />
-                <span className="text-sm text-gray-700">Broker</span>
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <div className="relative flex items-center justify-center">
+                  <input
+                    type="checkbox"
+                    checked={formData.isBroker}
+                    onChange={(e) => setFormData({ ...formData, isBroker: e.target.checked })}
+                    className="peer appearance-none w-4 h-4 border-2 border-slate-600 rounded-sm checked:bg-brand-500 checked:border-brand-500 transition-all bg-slate-900/50"
+                  />
+                  <div className="absolute inset-0 opacity-0 peer-checked:opacity-100 flex items-center justify-center text-slate-900 pointer-events-none transition-opacity">
+                    <svg className="w-3 h-3" viewBox="0 0 14 14" fill="none">
+                      <path d="M3 8L6 11L11 3.5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                </div>
+                <span className="text-xs font-sans text-slate-300 group-hover:text-white transition-colors">Broker</span>
               </label>
 
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={formData.isReceivable}
-                  onChange={(e) => setFormData({ ...formData, isReceivable: e.target.checked })}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                />
-                <span className="text-sm text-gray-700">Receivable (We Receive Money)</span>
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <div className="relative flex items-center justify-center">
+                  <input
+                    type="checkbox"
+                    checked={formData.isReceivable}
+                    onChange={(e) => setFormData({ ...formData, isReceivable: e.target.checked })}
+                    className="peer appearance-none w-4 h-4 border-2 border-slate-600 rounded-sm checked:bg-brand-500 checked:border-brand-500 transition-all bg-slate-900/50"
+                  />
+                  <div className="absolute inset-0 opacity-0 peer-checked:opacity-100 flex items-center justify-center text-slate-900 pointer-events-none transition-opacity">
+                    <svg className="w-3 h-3" viewBox="0 0 14 14" fill="none">
+                      <path d="M3 8L6 11L11 3.5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                </div>
+                <span className="text-xs font-sans text-slate-300 group-hover:text-white transition-colors">Receivable <span className="text-slate-500 text-[10px] ml-1">(Income)</span></span>
               </label>
 
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={formData.isPayable}
-                  onChange={(e) => setFormData({ ...formData, isPayable: e.target.checked })}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                />
-                <span className="text-sm text-gray-700">Payable (We Pay Money)</span>
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <div className="relative flex items-center justify-center">
+                  <input
+                    type="checkbox"
+                    checked={formData.isPayable}
+                    onChange={(e) => setFormData({ ...formData, isPayable: e.target.checked })}
+                    className="peer appearance-none w-4 h-4 border-2 border-slate-600 rounded-sm checked:bg-brand-500 checked:border-brand-500 transition-all bg-slate-900/50"
+                  />
+                  <div className="absolute inset-0 opacity-0 peer-checked:opacity-100 flex items-center justify-center text-slate-900 pointer-events-none transition-opacity">
+                    <svg className="w-3 h-3" viewBox="0 0 14 14" fill="none">
+                      <path d="M3 8L6 11L11 3.5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                </div>
+                <span className="text-xs font-sans text-slate-300 group-hover:text-white transition-colors">Payable <span className="text-slate-500 text-[10px] ml-1">(Expense)</span></span>
               </label>
             </div>
           </div>
 
-          <div className="flex justify-end gap-2 mt-6 pt-4 border-t">
-            <Button variant="outline" onClick={() => setShowModal(false)}>
+          <div className="flex justify-end gap-3 mt-8 pt-5 border-t border-slate-800">
+            <button 
+              onClick={() => setShowModal(false)}
+              className="px-5 py-2.5 rounded-lg border border-slate-700 text-slate-300 font-orbitron font-bold text-[10px] tracking-widest uppercase hover:bg-slate-800 hover:text-white transition-all"
+            >
               Cancel
-            </Button>
-            <Button onClick={handleSubmit}>
-              {editingId ? 'Update Party' : 'Create Party'}
-            </Button>
+            </button>
+            <button 
+              onClick={handleSubmit}
+              className="neon-button border-brand-500/50 shadow-[0_0_15px_rgba(0,212,255,0.2)]"
+            >
+              {editingId ? 'UPDATE RECORD' : 'SAVE RECORD'}
+            </button>
           </div>
         </div>
       </Modal>

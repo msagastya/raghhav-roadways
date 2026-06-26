@@ -7,6 +7,7 @@ import PageTransition from '../../components/layout/PageTransition';
 import useAuth from '../../hooks/useAuth';
 import useUIStore from '../../store/uiStore';
 import { cn } from '../../lib/utils';
+import { motion } from 'framer-motion';
 
 export default function DashboardLayout({ children }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -20,23 +21,37 @@ export default function DashboardLayout({ children }) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-gray-100">
-        <div className="flex flex-col items-center gap-4">
-          {/* Animated Logo */}
+      <div className="min-h-screen flex items-center justify-center bg-slate-950 relative z-50">
+        <div className="flex flex-col items-center gap-6 relative z-10">
           <div className="relative">
-            <div className="absolute inset-0 bg-primary-400/30 rounded-full blur-xl animate-pulse"></div>
-            <img
-              src="/logo.png"
-              alt="Loading"
-              className="w-20 h-20 object-contain rounded-xl shadow-lg relative z-10 animate-pulse"
+            <div className="w-24 h-24 border border-primary-500/30 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(0,255,136,0.15)] bg-slate-900/50 backdrop-blur-md relative overflow-hidden">
+              <div className="absolute inset-0 bg-primary-500/10 animate-neon-pulse" />
+              <span className="text-4xl font-orbitron font-bold text-primary-500 relative z-10">R</span>
+            </div>
+            
+            {/* Spinning ring */}
+            <motion.div
+              className="absolute -inset-4 border-2 border-dashed border-primary-500/40 rounded-full"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
             />
           </div>
-          {/* Loading Spinner */}
-          <div className="relative">
-            <div className="w-12 h-12 rounded-full border-4 border-primary-100"></div>
-            <div className="absolute top-0 left-0 w-12 h-12 rounded-full border-4 border-transparent border-t-primary-600 animate-spin"></div>
+          
+          <div className="space-y-2 text-center">
+            <p className="text-primary-500 font-orbitron font-bold tracking-[0.2em] uppercase text-sm animate-pulse">
+              System Initializing
+            </p>
+            <div className="flex gap-1 justify-center">
+              {[0, 1, 2].map((i) => (
+                <motion.div
+                  key={i}
+                  className="w-1.5 h-1.5 bg-brand-500 rounded-full shadow-[0_0_5px_rgba(0,212,255,0.8)]"
+                  animate={{ y: [-3, 3, -3] }}
+                  transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
+                />
+              ))}
+            </div>
           </div>
-          <p className="text-sm text-gray-500 font-medium animate-pulse">Loading...</p>
         </div>
       </div>
     );
@@ -47,30 +62,25 @@ export default function DashboardLayout({ children }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-gray-50 to-slate-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 relative">
+    <div className="min-h-screen relative text-slate-100 selection:bg-primary-500/30">
+      
       {/* Full-screen Logo Watermark Background */}
-      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <img
-            src="/logo.png"
-            alt=""
-            className="w-[60vw] h-[60vw] max-w-[700px] max-h-[700px] object-contain opacity-[0.04] dark:opacity-[0.03] select-none"
-            draggable={false}
-          />
-        </div>
-        {/* Subtle gradient wash */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-500/[0.02] via-transparent to-primary-600/[0.02]" />
+      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden flex items-center justify-center mix-blend-screen opacity-5">
+        <span className="text-[40vw] font-orbitron font-bold text-primary-500 leading-none blur-[4px]">R</span>
       </div>
 
       <Sidebar isOpen={sidebarOpen} />
+      
       <div
         className={cn(
-          'ml-16 transition-all duration-300 min-h-screen relative z-10',
+          'ml-16 transition-all duration-300 min-h-screen relative z-10 flex flex-col',
           sidebarHovered || sidebarOpen ? 'md:ml-72' : 'md:ml-20'
         )}
       >
         <Header />
-        <main className="p-3 sm:p-4 lg:p-6 xl:p-8">
+        
+        {/* Main Content Area */}
+        <main className="flex-1 p-3 sm:p-4 lg:p-6 xl:p-8 relative">
           <PageTransition>{children}</PageTransition>
         </main>
       </div>

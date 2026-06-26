@@ -10,8 +10,8 @@ import KPICards from '../../../components/analytics/KPICards';
 import { Card, CardContent, CardHeader } from '../../../components/ui/card';
 import { CardSkeleton } from '../../../components/ui/skeleton';
 import useToast from '../../../hooks/useToast';
-import { getErrorMessage } from '../../../lib/utils';
-import { Activity, TrendingUp, Clock, Zap, AlertTriangle, FileText, Truck } from 'lucide-react';
+import { getErrorMessage, cn } from '../../../lib/utils';
+import { Activity, TrendingUp, Clock, Zap, AlertTriangle, FileText, Truck, ArrowRight } from 'lucide-react';
 
 const RevenueChart = dynamic(() => import('../../../components/analytics/RevenueChart'), {
   ssr: false,
@@ -49,8 +49,8 @@ export default function DashboardPage() {
     return (
       <div className="space-y-6">
         <div>
-          <div className="h-8 w-48 bg-white/25 dark:bg-white/10 rounded animate-pulse"></div>
-          <div className="h-4 w-96 bg-white/25 dark:bg-white/10 rounded animate-pulse mt-2"></div>
+          <div className="h-8 w-48 bg-slate-800 rounded animate-pulse"></div>
+          <div className="h-4 w-96 bg-slate-800 rounded animate-pulse mt-2"></div>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
@@ -124,7 +124,7 @@ export default function DashboardPage() {
   ].slice(0, 5);
 
   return (
-    <div className="space-y-4 sm:space-y-6 lg:space-y-8">
+    <div className="space-y-4 sm:space-y-6 lg:space-y-8 animate-warp-in">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -132,16 +132,16 @@ export default function DashboardPage() {
         transition={{ duration: 0.4 }}
         className="px-1"
       >
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary-500/15 dark:bg-primary-400/10 backdrop-blur-sm rounded-xl border border-primary-300/20">
-            <Zap className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+        <div className="flex items-center gap-4">
+          <div className="p-3 bg-primary-500/10 backdrop-blur-md rounded-2xl border border-primary-500/30 shadow-[0_0_15px_rgba(0,255,136,0.2)]">
+            <Zap className="w-6 h-6 text-primary-500 animate-pulse" />
           </div>
           <div>
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white drop-shadow-sm">
-              Dashboard
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-orbitron font-bold text-white tracking-widest uppercase drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
+              COMMAND <span className="text-primary-500">CENTER</span>
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-0.5 text-xs sm:text-sm lg:text-base">
-              Welcome to Raghhav Roadways Transport Management System
+            <p className="text-primary-500/70 font-orbitron mt-1 text-xs sm:text-sm lg:text-sm tracking-[0.3em] uppercase">
+              Raghhav Roadways Operations
             </p>
           </div>
         </div>
@@ -177,49 +177,51 @@ export default function DashboardPage() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.4, delay: 0.4 }}
         >
-          <Card className="h-full">
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Activity className="w-5 h-5 text-primary-500" />
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Activity</h3>
+          <div className="glass-panel h-full flex flex-col">
+            <div className="p-5 border-b border-slate-800">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Activity className="w-5 h-5 text-primary-500" />
+                  <h3 className="text-sm font-orbitron font-bold tracking-widest uppercase text-slate-300">System Activity</h3>
+                </div>
+                <div className="w-2 h-2 rounded-full bg-primary-500 animate-pulse shadow-[0_0_5px_rgba(0,255,136,0.8)]" />
               </div>
-            </CardHeader>
-            <CardContent>
+            </div>
+            <div className="p-5 flex-1 overflow-y-auto custom-scrollbar">
               {dashboardData?.recentActivity?.length > 0 ? (
                 <div className="space-y-4">
                   {dashboardData.recentActivity.map((item, index) => (
                     <motion.div
                       key={index}
-                      className="flex items-center gap-3 p-3 rounded-lg bg-white/20 dark:bg-white/5 hover:bg-white/35 dark:hover:bg-white/10 border border-white/15 dark:border-white/5 transition-colors"
+                      className="flex items-start gap-4 p-4 rounded-xl bg-slate-900/50 hover:bg-slate-800/80 border border-slate-800/50 hover:border-primary-500/30 transition-all group"
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.5 + index * 0.1 }}
                     >
-                      <div className={`w-2 h-2 rounded-full ${item.type === 'create' ? 'bg-blue-500' :
-                          item.type === 'update' ? 'bg-yellow-500' :
-                            item.type === 'delete' ? 'bg-red-500' :
-                              'bg-primary-500'
-                        }`} />
+                      <div className={cn(
+                        "mt-1 w-2 h-2 rounded-full shadow-[0_0_8px_currentColor]",
+                        item.type === 'create' ? 'bg-brand-500 text-brand-500' :
+                        item.type === 'update' ? 'bg-yellow-500 text-yellow-500' :
+                        item.type === 'delete' ? 'bg-red-500 text-red-500' :
+                        'bg-primary-500 text-primary-500'
+                      )} />
                       <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">{item.description}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })} • {item.user}
+                        <p className="text-sm font-sans text-slate-200 group-hover:text-white transition-colors">{item.description}</p>
+                        <p className="text-[10px] font-orbitron tracking-wider text-slate-500 mt-2 uppercase">
+                          {formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })} • <span className="text-primary-500/70">{item.user}</span>
                         </p>
                       </div>
                     </motion.div>
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8">
-                  <Activity className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-                  <p className="text-gray-500 dark:text-gray-400 font-medium">No recent activity</p>
-                  <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
-                    Activity will appear here as you use the system
-                  </p>
+                <div className="flex flex-col items-center justify-center h-full py-12">
+                  <Activity className="w-12 h-12 text-slate-700 mx-auto mb-4" />
+                  <p className="text-sm font-orbitron tracking-widest text-slate-500 uppercase">Awaiting Activity</p>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </motion.div>
       </div>
 
@@ -230,39 +232,40 @@ export default function DashboardPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.5 }}
         >
-          <Card>
-            <CardHeader>
+          <div className="glass-panel h-full flex flex-col">
+            <div className="p-5 border-b border-slate-800">
               <div className="flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-orange-500" />
-                <h3 className="text-base font-semibold text-gray-900 dark:text-white">Alerts & Tasks</h3>
+                <AlertTriangle className="w-5 h-5 text-red-500" />
+                <h3 className="text-sm font-orbitron font-bold tracking-widest uppercase text-slate-300">Priority Alerts</h3>
               </div>
-            </CardHeader>
-            <CardContent>
+            </div>
+            <div className="p-5 flex-1">
               {alerts.length > 0 ? (
                 <div className="space-y-3">
                   {alerts.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between p-2 rounded-lg hover:bg-white/20 dark:hover:bg-white/10 transition-colors">
-                      <span className="text-sm text-gray-700 dark:text-gray-300 flex-1">{item.task}</span>
-                      <span className={`text-xs px-2 py-1 rounded-full font-medium ml-2 backdrop-blur-sm ${item.priority === 'high' ? 'bg-red-500/15 text-red-700 dark:text-red-400 border border-red-300/20' :
-                          item.priority === 'medium' ? 'bg-yellow-500/15 text-yellow-700 dark:text-yellow-400 border border-yellow-300/20' :
-                            'bg-green-500/15 text-green-700 dark:text-green-400 border border-green-300/20'
-                        }`}>
+                    <div key={index} className="flex items-center justify-between p-3 rounded-lg hover:bg-slate-800/50 border border-transparent hover:border-slate-700 transition-all cursor-pointer group">
+                      <span className="text-xs font-sans text-slate-300 group-hover:text-white flex-1">{item.task}</span>
+                      <span className={cn(
+                        "text-[9px] font-orbitron font-bold tracking-widest px-2 py-1 rounded-sm uppercase ml-3 border",
+                        item.priority === 'high' ? 'bg-red-500/10 text-red-500 border-red-500/30' :
+                        item.priority === 'medium' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30' :
+                        'bg-primary-500/10 text-primary-500 border-primary-500/30'
+                      )}>
                         {item.priority}
                       </span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8">
-                  <AlertTriangle className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-                  <p className="text-gray-500 dark:text-gray-400 font-medium">No alerts</p>
-                  <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
-                    All systems running smoothly
-                  </p>
+                <div className="flex flex-col items-center justify-center py-10">
+                  <div className="w-12 h-12 rounded-full border border-primary-500/30 flex items-center justify-center mb-3 bg-primary-500/5 shadow-[0_0_15px_rgba(0,255,136,0.1)]">
+                     <AlertTriangle className="w-5 h-5 text-primary-500" />
+                  </div>
+                  <p className="text-xs font-orbitron tracking-widest text-slate-500 uppercase">System Nominal</p>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </motion.div>
 
         <motion.div
@@ -271,22 +274,22 @@ export default function DashboardPage() {
           transition={{ duration: 0.4, delay: 0.6 }}
           className="lg:col-span-2"
         >
-          <Card>
-            <CardHeader>
+          <div className="glass-panel h-full flex flex-col">
+            <div className="p-5 border-b border-slate-800">
               <div className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-green-500" />
-                <h3 className="text-base font-semibold text-gray-900 dark:text-white">Quick Stats</h3>
+                <TrendingUp className="w-5 h-5 text-brand-500" />
+                <h3 className="text-sm font-orbitron font-bold tracking-widest uppercase text-slate-300">Live Telemetry</h3>
               </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            </div>
+            <div className="p-5 flex-1">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 h-full">
                 {[
                   { label: 'Active Vehicles', value: dashboardData?.kpis?.activeVehicles || 0, icon: Truck },
                   { label: 'Total Parties', value: dashboardData?.kpis?.totalParties || 0, icon: FileText },
                   { label: "Today's Bookings", value: dashboardData?.today?.bookings || 0, icon: FileText },
                   {
-                    label: 'Avg. Delivery Time',
-                    value: dashboardData?.kpis?.avgDeliveryTime ? `${dashboardData.kpis.avgDeliveryTime} days` : 'N/A',
+                    label: 'Avg. Delivery',
+                    value: dashboardData?.kpis?.avgDeliveryTime ? `${dashboardData.kpis.avgDeliveryTime} D` : 'N/A',
                     icon: Clock
                   },
                 ].map((stat, index) => {
@@ -294,21 +297,21 @@ export default function DashboardPage() {
                   return (
                     <motion.div
                       key={stat.label}
-                      className="text-center p-3 rounded-lg bg-white/20 dark:bg-white/5 backdrop-blur-sm border-2 border-white/20 dark:border-white/10"
+                      className="flex flex-col items-center justify-center text-center p-4 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-brand-500/50 hover:bg-slate-800/80 transition-all relative overflow-hidden group"
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: 0.7 + index * 0.1 }}
-                      whileHover={{ scale: 1.05 }}
                     >
-                      <Icon className="w-5 h-5 text-primary-500 mx-auto mb-2" />
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{stat.label}</p>
+                      <div className="absolute inset-0 bg-brand-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <Icon className="w-5 h-5 text-brand-500/70 mb-3 group-hover:text-brand-500 transition-colors" />
+                      <p className="text-2xl font-orbitron font-bold text-white tracking-wider relative z-10">{stat.value}</p>
+                      <p className="text-[10px] font-orbitron text-slate-500 mt-2 uppercase tracking-widest relative z-10">{stat.label}</p>
                     </motion.div>
                   );
                 })}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </motion.div>
       </div>
 
@@ -317,10 +320,9 @@ export default function DashboardPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}
-        className="text-center text-xs text-gray-400 dark:text-gray-500"
+        className="text-center text-[10px] font-orbitron text-slate-500 tracking-[0.2em] uppercase pt-4"
       >
-        Press <kbd className="px-1.5 py-0.5 bg-white/25 dark:bg-white/10 border border-white/20 dark:border-white/10 rounded font-mono">Ctrl+K</kbd> for command palette •
-        <kbd className="px-1.5 py-0.5 bg-white/25 dark:bg-white/10 border border-white/20 dark:border-white/10 rounded font-mono ml-1">Ctrl+D</kbd> for dark mode
+        System Inputs: <kbd className="px-2 py-1 bg-slate-900 border border-slate-700 rounded-md text-primary-500 ml-2">⌘/Ctrl + K</kbd> COMMAND PALETTE
       </motion.div>
     </div>
   );

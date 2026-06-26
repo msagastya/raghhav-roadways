@@ -4,18 +4,18 @@ import { useEffect, useState, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Search, Download, Eye, Trash2, FileText, UploadCloud } from 'lucide-react';
+import { Plus, Search, Download, Eye, Trash2, FileText, UploadCloud, IndianRupee } from 'lucide-react';
 import { invoiceAPI } from '../../../lib/api';
 import useToast from '../../../hooks/useToast';
-import { formatDate, formatCurrency, getErrorMessage } from '../../../lib/utils';
+import { formatDate, formatCurrency, getErrorMessage, cn } from '../../../lib/utils';
 
 const STATUS_FILTERS = ['All', 'Pending', 'Partial', 'Paid'];
 
 const statusColor = {
-  Paid: 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-700/30',
-  Partial: 'bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-700/30',
-  Pending: 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-700/30',
-  Overdue: 'bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-700/30',
+  Paid: 'bg-primary-500/10 text-primary-500 border-primary-500/30',
+  Partial: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30',
+  Pending: 'bg-red-500/10 text-red-500 border-red-500/30',
+  Overdue: 'bg-orange-500/10 text-orange-500 border-orange-500/30',
 };
 
 export default function InvoicesPage() {
@@ -120,17 +120,26 @@ export default function InvoicesPage() {
   }), [invoices]);
 
   return (
-    <div className="space-y-5 pb-10">
+    <div className="space-y-6 pb-10 animate-warp-in">
       {/* Header */}
       <motion.div
-        className="flex items-center justify-between"
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
         initial={{ opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35 }}
       >
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Invoices / Bills</h1>
-          <p className="text-sm text-gray-500 mt-0.5">{invoices.length} total bills</p>
+        <div className="flex items-center gap-4">
+          <div className="p-3 bg-primary-500/10 backdrop-blur-md rounded-2xl border border-primary-500/30 shadow-[0_0_15px_rgba(0,255,136,0.2)]">
+            <FileText className="w-6 h-6 text-primary-500" />
+          </div>
+          <div>
+            <h1 className="text-2xl lg:text-3xl font-orbitron font-bold text-white tracking-widest uppercase drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
+              INVOICE <span className="text-primary-500">LEDGER</span>
+            </h1>
+            <p className="text-primary-500/70 font-orbitron mt-1 text-xs tracking-[0.3em] uppercase">
+              {invoices.length} Total Records
+            </p>
+          </div>
         </div>
         <div className="flex items-center gap-3">
           <input
@@ -143,15 +152,15 @@ export default function InvoicesPage() {
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="flex items-center gap-2 bg-white/80 dark:bg-white/10 hover:bg-white dark:hover:bg-white/20 text-gray-900 dark:text-white border border-black/10 dark:border-white/10 font-semibold text-sm px-4 py-2.5 rounded-xl shadow-sm hover:shadow-md transition-all disabled:opacity-50"
+            className="neon-button-outline"
           >
-            {uploading ? <div className="w-4 h-4 animate-spin rounded-full border-2 border-primary-500 border-t-transparent" /> : <UploadCloud className="w-4 h-4 text-primary-500" />}
-            {uploading ? 'Syncing...' : 'Sync Excel'}
+            {uploading ? <div className="w-4 h-4 animate-spin rounded-full border-2 border-primary-500 border-t-transparent" /> : <UploadCloud className="w-4 h-4" />}
+            {uploading ? 'SYNCING...' : 'SYNC EXCEL'}
           </button>
           <Link href="/invoices/new">
-            <button className="flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-semibold text-sm px-4 py-2.5 rounded-xl shadow-sm hover:shadow-md transition-all">
+            <button className="neon-button">
               <Plus className="w-4 h-4" />
-              New Bill
+              NEW INVOICE
             </button>
           </Link>
         </div>
@@ -159,52 +168,53 @@ export default function InvoicesPage() {
 
       {/* Summary strip */}
       <motion.div
-        className="grid grid-cols-3 gap-3"
+        className="grid grid-cols-1 sm:grid-cols-3 gap-4"
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: 0.05 }}
       >
         {[
-          { label: 'Total Billed', value: totals.total, color: 'text-gray-900 dark:text-white' },
-          { label: 'Collected', value: totals.paid, color: 'text-green-600 dark:text-green-400' },
-          { label: 'Outstanding', value: totals.balance, color: 'text-red-600 dark:text-red-400' },
+          { label: 'TOTAL BILLED', value: totals.total, color: 'text-white', borderColor: 'border-slate-800' },
+          { label: 'COLLECTED', value: totals.paid, color: 'text-brand-500', borderColor: 'border-brand-500/30' },
+          { label: 'OUTSTANDING', value: totals.balance, color: 'text-red-500', borderColor: 'border-red-500/30' },
         ].map(s => (
-          <div key={s.label} className="bg-white/60 dark:bg-white/5 backdrop-blur-sm border border-black/8 dark:border-white/8 rounded-xl px-4 py-3">
-            <p className="text-xs text-gray-500 dark:text-gray-400">{s.label}</p>
-            <p className={`text-lg font-bold mt-0.5 ${s.color}`}>{formatCurrency(s.value)}</p>
+          <div key={s.label} className={cn("glass-panel p-5 border", s.borderColor)}>
+            <p className="text-[10px] font-orbitron text-slate-400 tracking-widest uppercase mb-1">{s.label}</p>
+            <p className={cn("text-2xl font-orbitron font-bold tracking-wider", s.color)}>{formatCurrency(s.value)}</p>
           </div>
         ))}
       </motion.div>
 
       {/* Filters */}
       <motion.div
-        className="flex flex-wrap items-center gap-3"
+        className="flex flex-col md:flex-row md:items-center gap-4"
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: 0.1 }}
       >
         {/* Search */}
-        <div className="flex items-center gap-2 bg-white/60 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl px-3 py-2 flex-1 min-w-48 max-w-sm">
-          <Search className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+        <div className="flex items-center gap-2 glass-panel border-slate-700 rounded-xl px-4 py-2.5 flex-1 max-w-md focus-within:border-primary-500/50 focus-within:shadow-[0_0_10px_rgba(0,255,136,0.1)] transition-all">
+          <Search className="w-4 h-4 text-slate-400 flex-shrink-0" />
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Search bill no, party…"
-            className="flex-1 bg-transparent text-sm outline-none text-gray-900 dark:text-white placeholder:text-gray-400"
+            placeholder="Search invoice no, party..."
+            className="flex-1 bg-transparent text-sm font-sans outline-none text-white placeholder:text-slate-500 placeholder:font-orbitron placeholder:tracking-widest placeholder:text-xs"
           />
         </div>
 
         {/* Status chips */}
-        <div className="flex gap-1.5">
+        <div className="flex flex-wrap gap-2">
           {STATUS_FILTERS.map(s => (
             <button
               key={s}
               onClick={() => setStatusFilter(s)}
-              className={`text-xs px-3 py-1.5 rounded-lg border font-medium transition-all ${
+              className={cn(
+                "text-[10px] font-orbitron font-bold tracking-widest uppercase px-4 py-2 rounded-lg border transition-all",
                 statusFilter === s
-                  ? 'bg-primary-500 text-white border-primary-500 shadow-sm'
-                  : 'bg-white/50 dark:bg-white/5 text-gray-600 dark:text-gray-400 border-black/10 dark:border-white/10 hover:border-primary-300'
-              }`}
+                  ? 'bg-primary-500/20 text-primary-500 border-primary-500 shadow-[0_0_10px_rgba(0,255,136,0.2)]'
+                  : 'bg-slate-900/50 text-slate-400 border-slate-800 hover:border-slate-600'
+              )}
             >
               {s}
             </button>
@@ -214,35 +224,39 @@ export default function InvoicesPage() {
 
       {/* Table */}
       <motion.div
-        className="bg-white/60 dark:bg-white/5 backdrop-blur-sm border border-black/8 dark:border-white/8 rounded-2xl overflow-hidden"
+        className="glass-panel overflow-hidden border-slate-800"
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: 0.15 }}
       >
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-500" />
+          <div className="flex flex-col items-center justify-center py-24">
+            <div className="w-12 h-12 rounded-full border-2 border-primary-500/20 border-t-primary-500 animate-spin mb-4" />
+            <p className="text-xs font-orbitron text-primary-500 tracking-widest uppercase animate-pulse">Initializing Data Stream...</p>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-gray-400">
-            <FileText className="w-10 h-10 mb-3 opacity-30" />
-            <p className="text-sm">No invoices found</p>
+          <div className="flex flex-col items-center justify-center py-24">
+            <div className="w-16 h-16 rounded-full bg-slate-900/50 border border-slate-800 flex items-center justify-center mb-4">
+              <FileText className="w-8 h-8 text-slate-600" />
+            </div>
+            <p className="text-sm font-orbitron font-bold text-slate-400 tracking-widest uppercase">No Invoices Found</p>
+            <p className="text-[10px] font-orbitron text-slate-500 mt-2 tracking-widest uppercase">Adjust search criteria</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto custom-scrollbar">
             <table className="min-w-full text-sm">
               <thead>
-                <tr className="border-b border-black/8 dark:border-white/8 bg-gray-50/80 dark:bg-white/3">
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Bill No.</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Date</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Party</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Total</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Balance</th>
-                  <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Status</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Actions</th>
+                <tr className="border-b border-slate-800 bg-slate-900/80">
+                  <th className="px-5 py-4 text-left text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">Bill No.</th>
+                  <th className="px-5 py-4 text-left text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">Date</th>
+                  <th className="px-5 py-4 text-left text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">Party</th>
+                  <th className="px-5 py-4 text-right text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">Total</th>
+                  <th className="px-5 py-4 text-right text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">Balance</th>
+                  <th className="px-5 py-4 text-center text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">Status</th>
+                  <th className="px-5 py-4 text-right text-[10px] font-orbitron font-bold text-slate-400 uppercase tracking-widest">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-black/5 dark:divide-white/5">
+              <tbody className="divide-y divide-slate-800/50 bg-slate-950/20">
                 <AnimatePresence>
                   {filtered.map((inv, i) => (
                     <motion.tr
@@ -252,53 +266,59 @@ export default function InvoicesPage() {
                       exit={{ opacity: 0 }}
                       transition={{ delay: i * 0.03 }}
                       onClick={() => router.push(`/invoices/${inv.id}`)}
-                      className="cursor-pointer hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-colors group"
+                      className="cursor-pointer hover:bg-slate-800/50 transition-colors group"
                     >
-                      <td className="px-4 py-3 font-semibold text-primary-600 dark:text-primary-400 whitespace-nowrap">
+                      <td className="px-5 py-4 font-orbitron font-bold text-primary-500 whitespace-nowrap">
                         {inv.invoiceNumber}
                       </td>
-                      <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                      <td className="px-5 py-4 text-slate-300 font-sans whitespace-nowrap">
                         {formatDate(inv.invoiceDate)}
                       </td>
-                      <td className="px-4 py-3 text-gray-900 dark:text-white font-medium">
+                      <td className="px-5 py-4 text-white font-sans font-medium">
                         {inv.partyName}
                       </td>
-                      <td className="px-4 py-3 text-right font-medium text-gray-900 dark:text-white">
+                      <td className="px-5 py-4 text-right font-orbitron font-bold text-white tracking-wider">
                         {formatCurrency(inv.totalAmount)}
                       </td>
-                      <td className={`px-4 py-3 text-right font-medium ${Number(inv.balanceAmount) > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
+                      <td className={cn(
+                        "px-5 py-4 text-right font-orbitron font-bold tracking-wider",
+                        Number(inv.balanceAmount) > 0 ? 'text-red-500' : 'text-primary-500'
+                      )}>
                         {formatCurrency(inv.balanceAmount)}
                       </td>
-                      <td className="px-4 py-3 text-center">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${statusColor[inv.paymentStatus] || statusColor.Pending}`}>
+                      <td className="px-5 py-4 text-center">
+                        <span className={cn(
+                          "inline-flex items-center px-2.5 py-1 rounded-sm text-[9px] font-orbitron font-bold tracking-widest uppercase border",
+                          statusColor[inv.paymentStatus] || statusColor.Pending
+                        )}>
                           {inv.paymentStatus || 'Pending'}
                         </span>
                       </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <td className="px-5 py-4">
+                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={e => { e.stopPropagation(); router.push(`/invoices/${inv.id}`); }}
-                            className="p-1.5 text-gray-500 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
+                            className="p-2 text-slate-400 hover:text-primary-500 hover:bg-primary-500/10 hover:border-primary-500/30 border border-transparent rounded-lg transition-all"
                             title="View"
                           >
-                            <Eye className="w-3.5 h-3.5" />
+                            <Eye className="w-4 h-4" />
                           </button>
                           <button
                             onClick={e => handleDownload(e, inv)}
                             disabled={downloadingId === inv.id}
-                            className="p-1.5 text-gray-500 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors disabled:opacity-40"
+                            className="p-2 text-slate-400 hover:text-brand-500 hover:bg-brand-500/10 hover:border-brand-500/30 border border-transparent rounded-lg transition-all disabled:opacity-40"
                             title="Download PDF"
                           >
                             {downloadingId === inv.id
-                              ? <div className="w-3.5 h-3.5 animate-spin rounded-full border-2 border-primary-500 border-t-transparent" />
-                              : <Download className="w-3.5 h-3.5" />}
+                              ? <div className="w-4 h-4 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
+                              : <Download className="w-4 h-4" />}
                           </button>
                           <button
                             onClick={e => handleDelete(e, inv)}
-                            className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                            className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-500/10 hover:border-red-500/30 border border-transparent rounded-lg transition-all"
                             title="Delete"
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </td>

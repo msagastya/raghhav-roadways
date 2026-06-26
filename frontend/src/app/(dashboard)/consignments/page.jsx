@@ -8,14 +8,15 @@ import { Plus, Search, Truck, Edit, Trash2 } from 'lucide-react';
 import { consignmentAPI } from '../../../lib/api';
 import useToast from '../../../hooks/useToast';
 import { formatDate, formatCurrency, getErrorMessage } from '../../../lib/utils';
+import { cn } from '../../../lib/utils';
 
 const STATUS_FILTERS = ['All', 'Pending', 'In Transit', 'Delivered', 'Cancelled'];
 
 const statusColor = {
-  Delivered: 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-700/30',
-  'In Transit': 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-700/30',
-  Pending: 'bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-700/30',
-  Cancelled: 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-700/30',
+  Delivered: 'bg-green-500/20 text-green-400 border-green-500/30 shadow-[0_0_10px_rgba(34,197,94,0.2)]',
+  'In Transit': 'bg-blue-500/20 text-blue-400 border-blue-500/30 shadow-[0_0_10px_rgba(59,130,246,0.2)]',
+  Pending: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30 shadow-[0_0_10px_rgba(234,179,8,0.2)]',
+  Cancelled: 'bg-red-500/20 text-red-400 border-red-500/30 shadow-[0_0_10px_rgba(239,68,68,0.2)]',
 };
 
 export default function ConsignmentsPage() {
@@ -76,7 +77,7 @@ export default function ConsignmentsPage() {
   }, [consignments, statusFilter, debouncedSearch]);
 
   return (
-    <div className="space-y-5 pb-10">
+    <div className="space-y-6 pb-10 animate-warp-in">
       {/* Header */}
       <motion.div
         className="flex items-center justify-between"
@@ -85,11 +86,11 @@ export default function ConsignmentsPage() {
         transition={{ duration: 0.35 }}
       >
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Consignments / GRs</h1>
-          <p className="text-sm text-gray-500 mt-0.5">{consignments.length} total records</p>
+          <h1 className="text-2xl font-orbitron font-bold text-white tracking-widest uppercase">CONSIGNMENTS <span className="text-primary-500">/ GRs</span></h1>
+          <p className="text-xs font-orbitron text-slate-400 tracking-[0.2em] uppercase mt-1">Total Records: <span className="text-brand-500">{consignments.length}</span></p>
         </div>
         <Link href="/consignments/new">
-          <button className="flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-semibold text-sm px-4 py-2.5 rounded-xl shadow-sm hover:shadow-md transition-all">
+          <button className="flex items-center gap-2 bg-primary-500/20 hover:bg-primary-500/30 text-primary-500 font-orbitron font-bold text-xs px-5 py-2.5 rounded-xl border border-primary-500/50 shadow-[0_0_15px_rgba(0,255,136,0.3)] hover:shadow-[0_0_25px_rgba(0,255,136,0.5)] transition-all uppercase tracking-wider">
             <Plus className="w-4 h-4" />
             New GR
           </button>
@@ -103,25 +104,26 @@ export default function ConsignmentsPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: 0.08 }}
       >
-        <div className="flex items-center gap-2 bg-white/60 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl px-3 py-2 flex-1 min-w-48 max-w-sm">
-          <Search className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+        <div className="flex items-center gap-2 bg-slate-900/50 border border-slate-700 rounded-xl px-3 py-2 flex-1 min-w-48 max-w-sm focus-within:border-primary-500 focus-within:shadow-[0_0_15px_rgba(0,255,136,0.2)] transition-all">
+          <Search className="w-4 h-4 text-primary-500/70 flex-shrink-0" />
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Search GR No, vehicle, route, contents…"
-            className="flex-1 bg-transparent text-sm outline-none text-gray-900 dark:text-white placeholder:text-gray-400"
+            placeholder="Search GR No, vehicle, route..."
+            className="flex-1 bg-transparent text-sm outline-none text-white placeholder:text-slate-500 font-sans"
           />
         </div>
-        <div className="flex gap-1.5">
+        <div className="flex gap-2 overflow-x-auto pb-1 hide-scrollbar">
           {STATUS_FILTERS.map(s => (
             <button
               key={s}
               onClick={() => setStatusFilter(s)}
-              className={`text-xs px-3 py-1.5 rounded-lg border font-medium transition-all ${
+              className={cn(
+                "text-xs px-4 py-2 rounded-lg font-orbitron tracking-wider uppercase transition-all whitespace-nowrap border",
                 statusFilter === s
-                  ? 'bg-primary-500 text-white border-primary-500 shadow-sm'
-                  : 'bg-white/50 dark:bg-white/5 text-gray-600 dark:text-gray-400 border-black/10 dark:border-white/10 hover:border-primary-300'
-              }`}
+                  ? 'bg-brand-500/20 text-brand-500 border-brand-500/50 shadow-[0_0_15px_rgba(0,212,255,0.3)]'
+                  : 'bg-slate-900/50 text-slate-400 border-slate-700 hover:border-slate-500'
+              )}
             >
               {s}
             </button>
@@ -129,38 +131,44 @@ export default function ConsignmentsPage() {
         </div>
       </motion.div>
 
-      {/* Table */}
+      {/* Table Card */}
       <motion.div
-        className="bg-white/60 dark:bg-white/5 backdrop-blur-sm border border-black/8 dark:border-white/8 rounded-2xl overflow-hidden"
+        className="glass-panel"
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: 0.13 }}
       >
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-500" />
+          <div className="flex flex-col items-center justify-center py-32 space-y-4">
+            <div className="relative w-12 h-12">
+               <div className="absolute inset-0 border-2 border-primary-500/20 rounded-full"></div>
+               <div className="absolute inset-0 border-2 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+            <p className="text-xs font-orbitron tracking-widest text-primary-500 uppercase animate-pulse">Scanning Database...</p>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-gray-400">
-            <Truck className="w-10 h-10 mb-3 opacity-30" />
-            <p className="text-sm">No consignments found</p>
+          <div className="flex flex-col items-center justify-center py-24 text-slate-500">
+            <div className="w-16 h-16 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center mb-4">
+              <Truck className="w-8 h-8 opacity-50" />
+            </div>
+            <p className="text-sm font-orbitron tracking-widest uppercase">No Records Found</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full text-sm">
+            <table className="min-w-full text-sm font-sans">
               <thead>
-                <tr className="border-b border-black/8 dark:border-white/8 bg-gray-50/80 dark:bg-white/3">
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">GR No.</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Date</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Vehicle</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Route</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Contents</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Freight</th>
-                  <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Status</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Actions</th>
+                <tr className="border-b border-slate-800 bg-slate-900/50">
+                  <th className="px-5 py-4 text-left text-[10px] font-orbitron text-slate-400 uppercase tracking-widest">GR No.</th>
+                  <th className="px-5 py-4 text-left text-[10px] font-orbitron text-slate-400 uppercase tracking-widest">Date</th>
+                  <th className="px-5 py-4 text-left text-[10px] font-orbitron text-slate-400 uppercase tracking-widest">Vehicle</th>
+                  <th className="px-5 py-4 text-left text-[10px] font-orbitron text-slate-400 uppercase tracking-widest">Route</th>
+                  <th className="px-5 py-4 text-left text-[10px] font-orbitron text-slate-400 uppercase tracking-widest">Contents</th>
+                  <th className="px-5 py-4 text-right text-[10px] font-orbitron text-slate-400 uppercase tracking-widest">Freight</th>
+                  <th className="px-5 py-4 text-center text-[10px] font-orbitron text-slate-400 uppercase tracking-widest">Status</th>
+                  <th className="px-5 py-4 text-right text-[10px] font-orbitron text-slate-400 uppercase tracking-widest">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-black/5 dark:divide-white/5">
+              <tbody className="divide-y divide-slate-800/50">
                 <AnimatePresence>
                   {filtered.map((c, i) => (
                     <motion.tr
@@ -170,46 +178,46 @@ export default function ConsignmentsPage() {
                       exit={{ opacity: 0 }}
                       transition={{ delay: i * 0.025 }}
                       onClick={() => router.push(`/consignments/${c.id}`)}
-                      className="cursor-pointer hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-colors group"
+                      className="cursor-pointer hover:bg-slate-800/50 transition-colors group"
                     >
-                      <td className="px-4 py-3 font-semibold text-primary-600 dark:text-primary-400 whitespace-nowrap">
-                        {c.grNumber}
+                      <td className="px-5 py-4 whitespace-nowrap">
+                         <span className="font-orbitron font-bold tracking-wider text-primary-500">{c.grNumber}</span>
                       </td>
-                      <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                      <td className="px-5 py-4 text-slate-300 whitespace-nowrap">
                         {formatDate(c.grDate)}
                       </td>
-                      <td className="px-4 py-3 text-gray-900 dark:text-white font-medium whitespace-nowrap">
+                      <td className="px-5 py-4 text-white font-medium whitespace-nowrap">
                         {c.vehicleNumber}
                       </td>
-                      <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">
-                        {c.fromLocation} → {c.toLocation}
+                      <td className="px-5 py-4 text-slate-300 whitespace-nowrap flex items-center gap-2">
+                        {c.fromLocation} <ArrowRight className="w-3 h-3 text-brand-500" /> {c.toLocation}
                       </td>
-                      <td className="px-4 py-3 text-gray-600 dark:text-gray-400 max-w-xs truncate">
+                      <td className="px-5 py-4 text-slate-400 max-w-xs truncate">
                         {c.description || '—'}
                       </td>
-                      <td className="px-4 py-3 text-right font-medium text-gray-900 dark:text-white">
+                      <td className="px-5 py-4 text-right font-medium text-white">
                         {formatCurrency(c.freightAmount)}
                       </td>
-                      <td className="px-4 py-3 text-center">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${statusColor[c.status] || statusColor.Pending}`}>
+                      <td className="px-5 py-4 text-center">
+                        <span className={`inline-flex items-center px-3 py-1 rounded-md text-[10px] font-orbitron font-bold tracking-wider uppercase border ${statusColor[c.status] || statusColor.Pending}`}>
                           {c.status || 'Pending'}
                         </span>
                       </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <td className="px-5 py-4">
+                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={e => { e.stopPropagation(); router.push(`/consignments/${c.id}/edit`); }}
-                            className="p-1.5 text-gray-500 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
+                            className="p-2 text-slate-400 hover:text-brand-500 hover:bg-brand-500/10 hover:shadow-[0_0_10px_rgba(0,212,255,0.2)] rounded-lg transition-all"
                             title="Edit"
                           >
-                            <Edit className="w-3.5 h-3.5" />
+                            <Edit className="w-4 h-4" />
                           </button>
                           <button
                             onClick={e => handleDelete(e, c)}
-                            className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                            className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-500/10 hover:shadow-[0_0_10px_rgba(239,68,68,0.2)] rounded-lg transition-all"
                             title="Delete"
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </td>
@@ -224,3 +232,5 @@ export default function ConsignmentsPage() {
     </div>
   );
 }
+// Add ArrowRight icon import since it's used in the template
+import { ArrowRight } from 'lucide-react';
