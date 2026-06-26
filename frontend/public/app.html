@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Space Grotesk',sans-serif;overflow:hidden;background:#030812}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(0,255,136,0.25);border-radius:2px}
+input::placeholder{color:rgba(226,240,255,0.25)}
+@keyframes neon-pulse{0%,100%{box-shadow:0 0 6px rgba(0,255,136,0.5),0 0 14px rgba(0,255,136,0.15)}50%{box-shadow:0 0 20px rgba(0,255,136,0.9),0 0 50px rgba(0,255,136,0.35)}}
+@keyframes warp-in{from{opacity:0;transform:scale(0.88) translateY(28px);filter:blur(10px)}to{opacity:1;transform:scale(1) translateY(0);filter:blur(0)}}
+@keyframes grid-flow{from{background-position:0 0}to{background-position:50px 50px}}
+@keyframes scan{0%{top:-4px;opacity:0}5%{opacity:1}95%{opacity:0.6}100%{top:100vh;opacity:0}}
+@keyframes fade-slide{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes shimmer{from{background-position:-500px 0}to{background-position:500px 0}}
+@keyframes count{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes border-breathe{0%,100%{opacity:0.25}50%{opacity:0.9}}
+@keyframes hue-spin{from{filter:hue-rotate(0deg)}to{filter:hue-rotate(360deg)}}
+@keyframes rgb-text{0%{color:#00ff88}33%{color:#00d4ff}66%{color:#a855f7}100%{color:#00ff88}}
+@keyframes corner-pulse{0%,100%{opacity:0.4}50%{opacity:1}}
+</style>
+</helmet>
+
+<div style="width:100vw;height:100vh;overflow:hidden;position:relative;background:#030812;color:#e2f0ff;font-family:'Space Grotesk',sans-serif">
+
+  <!-- Animated grid bg -->
+  <div style="position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(0,255,136,0.035) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,0.035) 1px,transparent 1px);background-size:50px 50px;animation:grid-flow 22s linear infinite;z-index:0"></div>
+  <!-- Moving scan line -->
+  <div style="position:absolute;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent 0%,rgba(0,255,136,0.6) 40%,rgba(0,212,255,0.5) 60%,transparent 100%);pointer-events:none;z-index:1;animation:scan 12s linear infinite;box-shadow:0 0 12px rgba(0,255,136,0.4),0 0 30px rgba(0,212,255,0.2)"></div>
+  <!-- Ambient glow blobs -->
+  <div style="position:absolute;top:-120px;left:-80px;width:400px;height:400px;background:radial-gradient(circle,rgba(0,255,136,0.06),transparent 70%);pointer-events:none;z-index:0;animation:float 8s ease-in-out infinite"></div>
+  <div style="position:absolute;bottom:-100px;right:-60px;width:360px;height:360px;background:radial-gradient(circle,rgba(168,85,247,0.05),transparent 70%);pointer-events:none;z-index:0;animation:float 10s ease-in-out infinite 2s"></div>
+
+  <!-- ═══════════ LOGIN ═══════════ -->
+  <sc-if value="{{ showLogin }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;animation:warp-in 0.6s ease-out">
+      <div style="width:420px;background:rgba(4,12,24,0.97);border:1px solid rgba(0,255,136,0.28);border-radius:18px;padding:48px;position:relative;overflow:hidden;box-shadow:0 0 80px rgba(0,255,136,0.06),0 50px 100px rgba(0,0,0,0.6)">
+        <!-- Corner chrome -->
+        <div style="position:absolute;top:0;left:0;width:32px;height:32px;border-top:2px solid #00ff88;border-left:2px solid #00ff88;border-radius:16px 0 0 0;animation:corner-pulse 3s ease-in-out infinite"></div>
+        <div style="position:absolute;top:0;right:0;width:32px;height:32px;border-top:2px solid #00ff88;border-right:2px solid #00ff88;border-radius:0 16px 0 0;animation:corner-pulse 3s ease-in-out infinite 0.75s"></div>
+        <div style="position:absolute;bottom:0;left:0;width:32px;height:32px;border-bottom:2px solid #00ff88;border-left:2px solid #00ff88;border-radius:0 0 0 16px;animation:corner-pulse 3s ease-in-out infinite 1.5s"></div>
+        <div style="position:absolute;bottom:0;right:0;width:32px;height:32px;border-bottom:2px solid #00ff88;border-right:2px solid #00ff88;border-radius:0 0 16px 0;animation:corner-pulse 3s ease-in-out infinite 2.25s"></div>
+        <!-- Top glow bar -->
+        <div style="position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,#00ff88,#00d4ff,transparent);box-shadow:0 0 18px #00ff88,0 0 40px rgba(0,212,255,0.4)"></div>
+        <!-- Animated inner glow -->
+        <div style="position:absolute;top:0;left:0;right:0;height:120px;background:linear-gradient(to bottom,rgba(0,255,136,0.04),transparent);pointer-events:none"></div>
+
+        <!-- Logo block -->
+        <div style="text-align:center;margin-bottom:40px">
+          <div style="display:inline-flex;width:72px;height:72px;border-radius:50%;border:2px solid rgba(0,255,136,0.6);align-items:center;justify-content:center;background:rgba(0,255,136,0.06);animation:neon-pulse 3s ease-in-out infinite;margin-bottom:18px;position:relative">
+            <div style="position:absolute;inset:-4px;border-radius:50%;border:1px solid rgba(0,255,136,0.2);animation:neon-pulse 3s ease-in-out infinite 1.5s"></div>
+            <span style="font-family:'Orbitron',sans-serif;font-weight:900;font-size:20px;color:#00ff88;text-shadow:0 0 16px #00ff88;letter-spacing:1px">RR</span>
+          </div>
+          <div style="font-family:'Orbitron',sans-serif;font-weight:900;font-size:24px;color:#00ff88;letter-spacing:6px;text-shadow:0 0 24px rgba(0,255,136,0.6),0 0 60px rgba(0,255,136,0.2);line-height:1.2">RAGHHAV</div>
+          <div style="font-family:'Orbitron',sans-serif;font-weight:900;font-size:24px;color:#00ff88;letter-spacing:6px;text-shadow:0 0 24px rgba(0,255,136,0.6),0 0 60px rgba(0,255,136,0.2);line-height:1.2">ROADWAYS</div>
+          <div style="font-size:10px;color:rgba(226,240,255,0.28);letter-spacing:4px;text-transform:uppercase;margin-top:10px">Transport Management System</div>
+        </div>
+
+        <!-- Form -->
+        <form onSubmit="{{ handleLogin }}" style="display:flex;flex-direction:column;gap:20px">
+          <div>
+            <label style="display:block;font-size:9px;color:rgba(0,255,136,0.6);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px">Email / Username</label>
+            <input type="text" value="{{ loginUsername }}" onChange="{{ onUserChange }}" required="true" autoFocus="true" style="width:100%;padding:13px 18px;background:rgba(0,255,136,0.04);border:1px solid rgba(0,255,136,0.18);border-radius:8px;color:#e2f0ff;font-size:14px;outline:none;font-family:'Space Grotesk',sans-serif;transition:border-color 0.2s,box-shadow 0.2s;box-sizing:border-box" />
+          </div>
+          <div>
+            <label style="display:block;font-size:9px;color:rgba(0,255,136,0.6);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px">Password</label>
+            <input type="password" value="{{ loginPassword }}" onChange="{{ onPassChange }}" required="true" style="width:100%;padding:13px 18px;background:rgba(0,255,136,0.04);border:1px solid rgba(0,255,136,0.18);border-radius:8px;color:#e2f0ff;font-size:14px;outline:none;font-family:'Space Grotesk',sans-serif;transition:border-color 0.2s,box-shadow 0.2s;box-sizing:border-box" />
+          </div>
+          <sc-if value="{{ loginError }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:10px 14px;background:rgba(248,113,113,0.07);border:1px solid rgba(248,113,113,0.3);border-radius:6px;font-size:12px;color:#f87171;letter-spacing:0.3px">{{ loginError }}</div>
+          </sc-if>
+          <button type="submit" disabled="{{ loginLoading }}" style="padding:15px;background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.5);border-radius:8px;color:#00ff88;font-size:12px;font-weight:700;letter-spacing:4px;text-transform:uppercase;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all 0.2s;text-shadow:0 0 10px rgba(0,255,136,0.5)">{{ loginBtnText }}</button>
+        </form>
+        <div style="text-align:center;margin-top:20px;font-size:10px;color:rgba(226,240,255,0.2);letter-spacing:2px">SECURED WITH JWT ENCRYPTION</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ═══════════ APP SHELL ═══════════ -->
+  <sc-if value="{{ showApp }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;height:100vh;position:relative;z-index:2">
+
+      <!-- ── SIDEBAR ── -->
+      <div onMouseEnter="{{ onSbIn }}" onMouseLeave="{{ onSbOut }}" style="width:{{ sbW }};min-width:{{ sbW }};height:100vh;background:rgba(2,8,16,0.98);border-right:1px solid rgba(0,255,136,0.08);display:flex;flex-direction:column;transition:width 0.3s cubic-bezier(0.4,0,0.2,1),min-width 0.3s cubic-bezier(0.4,0,0.2,1);overflow:hidden;position:relative;flex-shrink:0;z-index:10">
+        <!-- Neon right edge -->
+        <div style="position:absolute;right:0;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,transparent 0%,rgba(0,255,136,0.6) 25%,rgba(0,212,255,0.4) 55%,rgba(168,85,247,0.4) 80%,transparent 100%);animation:border-breathe 4s ease-in-out infinite"></div>
+
+        <!-- Logo -->
+        <div style="height:70px;display:flex;align-items:center;padding:0 13px;border-bottom:1px solid rgba(0,255,136,0.07);gap:12px;flex-shrink:0">
+          <div style="width:40px;height:40px;border-radius:50%;border:2px solid rgba(0,255,136,0.55);display:flex;align-items:center;justify-content:center;flex-shrink:0;animation:neon-pulse 4s ease-in-out infinite;background:rgba(0,255,136,0.05)">
+            <span style="font-family:'Orbitron',sans-serif;font-weight:900;font-size:11px;color:#00ff88;text-shadow:0 0 10px #00ff88;letter-spacing:1px">RR</span>
+          </div>
+          <div style="opacity:{{ sbOp }};max-width:{{ sbMW }};overflow:hidden;transition:opacity 0.25s,max-width 0.3s;white-space:nowrap">
+            <div style="font-family:'Orbitron',sans-serif;font-weight:900;font-size:10px;color:#00ff88;letter-spacing:2px;text-shadow:0 0 10px rgba(0,255,136,0.4);line-height:1.4">RAGHHAV ROADWAYS</div>
+            <div style="font-size:9px;color:rgba(226,240,255,0.22);letter-spacing:2px;text-transform:uppercase">TMS v2.0</div>
+          </div>
+        </div>
+
+        <!-- Nav items -->
+        <nav style="flex:1;overflow-y:auto;overflow-x:hidden;padding:10px 0">
+          <sc-for list="{{ navItems }}" as="nav" hint-placeholder-count="10">
+            <button onClick="{{ nav.onClick }}" style="display:flex;align-items:center;gap:11px;width:100%;padding:{{ sbPad }};justify-content:{{ sbJust }};background:{{ nav.bg }};border:0;border-left:3px solid {{ nav.bl }};cursor:pointer;transition:background 0.15s;min-height:44px;position:relative">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{ nav.stroke }}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;filter:{{ nav.filt }};transition:all 0.2s">
+                <path d="{{ nav.path }}"></path>
+              </svg>
+              <span style="font-size:12px;font-weight:{{ nav.fw }};color:{{ nav.lc }};white-space:nowrap;opacity:{{ sbOp }};max-width:{{ sbMW }};overflow:hidden;transition:opacity 0.25s,max-width 0.3s;letter-spacing:0.3px">{{ nav.label }}</span>
+            </button>
+          </sc-for>
+        </nav>
+
+        <!-- Footer -->
+        <div style="border-top:1px solid rgba(0,255,136,0.07);padding:12px 13px;display:flex;align-items:center;gap:10px;flex-shrink:0">
+          <div style="flex:1;overflow:hidden;opacity:{{ sbOp }};max-width:{{ sbMW }};transition:opacity 0.25s,max-width 0.3s;white-space:nowrap">
+            <p style="font-size:11px;color:rgba(226,240,255,0.45);overflow:hidden;text-overflow:ellipsis">{{ userName }}</p>
+            <p style="font-size:9px;color:rgba(0,255,136,0.45);text-transform:uppercase;letter-spacing:1.5px;margin-top:1px">{{ userRole }}</p>
+          </div>
+          <button onClick="{{ handleLogout }}" title="Logout" style="width:30px;height:30px;border-radius:50%;border:1px solid rgba(248,113,113,0.3);background:rgba(248,113,113,0.06);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all 0.2s">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ── MAIN AREA ── -->
+      <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0">
+
+        <!-- Header -->
+        <div style="height:56px;border-bottom:1px solid rgba(0,255,136,0.1);background:rgba(2,8,16,0.88);backdrop-filter:blur(16px);display:flex;align-items:center;justify-content:space-between;padding:0 28px;flex-shrink:0;position:relative">
+          <div style="position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,255,136,0.3),rgba(0,212,255,0.2),transparent)"></div>
+          <div style="font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;color:rgba(226,240,255,0.9);letter-spacing:4px;text-transform:uppercase">{{ pageTitle }}</div>
+          <div style="display:flex;align-items:center;gap:22px">
+            <div style="text-align:right">
+              <div style="font-family:'Orbitron',sans-serif;font-size:13px;color:#00ff88;letter-spacing:2px;text-shadow:0 0 10px rgba(0,255,136,0.5)">{{ clockTime }}</div>
+              <div style="font-size:10px;color:rgba(226,240,255,0.28);letter-spacing:1px;margin-top:1px">{{ clockDate }}</div>
+            </div>
+            <div style="width:1px;height:30px;background:rgba(0,255,136,0.15)"></div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="text-align:right">
+                <div style="font-size:12px;color:#e2f0ff;font-weight:500">{{ userName }}</div>
+                <div style="font-size:9px;color:rgba(0,255,136,0.5);text-transform:uppercase;letter-spacing:1.5px;margin-top:1px">{{ userRole }}</div>
+              </div>
+              <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,rgba(0,255,136,0.3),rgba(0,212,255,0.2));border:1px solid rgba(0,255,136,0.45);display:flex;align-items:center;justify-content:center;animation:neon-pulse 5s ease-in-out infinite;flex-shrink:0">
+                <span style="font-size:14px;font-weight:700;color:#00ff88">{{ userInitial }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Page content -->
+        <div key="{{ page }}" style="flex:1;overflow-y:auto;padding:28px;animation:warp-in 0.35s ease-out">
+          {{ pageContent }}
+        </div>
+
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    page: 'dashboard', sbExpanded: false,
+    user: null, token: null,
+    loginUsername: '', loginPassword: '', loginLoading: false, loginError: '',
+    time: new Date(),
+    dashboardData: null,
+    consignments: [], invoices: [], payments: [], vehicles: [], parties: [],
+    search: '', statusFilter: 'All', pageLoading: false,
+  };
+
+  BASE = 'https://raghhav-roadways.onrender.com/api/v1';
+
+  componentDidMount() {
+    const t = localStorage.getItem('rr_token'), u = localStorage.getItem('rr_user');
+    if (t && u) {
+      try { this.setState({ token: t, user: JSON.parse(u) }, () => this.loadPage('dashboard')); }
+      catch(e) { localStorage.removeItem('rr_token'); localStorage.removeItem('rr_user'); }
+    }
+    this._clk = setInterval(() => this.setState({ time: new Date() }), 1000);
+  }
+  componentWillUnmount() { clearInterval(this._clk); }
+
+  api = async (path, opts = {}) => {
+    const r = await fetch(this.BASE + path, {
+      ...opts,
+      headers: { 'Content-Type': 'application/json', ...(this.state.token ? { Authorization: `Bearer ${this.state.token}` } : {}), ...(opts.headers || {}) },
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.message || d.error?.message || 'Request failed');
+    return d;
+  };
+
+  handleLogin = async (e) => {
+    e.preventDefault();
+    const { loginUsername: username, loginPassword: password } = this.state;
+    this.setState({ loginLoading: true, loginError: '' });
+    try {
+      const data = await this.api('/auth/login', { method: 'POST', body: JSON.stringify({ username, password }) });
+      const { user, accessToken } = data.data;
+      localStorage.setItem('rr_token', accessToken);
+      localStorage.setItem('rr_user', JSON.stringify(user));
+      this.setState({ token: accessToken, user, page: 'dashboard' }, () => this.loadPage('dashboard'));
+    } catch(err) { this.setState({ loginError: err.message }); }
+    finally { this.setState({ loginLoading: false }); }
+  };
+
+  handleLogout = () => {
+    localStorage.removeItem('rr_token'); localStorage.removeItem('rr_user');
+    this.setState({ token: null, user: null, page: 'dashboard', dashboardData: null });
+  };
+
+  navigate = (page) => { this.setState({ page, search: '', statusFilter: 'All' }, () => this.loadPage(page)); };
+
+  loadPage = async (page) => {
+    if (!this.state.token) return;
+    this.setState({ pageLoading: true });
+    try {
+      const LOADERS = {
+        dashboard: async () => { const r = await this.api('/reports/dashboard'); this.setState({ dashboardData: r.data || r }); },
+        consignments: async () => { const r = await this.api('/consignments?limit=200'); this.setState({ consignments: r.data?.consignments || [] }); },
+        invoices: async () => { const r = await this.api('/invoices?limit=200'); this.setState({ invoices: r.data?.invoices || [] }); },
+        payments: async () => { const r = await this.api('/payments?limit=100'); this.setState({ payments: r.data?.payments || [] }); },
+        vehicles: async () => { const r = await this.api('/vehicles?limit=100'); this.setState({ vehicles: r.data?.vehicles || [] }); },
+        parties: async () => { const r = await this.api('/parties?limit=200'); this.setState({ parties: r.data?.parties || [] }); },
+      };
+      if (LOADERS[page]) await LOADERS[page]();
+    } catch(err) { console.error('Page load error:', err); }
+    finally { this.setState({ pageLoading: false }); }
+  };
+
+  fmt = (n) => n != null ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(n) : '—';
+  fmtD = (d) => d ? new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' }) : '—';
+
+  // ── UI HELPERS ──────────────────────────────────────────────
+
+  hdr(title, sub, color, action) {
+    const h = React.createElement;
+    return h('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between' } },
+      h('div', { style: { display: 'flex', alignItems: 'center', gap: 14 } },
+        h('div', { style: { width: 4, height: 30, background: color, borderRadius: 2, boxShadow: `0 0 12px ${color},0 0 30px ${color}60` } }),
+        h('div', null,
+          h('h1', { style: { fontFamily: "'Orbitron',sans-serif", fontSize: 19, fontWeight: 700, color, letterSpacing: 3, textShadow: `0 0 20px ${color}60` } }, title),
+          sub && h('p', { style: { fontSize: 11, color: 'rgba(226,240,255,0.3)', marginTop: 3, letterSpacing: 0.5 } }, sub)
+        )
+      ),
+      action && h('button', {
+        style: { padding: '10px 20px', background: 'transparent', border: `1px solid ${color}80`, borderRadius: 8, color, fontSize: 11, fontWeight: 700, letterSpacing: 2.5, cursor: 'pointer', textShadow: `0 0 8px ${color}60`, transition: 'all 0.2s', fontFamily: "'Space Grotesk',sans-serif", textTransform: 'uppercase' },
+        onMouseEnter: e => { e.target.style.background = `${color}18`; e.target.style.boxShadow = `0 0 20px ${color}30`; },
+        onMouseLeave: e => { e.target.style.background = 'transparent'; e.target.style.boxShadow = 'none'; }
+      }, action)
+    );
+  }
+
+  badge(status, map) {
+    const h = React.createElement;
+    const e = map[status] || { c: '#64748b', r: '100,116,139' };
+    return h('span', { style: { display: 'inline-block', padding: '3px 11px', borderRadius: 4, fontSize: 10, fontWeight: 700, letterSpacing: 0.8, color: e.c, background: `rgba(${e.r},0.1)`, border: `1px solid rgba(${e.r},0.4)`, textShadow: `0 0 8px ${e.c}70`, textTransform: 'uppercase' } }, status || '—');
+  }
+
+  srch(val, onChange, ph, rgb) {
+    const h = React.createElement;
+    return h('div', { style: { display: 'flex', alignItems: 'center', gap: 10, background: 'rgba(4,12,24,0.95)', border: `1px solid rgba(${rgb},0.2)`, borderRadius: 8, padding: '9px 16px', maxWidth: 360 } },
+      h('span', { style: { color: 'rgba(226,240,255,0.25)', fontSize: 18, lineHeight: 1 } }, '⌕'),
+      h('input', { value: val, onChange, placeholder: ph, style: { background: 'none', border: 'none', outline: 'none', color: '#e2f0ff', fontSize: 13, flex: 1, fontFamily: "'Space Grotesk',sans-serif" } })
+    );
+  }
+
+  chips(opts, cur, onChg, rgb) {
+    const h = React.createElement;
+    return h('div', { style: { display: 'flex', gap: 6, flexWrap: 'wrap' } },
+      ...opts.map(o => {
+        const sel = cur === o;
+        return h('button', { key: o, onClick: () => onChg(o), style: { padding: '6px 14px', borderRadius: 6, fontSize: 11, fontWeight: sel ? 700 : 400, letterSpacing: 0.8, cursor: 'pointer', transition: 'all 0.15s', background: sel ? `rgba(${rgb},0.15)` : 'transparent', border: `1px solid rgba(${rgb},${sel ? 0.7 : 0.15})`, color: sel ? `rgb(${rgb})` : 'rgba(226,240,255,0.35)', textShadow: sel ? `0 0 8px rgba(${rgb},0.6)` : 'none', textTransform: 'uppercase' } }, o);
+      })
+    );
+  }
+
+  tbl(heads, rows, loading, rgb) {
+    const h = React.createElement;
+    return h('div', { style: { background: 'rgba(4,12,24,0.95)', border: `1px solid rgba(${rgb},0.15)`, borderRadius: 14, overflow: 'hidden' } },
+      h('table', { style: { width: '100%', borderCollapse: 'collapse' } },
+        h('thead', null,
+          h('tr', { style: { borderBottom: `1px solid rgba(${rgb},0.14)`, background: `rgba(${rgb},0.04)` } },
+            ...heads.map((hd, i) => h('th', { key: i, style: { padding: '12px 16px', textAlign: hd.r ? 'right' : 'left', fontSize: 9, fontWeight: 700, color: `rgba(${rgb},0.6)`, letterSpacing: 2.5, textTransform: 'uppercase' } }, hd.l))
+          )
+        ),
+        h('tbody', null,
+          loading
+            ? h('tr', null, h('td', { colSpan: heads.length, style: { textAlign: 'center', padding: 60, color: `rgba(${rgb},0.4)`, fontFamily: "'Orbitron',sans-serif", fontSize: 11, letterSpacing: 4 } }, 'SCANNING DATA...'))
+            : rows.length === 0
+              ? h('tr', null, h('td', { colSpan: heads.length, style: { textAlign: 'center', padding: 60, color: 'rgba(226,240,255,0.12)', fontSize: 12, letterSpacing: 1 } }, 'NO RECORDS FOUND'))
+              : rows.map((row, i) =>
+                  h('tr', { key: row.k || i, style: { borderBottom: `1px solid rgba(${rgb},0.06)`, cursor: 'pointer', transition: 'background 0.1s', animation: `fade-slide 0.2s ease-out ${Math.min(i, 15) * 0.025}s both` },
+                    onMouseEnter: e => e.currentTarget.style.background = `rgba(${rgb},0.05)`,
+                    onMouseLeave: e => e.currentTarget.style.background = 'transparent' },
+                    ...row.cells.map((cell, ci) => h('td', { key: ci, style: { padding: '12px 16px', ...cell.s } }, cell.v))
+                  )
+                )
+        )
+      )
+    );
+  }
+
+  // ── DASHBOARD ───────────────────────────────────────────────
+
+  renderDashboard() {
+    const h = React.createElement, { dashboardData: d, pageLoading } = this.state;
+    const k = d?.kpis || {};
+    const kd = [
+      { l: 'Total Revenue', v: this.fmt(k.totalRevenue), c: '#00ff88', r: '0,255,136' },
+      { l: 'Active Vehicles', v: k.activeVehicles ?? 0, c: '#00d4ff', r: '0,212,255' },
+      { l: 'Pending Deliveries', v: k.pendingDeliveries ?? 0, c: '#a855f7', r: '168,85,247' },
+      { l: 'Pending Invoices', v: k.pendingInvoices ?? 0, c: '#f59e0b', r: '245,158,11' },
+      { l: 'On-Time Delivery', v: `${Number(k.onTimeDelivery ?? 0).toFixed(1)}%`, c: '#00ff88', r: '0,255,136' },
+      { l: 'Total Parties', v: k.totalParties ?? 0, c: '#00d4ff', r: '0,212,255' },
+      { l: 'Completed Orders', v: k.completedOrders ?? 0, c: '#a855f7', r: '168,85,247' },
+      { l: 'System Alerts', v: k.totalAlerts ?? 0, c: '#f87171', r: '248,113,113' },
+    ];
+
+    if (pageLoading) return h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14 } },
+      ...Array.from({ length: 8 }).map((_, i) => h('div', { key: i, style: { height: 108, background: 'rgba(0,255,136,0.03)', border: '1px solid rgba(0,255,136,0.08)', borderRadius: 12, backgroundImage: 'linear-gradient(90deg,transparent,rgba(0,255,136,0.06),transparent)', backgroundSize: '500px 100%', animation: 'shimmer 1.5s ease-in-out infinite' } }))
+    );
+
+    const pts = d?.charts?.revenueTrend || [];
+    const W = 370, H = 108, maxV = Math.max(...pts.map(p => Number(p.revenue || 0)), 1);
+    const coords = pts.map((p, i) => [Math.round((i / Math.max(pts.length - 1, 1)) * W), Math.round(H - (Number(p.revenue || 0) / maxV) * H)]);
+    const lp = coords.length > 1 ? `M ${coords.map(c => c.join(',')).join(' L ')}` : '';
+    const ap = lp ? `${lp} L ${W},${H} L 0,${H} Z` : '';
+
+    const alerts = [
+      ...(d?.alerts?.overdueInvoices || []).map(x => ({ msg: `Invoice ${x.invoiceNumber} overdue ${x.overdueDays}d`, c: '#f87171', r: '248,113,113' })),
+      ...(d?.alerts?.expiringDocuments || []).map(x => ({ msg: `${x.documentType} expiring: ${x.vehicleNo}`, c: '#f59e0b', r: '245,158,11' })),
+    ].slice(0, 6);
+
+    const acts = d?.recentActivity || [];
+    const TC = { create: '#00ff88', update: '#f59e0b', delete: '#f87171' };
+
+    return h('div', { style: { display: 'flex', flexDirection: 'column', gap: 24 } },
+      h('div', { style: { display: 'flex', alignItems: 'center', gap: 14 } },
+        h('div', { style: { width: 4, height: 30, background: '#00ff88', borderRadius: 2, boxShadow: '0 0 12px #00ff88,0 0 30px rgba(0,255,136,0.4)' } }),
+        h('h1', { style: { fontFamily: "'Orbitron',sans-serif", fontSize: 21, fontWeight: 700, color: '#00ff88', letterSpacing: 4, textShadow: '0 0 24px rgba(0,255,136,0.5)' } }, 'COMMAND CENTER'),
+        h('span', { style: { fontSize: 11, color: 'rgba(226,240,255,0.2)', letterSpacing: 3 } }, '—  LIVE OVERVIEW')
+      ),
+      h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14 } },
+        ...kd.map((kk, i) =>
+          h('div', { key: i, style: { background: 'linear-gradient(135deg,rgba(8,18,36,0.9),rgba(4,12,24,0.95))', border: `1px solid rgba(${kk.r},0.2)`, borderRadius: 14, padding: '20px 22px', position: 'relative', overflow: 'hidden', animation: `warp-in 0.45s ease-out ${i * 0.07}s both` } },
+            h('div', { style: { position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: kk.c, boxShadow: `0 0 10px ${kk.c},0 0 25px ${kk.c}60` } }),
+            h('div', { style: { position: 'absolute', top: -20, right: -20, width: 90, height: 90, background: kk.c, opacity: 0.04, borderRadius: '50%', filter: 'blur(20px)' } }),
+            h('p', { style: { fontSize: 28, fontWeight: 700, color: kk.c, fontFamily: "'Orbitron',sans-serif", letterSpacing: 1, textShadow: `0 0 14px ${kk.c}60`, animation: 'count 0.6s ease-out both' } }, String(kk.v)),
+            h('p', { style: { fontSize: 10, color: 'rgba(226,240,255,0.38)', textTransform: 'uppercase', letterSpacing: 1.5, marginTop: 8 } }, kk.l)
+          )
+        )
+      ),
+      h('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 } },
+        h('div', { style: { background: 'rgba(4,12,24,0.95)', border: '1px solid rgba(0,255,136,0.14)', borderRadius: 14, padding: '22px' } },
+          h('p', { style: { fontSize: 10, color: '#00ff88', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 18, fontWeight: 700 } }, '⟡  Revenue Trend'),
+          pts.length < 2
+            ? h('div', { style: { textAlign: 'center', padding: '36px 0', color: 'rgba(226,240,255,0.12)', fontSize: 12, letterSpacing: 2 } }, 'NO CHART DATA')
+            : h('svg', { viewBox: `0 0 ${W} ${H + 10}`, width: '100%', height: '136' },
+                h('defs', null,
+                  h('linearGradient', { id: 'rgg', x1: '0', y1: '0', x2: '0', y2: '1' },
+                    h('stop', { offset: '0%', stopColor: '#00ff88', stopOpacity: '0.3' }),
+                    h('stop', { offset: '100%', stopColor: '#00ff88', stopOpacity: '0' })
+                  )
+                ),
+                h('path', { d: ap, fill: 'url(#rgg)' }),
+                h('path', { d: lp, fill: 'none', stroke: '#00ff88', strokeWidth: '2.5', style: { filter: 'drop-shadow(0 0 5px #00ff88)' } }),
+                ...coords.map((c, i) => h('circle', { key: i, cx: c[0], cy: c[1], r: '3.5', fill: '#00ff88', style: { filter: 'drop-shadow(0 0 5px #00ff88)' } }))
+              )
+        ),
+        h('div', { style: { background: 'rgba(4,12,24,0.95)', border: '1px solid rgba(0,212,255,0.14)', borderRadius: 14, padding: '22px', overflow: 'hidden' } },
+          h('p', { style: { fontSize: 10, color: '#00d4ff', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 16, fontWeight: 700 } }, '◈  Activity Stream'),
+          acts.length === 0
+            ? h('div', { style: { textAlign: 'center', padding: '36px 0', color: 'rgba(226,240,255,0.12)', fontSize: 12, letterSpacing: 2 } }, 'NO ACTIVITY YET')
+            : h('div', { style: { display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 190, overflowY: 'auto' } },
+                ...acts.slice(0, 8).map((a, i) =>
+                  h('div', { key: i, style: { display: 'flex', gap: 12, padding: '8px 12px', background: 'rgba(0,0,0,0.25)', borderRadius: 7, borderLeft: `2px solid ${TC[a.type] || '#00ff88'}`, animation: `fade-slide 0.3s ease-out ${i * 0.04}s both` } },
+                    h('div', { style: { width: 5, height: 5, borderRadius: '50%', background: TC[a.type] || '#00ff88', marginTop: 5, flexShrink: 0 } }),
+                    h('div', null,
+                      h('p', { style: { fontSize: 12, color: 'rgba(226,240,255,0.78)', lineHeight: 1.4 } }, a.description),
+                      h('p', { style: { fontSize: 10, color: 'rgba(226,240,255,0.28)', marginTop: 2 } }, `${a.user || ''} · ${a.timestamp ? new Date(a.timestamp).toLocaleTimeString() : ''}`)
+                    )
+                  )
+                )
+              )
+        )
+      ),
+      alerts.length > 0 && h('div', { style: { background: 'rgba(4,12,24,0.95)', border: '1px solid rgba(248,113,113,0.18)', borderRadius: 14, padding: '22px' } },
+        h('p', { style: { fontSize: 10, color: '#f87171', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 16, fontWeight: 700 } }, '⚠  Active Alerts'),
+        h('div', { style: { display: 'flex', flexWrap: 'wrap', gap: 10 } },
+          ...alerts.map((a, i) =>
+            h('div', { key: i, style: { display: 'flex', alignItems: 'center', gap: 10, padding: '8px 14px', background: `rgba(${a.r},0.07)`, border: `1px solid rgba(${a.r},0.28)`, borderRadius: 8 } },
+              h('div', { style: { width: 6, height: 6, borderRadius: '50%', background: a.c, boxShadow: `0 0 8px ${a.c}`, flexShrink: 0 } }),
+              h('span', { style: { fontSize: 12, color: 'rgba(226,240,255,0.7)' } }, a.msg)
+            )
+          )
+        )
+      )
+    );
+  }
+
+  // ── CONSIGNMENTS ─────────────────────────────────────────────
+
+  renderConsignments() {
+    const h = React.createElement, { consignments, search, statusFilter, pageLoading } = this.state;
+    const RGB = '0,212,255', C = '#00d4ff';
+    const SM = { Delivered: { c: '#00ff88', r: '0,255,136' }, 'In Transit': { c: '#00d4ff', r: '0,212,255' }, Pending: { c: '#f59e0b', r: '245,158,11' }, Cancelled: { c: '#f87171', r: '248,113,113' } };
+    const filt = consignments.filter(x => {
+      if (statusFilter !== 'All' && x.status !== statusFilter) return false;
+      if (!search) return true;
+      const q = search.toLowerCase();
+      return x.grNumber?.toLowerCase().includes(q) || x.vehicleNumber?.toLowerCase().includes(q) || x.fromLocation?.toLowerCase().includes(q) || x.toLocation?.toLowerCase().includes(q);
+    });
+    const rows = filt.slice(0, 80).map(x => ({ k: x.id, cells: [
+      { v: h('span', { style: { fontFamily: "'Orbitron',sans-serif", fontSize: 12, color: C, fontWeight: 700 } }, x.grNumber), s: {} },
+      { v: this.fmtD(x.grDate), s: { color: 'rgba(226,240,255,0.45)', fontSize: 12 } },
+      { v: x.vehicleNumber || '—', s: { color: '#e2f0ff', fontWeight: 500 } },
+      { v: `${x.fromLocation || '—'} → ${x.toLocation || '—'}`, s: { color: 'rgba(226,240,255,0.5)', fontSize: 12 } },
+      { v: this.fmt(x.freightAmount), s: { textAlign: 'right', fontWeight: 600, color: '#e2f0ff' } },
+      { v: this.badge(x.status || 'Pending', SM), s: {} },
+    ] }));
+    return h('div', { style: { display: 'flex', flexDirection: 'column', gap: 20 } },
+      this.hdr('LOGISTICS GRID', `${consignments.length} consignment records`, C, '+ New GR'),
+      h('div', { style: { display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' } },
+        this.srch(search, e => this.setState({ search: e.target.value }), 'Search GR no, vehicle, route…', RGB),
+        this.chips(['All','Pending','In Transit','Delivered','Cancelled'], statusFilter, v => this.setState({ statusFilter: v }), RGB)
+      ),
+      this.tbl([{ l: 'GR No.' }, { l: 'Date' }, { l: 'Vehicle' }, { l: 'Route' }, { l: 'Freight', r: true }, { l: 'Status' }], rows, pageLoading, RGB)
+    );
+  }
+
+  // ── INVOICES ─────────────────────────────────────────────────
+
+  renderInvoices() {
+    const h = React.createElement, { invoices, search, statusFilter, pageLoading } = this.state;
+    const RGB = '0,255,136', C = '#00ff88';
+    const SM = { Paid: { c: '#00ff88', r: '0,255,136' }, Partial: { c: '#f59e0b', r: '245,158,11' }, Pending: { c: '#f87171', r: '248,113,113' }, Overdue: { c: '#f87171', r: '248,113,113' } };
+    const total = invoices.reduce((s, i) => s + Number(i.totalAmount || 0), 0);
+    const paid = invoices.reduce((s, i) => s + Number(i.paidAmount || 0), 0);
+    const bal = invoices.reduce((s, i) => s + Number(i.balanceAmount || 0), 0);
+    const filt = invoices.filter(x => {
+      if (statusFilter !== 'All' && x.paymentStatus !== statusFilter) return false;
+      if (!search) return true;
+      const q = search.toLowerCase();
+      return x.invoiceNumber?.toLowerCase().includes(q) || x.partyName?.toLowerCase().includes(q);
+    });
+    const rows = filt.slice(0, 80).map(x => ({ k: x.id, cells: [
+      { v: h('span', { style: { fontFamily: "'Orbitron',sans-serif", fontSize: 12, color: C, fontWeight: 700 } }, x.invoiceNumber), s: {} },
+      { v: this.fmtD(x.invoiceDate), s: { color: 'rgba(226,240,255,0.45)', fontSize: 12 } },
+      { v: x.partyName || '—', s: { color: '#e2f0ff', fontWeight: 500 } },
+      { v: this.fmt(x.totalAmount), s: { textAlign: 'right', fontWeight: 600, color: '#e2f0ff' } },
+      { v: this.fmt(x.balanceAmount), s: { textAlign: 'right', fontWeight: 600, color: Number(x.balanceAmount) > 0 ? '#f87171' : '#00ff88' } },
+      { v: this.badge(x.paymentStatus || 'Pending', SM), s: {} },
+    ] }));
+    return h('div', { style: { display: 'flex', flexDirection: 'column', gap: 20 } },
+      this.hdr('INVOICE LEDGER', `${invoices.length} bills`, C, '+ New Bill'),
+      h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14 } },
+        ...[{ l: 'Total Billed', v: this.fmt(total), c: '#e2f0ff', r: '226,240,255' }, { l: 'Collected', v: this.fmt(paid), c: '#00ff88', r: '0,255,136' }, { l: 'Outstanding', v: this.fmt(bal), c: '#f87171', r: '248,113,113' }].map((s, i) =>
+          h('div', { key: i, style: { background: 'rgba(4,12,24,0.95)', border: `1px solid rgba(${s.r},0.12)`, borderRadius: 12, padding: '16px 22px' } },
+            h('p', { style: { fontSize: 10, color: 'rgba(226,240,255,0.32)', textTransform: 'uppercase', letterSpacing: 2 } }, s.l),
+            h('p', { style: { fontSize: 22, fontWeight: 700, color: s.c, fontFamily: "'Orbitron',sans-serif", marginTop: 6, textShadow: `0 0 12px ${s.c}40` } }, s.v)
+          )
+        )
+      ),
+      h('div', { style: { display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' } },
+        this.srch(search, e => this.setState({ search: e.target.value }), 'Search bill no, party…', RGB),
+        this.chips(['All','Pending','Partial','Paid'], statusFilter, v => this.setState({ statusFilter: v }), RGB)
+      ),
+      this.tbl([{ l: 'Bill No.' }, { l: 'Date' }, { l: 'Party' }, { l: 'Total', r: true }, { l: 'Balance', r: true }, { l: 'Status' }], rows, pageLoading, RGB)
+    );
+  }
+
+  // ── PAYMENTS ─────────────────────────────────────────────────
+
+  renderPayments() {
+    const h = React.createElement, { payments, search, statusFilter, pageLoading } = this.state;
+    const RGB = '168,85,247', C = '#a855f7';
+    const SM = { Completed: { c: '#00ff88', r: '0,255,136' }, Partial: { c: '#00d4ff', r: '0,212,255' }, Pending: { c: '#f59e0b', r: '245,158,11' } };
+    const filt = payments.filter(x => {
+      if (statusFilter !== 'All' && x.paymentStatus !== statusFilter) return false;
+      if (!search) return true;
+      const q = search.toLowerCase();
+      return x.paymentNumber?.toLowerCase().includes(q) || x.partyName?.toLowerCase().includes(q);
+    });
+    const rows = filt.slice(0, 80).map(x => ({ k: x.id, cells: [
+      { v: h('span', { style: { fontFamily: "'Orbitron',sans-serif", fontSize: 12, color: C, fontWeight: 700 } }, x.paymentNumber), s: {} },
+      { v: this.fmtD(x.paymentDate), s: { color: 'rgba(226,240,255,0.45)', fontSize: 12 } },
+      { v: x.partyName || '—', s: { color: '#e2f0ff', fontWeight: 500 } },
+      { v: this.fmt(x.paidAmount), s: { textAlign: 'right', fontWeight: 600, color: '#00ff88' } },
+      { v: this.fmt(x.balanceAmount), s: { textAlign: 'right', fontWeight: 600, color: Number(x.balanceAmount) > 0 ? '#f87171' : '#00ff88' } },
+      { v: this.badge(x.paymentStatus || 'Pending', SM), s: {} },
+    ] }));
+    return h('div', { style: { display: 'flex', flexDirection: 'column', gap: 20 } },
+      this.hdr('PAYMENT TRACKER', `${payments.length} payment records`, C, '+ Record Payment'),
+      h('div', { style: { display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' } },
+        this.srch(search, e => this.setState({ search: e.target.value }), 'Search payment no, party…', RGB),
+        this.chips(['All','Pending','Partial','Completed'], statusFilter, v => this.setState({ statusFilter: v }), RGB)
+      ),
+      this.tbl([{ l: 'Payment No.' }, { l: 'Date' }, { l: 'Party' }, { l: 'Paid', r: true }, { l: 'Balance', r: true }, { l: 'Status' }], rows, pageLoading, RGB)
+    );
+  }
+
+  // ── VEHICLES ─────────────────────────────────────────────────
+
+  renderVehicles() {
+    const h = React.createElement, { vehicles, search, pageLoading } = this.state;
+    const RGB = '245,158,11', C = '#f59e0b';
+    const filt = vehicles.filter(x => !search || x.vehicleNo?.toLowerCase().includes(search.toLowerCase()) || x.ownerName?.toLowerCase().includes(search.toLowerCase()));
+    if (pageLoading) return h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(270px,1fr))', gap: 14 } },
+      ...Array.from({ length: 8 }).map((_, i) => h('div', { key: i, style: { height: 150, background: 'rgba(4,12,24,0.95)', border: '1px solid rgba(245,158,11,0.1)', borderRadius: 12, backgroundImage: 'linear-gradient(90deg,transparent,rgba(245,158,11,0.05),transparent)', backgroundSize: '500px 100%', animation: 'shimmer 1.5s ease-in-out infinite' } }))
+    );
+    return h('div', { style: { display: 'flex', flexDirection: 'column', gap: 20 } },
+      this.hdr('FLEET REGISTRY', `${vehicles.length} vehicles`, C, '+ Add Vehicle'),
+      this.srch(search, e => this.setState({ search: e.target.value }), 'Search vehicle no, owner…', RGB),
+      h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(270px,1fr))', gap: 14 } },
+        ...filt.map((v, i) =>
+          h('div', { key: v.id, style: { background: 'rgba(4,12,24,0.95)', border: `1px solid rgba(${v.isActive ? RGB : '100,116,139'},0.28)`, borderRadius: 14, padding: '20px 22px', position: 'relative', overflow: 'hidden', animation: `warp-in 0.4s ease-out ${Math.min(i, 12) * 0.05}s both`, transition: 'border-color 0.2s' },
+            onMouseEnter: e => e.currentTarget.style.borderColor = `rgba(${v.isActive ? RGB : '100,116,139'},0.6)`,
+            onMouseLeave: e => e.currentTarget.style.borderColor = `rgba(${v.isActive ? RGB : '100,116,139'},0.28)` },
+            h('div', { style: { position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: v.isActive ? C : '#475569', boxShadow: v.isActive ? `0 0 10px ${C}` : 'none' } }),
+            h('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 } },
+              h('span', { style: { fontFamily: "'Orbitron',sans-serif", fontSize: 15, fontWeight: 700, color: v.isActive ? C : '#64748b', letterSpacing: 2, textShadow: v.isActive ? `0 0 12px ${C}60` : 'none' } }, v.vehicleNo),
+              h('span', { style: { padding: '3px 11px', borderRadius: 4, fontSize: 9, fontWeight: 700, letterSpacing: 1, color: v.isActive ? '#00ff88' : '#64748b', background: v.isActive ? 'rgba(0,255,136,0.1)' : 'rgba(100,116,139,0.1)', border: `1px solid ${v.isActive ? 'rgba(0,255,136,0.4)' : 'rgba(100,116,139,0.3)'}`, textTransform: 'uppercase' } }, v.isActive ? 'Active' : 'Inactive')
+            ),
+            h('div', { style: { display: 'flex', flexDirection: 'column', gap: 7 } },
+              ...[ ['Type', v.vehicleType], ['Owner', v.ownerName], ['Driver', v.driverName], ['Owner Type', v.ownerType] ].map(([lbl, val]) =>
+                h('div', { key: lbl, style: { display: 'flex', justifyContent: 'space-between', fontSize: 12 } },
+                  h('span', { style: { color: 'rgba(226,240,255,0.3)' } }, lbl),
+                  h('span', { style: { color: '#e2f0ff' } }, val || '—')
+                )
+              )
+            )
+          )
+        )
+      )
+    );
+  }
+
+  // ── PARTIES ──────────────────────────────────────────────────
+
+  renderParties() {
+    const h = React.createElement, { parties, search, statusFilter, pageLoading } = this.state;
+    const RGB = '0,212,255', C = '#00d4ff';
+    const filt = parties.filter(x => {
+      if (statusFilter !== 'All' && x.partyType !== statusFilter) return false;
+      if (!search) return true;
+      const q = search.toLowerCase();
+      return x.name?.toLowerCase().includes(q) || x.city?.toLowerCase().includes(q) || x.phone?.toLowerCase().includes(q);
+    });
+    const rows = filt.slice(0, 80).map(x => ({ k: x.id, cells: [
+      { v: h('span', { style: { fontFamily: "'Orbitron',sans-serif", fontSize: 12, color: C, fontWeight: 700 } }, x.name), s: {} },
+      { v: x.partyType || '—', s: { color: 'rgba(226,240,255,0.55)', fontSize: 12, textTransform: 'capitalize' } },
+      { v: x.phone || '—', s: { color: '#e2f0ff' } },
+      { v: x.city || '—', s: { color: 'rgba(226,240,255,0.55)' } },
+      { v: x.state || '—', s: { color: 'rgba(226,240,255,0.55)' } },
+    ] }));
+    return h('div', { style: { display: 'flex', flexDirection: 'column', gap: 20 } },
+      this.hdr('PARTY DIRECTORY', `${parties.length} records`, C, '+ Add Party'),
+      h('div', { style: { display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' } },
+        this.srch(search, e => this.setState({ search: e.target.value }), 'Search name, city, phone…', RGB),
+        this.chips(['All','Consignor','Consignee','Both'], statusFilter, v => this.setState({ statusFilter: v }), RGB)
+      ),
+      this.tbl([{ l: 'Name' }, { l: 'Type' }, { l: 'Phone' }, { l: 'City' }, { l: 'State' }], rows, pageLoading, RGB)
+    );
+  }
+
+  // ── PLACEHOLDER ──────────────────────────────────────────────
+
+  renderPlaceholder(title, color) {
+    const h = React.createElement;
+    return h('div', { style: { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '62vh', gap: 22 } },
+      h('div', { style: { fontFamily: "'Orbitron',sans-serif", fontSize: 34, fontWeight: 900, color, textShadow: `0 0 40px ${color}70`, letterSpacing: 5, animation: 'float 3.5s ease-in-out infinite', textAlign: 'center' } }, title),
+      h('div', { style: { display: 'flex', gap: 8 } },
+        ...[0,1,2].map(i => h('div', { key: i, style: { width: 8, height: 8, borderRadius: '50%', background: color, boxShadow: `0 0 12px ${color}`, opacity: 0.6, animation: `count 1s ease-in-out infinite ${i * 0.2}s alternate` } }))
+      ),
+      h('div', { style: { fontSize: 11, color: 'rgba(226,240,255,0.2)', letterSpacing: 4, textTransform: 'uppercase' } }, 'Module loading soon')
+    );
+  }
+
+  // ── RENDER VALS ──────────────────────────────────────────────
+
+  renderVals() {
+    const { page, user, token, sbExpanded, time, loginUsername, loginPassword, loginLoading, loginError } = this.state;
+
+    const NAVDEFS = [
+      { label: 'Dashboard', page: 'dashboard', c: '#00ff88', r: '0,255,136', path: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
+      { label: 'Consignments', page: 'consignments', c: '#00d4ff', r: '0,212,255', path: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
+      { label: 'Invoices', page: 'invoices', c: '#00ff88', r: '0,255,136', path: 'M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z' },
+      { label: 'Payments', page: 'payments', c: '#a855f7', r: '168,85,247', path: 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z' },
+      { label: 'Parties', page: 'parties', c: '#00d4ff', r: '0,212,255', path: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z' },
+      { label: 'Vehicles', page: 'vehicles', c: '#f59e0b', r: '245,158,11', path: 'M8 17a2 2 0 104 0m0 0a2 2 0 104 0M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4z' },
+      { label: 'Masters', page: 'masters', c: '#64748b', r: '100,116,139', path: 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4' },
+      { label: 'Analytics', page: 'analytics', c: '#00d4ff', r: '0,212,255', path: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
+      { label: 'Reports', page: 'reports', c: '#00ff88', r: '0,255,136', path: 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
+      { label: 'Settings', page: 'settings', c: '#64748b', r: '100,116,139', path: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z' },
+    ];
+
+    const navItems = NAVDEFS.map(d => {
+      const on = page === d.page;
+      return { ...d, bg: on ? `rgba(${d.r},0.1)` : 'transparent', bl: on ? d.c : 'transparent', stroke: on ? d.c : 'rgba(226,240,255,0.32)', filt: on ? `drop-shadow(0 0 5px ${d.c})` : 'none', lc: on ? d.c : 'rgba(226,240,255,0.42)', fw: on ? '600' : '400', onClick: () => this.navigate(d.page) };
+    });
+
+    const PTITLES = { dashboard: 'Command Center', consignments: 'Logistics Grid', invoices: 'Invoice Ledger', payments: 'Payment Tracker', vehicles: 'Fleet Registry', parties: 'Party Directory', masters: 'Data Masters', analytics: 'Analytics Hub', reports: 'Report Center', settings: 'System Settings' };
+
+    let pageContent;
+    switch(page) {
+      case 'dashboard': pageContent = this.renderDashboard(); break;
+      case 'consignments': pageContent = this.renderConsignments(); break;
+      case 'invoices': pageContent = this.renderInvoices(); break;
+      case 'payments': pageContent = this.renderPayments(); break;
+      case 'vehicles': pageContent = this.renderVehicles(); break;
+      case 'parties': pageContent = this.renderParties(); break;
+      default: pageContent = this.renderPlaceholder((PTITLES[page] || page).toUpperCase(), '#64748b');
+    }
+
+    return {
+      showLogin: !token, showApp: !!token,
+      loginUsername, loginPassword, loginLoading, loginError,
+      loginBtnText: loginLoading ? 'INITIALIZING...' : 'SIGN  IN  →',
+      handleLogin: this.handleLogin,
+      onUserChange: e => this.setState({ loginUsername: e.target.value }),
+      onPassChange: e => this.setState({ loginPassword: e.target.value }),
+      handleLogout: this.handleLogout,
+      onSbIn: () => this.setState({ sbExpanded: true }),
+      onSbOut: () => this.setState({ sbExpanded: false }),
+      sbW: sbExpanded ? '242px' : '66px',
+      sbOp: sbExpanded ? 1 : 0,
+      sbMW: sbExpanded ? '170px' : '0px',
+      sbPad: sbExpanded ? '10px 16px 10px 14px' : '10px 0',
+      sbJust: sbExpanded ? 'flex-start' : 'center',
+      navItems,
+      pageContent,
+      page,
+      pageTitle: PTITLES[page] || page,
+      clockTime: time.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+      clockDate: time.toLocaleDateString('en-IN', { weekday: 'short', day: '2-digit', month: 'short' }),
+      userName: user?.fullName || user?.username || 'User',
+      userRole: user?.roleName || 'Admin',
+      userInitial: (user?.fullName || user?.username || 'U')[0].toUpperCase(),
+    };
+  }
+}
+</script>
+</body>
+</html>
