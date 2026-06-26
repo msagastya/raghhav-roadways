@@ -6,14 +6,19 @@ const logger = require('../utils/logger');
 
 /**
  * Login user
- * @param {string} username
+ * @param {string} usernameOrEmail
  * @param {string} password
  * @returns {Object} - tokens and user info
  */
-const login = async (username, password) => {
+const login = async (usernameOrEmail, password) => {
   // Find user with role and permissions
-  const user = await prisma.user.findUnique({
-    where: { username },
+  const user = await prisma.user.findFirst({
+    where: { 
+      OR: [
+        { username: usernameOrEmail },
+        { email: usernameOrEmail }
+      ]
+    },
     include: {
       role: {
         include: {
