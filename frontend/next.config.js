@@ -8,6 +8,20 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'https://raghhav-roadways.onrender.com/api/v1',
   },
+  async redirects() {
+    return [
+      {
+        source: '/app.html',
+        destination: '/consignments',
+        permanent: false,
+      },
+      {
+        source: '/login.html',
+        destination: '/login',
+        permanent: false,
+      }
+    ]
+  },
   // Security headers
   headers: async () => {
     return [
