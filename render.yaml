@@ -3,7 +3,7 @@ services:
     name: raghhav-roadways
     env: node
     region: singapore
-    buildCommand: cd backend && SKIP_PRISMA_POSTINSTALL=1 npm install && npx prisma generate
+    buildCommand: cd backend && npm install
     startCommand: cd backend && npm start
     healthCheckPath: /api/v1/health
     envVars:
