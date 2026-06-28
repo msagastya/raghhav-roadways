@@ -36,10 +36,10 @@ export default function Button({
 
   const variants = {
     primary: 'bg-gradient-to-br from-primary-500 to-primary-700 text-white shadow-lg shadow-primary-500/30 hover:shadow-xl hover:shadow-primary-500/40 hover:-translate-y-0.5 active:translate-y-0 focus:ring-primary-500 border-2 border-primary-400/30',
-    secondary: 'bg-white/30 dark:bg-white/10 backdrop-blur-md text-gray-900 dark:text-gray-100 border-2 border-white/25 dark:border-white/10 hover:bg-white/45 dark:hover:bg-white/20 hover:-translate-y-0.5 active:translate-y-0 focus:ring-gray-500',
-    outline: 'border-2 border-white/30 dark:border-white/15 bg-white/20 dark:bg-white/5 backdrop-blur-md text-gray-700 dark:text-gray-300 hover:border-white/50 dark:hover:border-white/25 hover:bg-white/35 dark:hover:bg-white/15 hover:-translate-y-0.5 active:translate-y-0 focus:ring-gray-500',
+    secondary: 'bg-transparent/30 dark:bg-transparent/10 backdrop-blur-md text-gray-100 dark:text-gray-100 border-2 border-white/25 dark:border-white/10 hover:bg-transparent/45 dark:hover:bg-transparent/20 hover:-translate-y-0.5 active:translate-y-0 focus:ring-gray-500',
+    outline: 'border-2 border-white/30 dark:border-white/15 bg-transparent/20 dark:bg-transparent/5 backdrop-blur-md text-gray-300 dark:text-gray-300 hover:border-white/50 dark:hover:border-white/25 hover:bg-transparent/35 dark:hover:bg-transparent/15 hover:-translate-y-0.5 active:translate-y-0 focus:ring-gray-500',
     danger: 'bg-gradient-to-br from-red-500 to-red-700 text-white shadow-lg shadow-red-500/30 hover:shadow-xl hover:shadow-red-500/40 hover:-translate-y-0.5 active:translate-y-0 focus:ring-red-500 border-2 border-red-400/30',
-    ghost: 'text-gray-700 dark:text-gray-300 hover:bg-white/25 dark:hover:bg-white/10 hover:-translate-y-0.5 active:translate-y-0 focus:ring-gray-500',
+    ghost: 'text-gray-300 dark:text-gray-300 hover:bg-transparent/25 dark:hover:bg-transparent/10 hover:-translate-y-0.5 active:translate-y-0 focus:ring-gray-500',
   };
 
   const sizes = {
@@ -68,7 +68,7 @@ export default function Button({
         {ripples.map((ripple) => (
           <motion.span
             key={ripple.id}
-            className="absolute rounded-full bg-white/30 pointer-events-none"
+            className="absolute rounded-full bg-transparent/30 pointer-events-none"
             style={{
               left: ripple.x,
               top: ripple.y,

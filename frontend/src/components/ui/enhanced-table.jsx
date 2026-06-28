@@ -27,7 +27,7 @@ export const SortableHeader = ({ column, currentSort, onSort, children }) => {
   return (
     <th
       onClick={handleClick}
-      className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors select-none"
+      className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-transparent/10 transition-colors select-none"
     >
       <div className="flex items-center gap-2">
         <span>{children}</span>
@@ -56,7 +56,7 @@ export const SelectCell = ({ checked, onChange, disabled = false }) => {
         checked={checked}
         onChange={onChange}
         disabled={disabled}
-        className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+        className="w-4 h-4 text-primary-600 border-white/20 rounded focus:ring-primary-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
       />
     </td>
   );
@@ -166,9 +166,9 @@ export const EnhancedTable = ({
       )}
 
       {/* Table */}
-      <div className="overflow-x-auto bg-white rounded-lg border border-gray-200 shadow-sm">
+      <div className="overflow-x-auto bg-transparent rounded-lg border border-white/10 shadow-sm">
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+          <thead className="bg-transparent/5">
             <tr>
               {/* Select All Checkbox */}
               {selectable && (
@@ -182,7 +182,7 @@ export const EnhancedTable = ({
                         ? onSelectAll(data.map((row) => row.id))
                         : onSelectAll([])
                     }
-                    className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 cursor-pointer"
+                    className="w-4 h-4 text-primary-600 border-white/20 rounded focus:ring-primary-500 cursor-pointer"
                   />
                 </th>
               )}
@@ -201,7 +201,7 @@ export const EnhancedTable = ({
                 ) : (
                   <th
                     key={column.key}
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
                   >
                     {column.label}
                   </th>
@@ -210,14 +210,14 @@ export const EnhancedTable = ({
             </tr>
           </thead>
 
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-transparent divide-y divide-gray-200">
             {loading ? (
               <tr>
                 <td colSpan={columns.length + (selectable ? 1 : 0)} className="px-6 py-12">
                   <div className="flex items-center justify-center">
                     <div className="text-center">
                       <div className="inline-block w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
-                      <p className="mt-2 text-sm text-gray-600">Loading...</p>
+                      <p className="mt-2 text-sm text-gray-400">Loading...</p>
                     </div>
                   </div>
                 </td>
@@ -235,7 +235,7 @@ export const EnhancedTable = ({
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: rowIndex * 0.05 }}
-                  className={`hover:bg-gray-50 transition-colors ${
+                  className={`hover:bg-transparent/5 transition-colors ${
                     selectedRows.includes(row.id) ? 'bg-primary-50' : ''
                   }`}
                 >

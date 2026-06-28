@@ -123,8 +123,8 @@ export default function NewPaymentPage() {
             </Button>
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Create Payment Record</h1>
-            <p className="text-gray-600 mt-1">Record a planned payment amount (you can add actual payments later)</p>
+            <h1 className="text-2xl font-bold text-gray-100">Create Payment Record</h1>
+            <p className="text-gray-400 mt-1">Record a planned payment amount (you can add actual payments later)</p>
           </div>
         </div>
       </div>
@@ -132,8 +132,8 @@ export default function NewPaymentPage() {
       <form onSubmit={handleSubmit}>
         <Card>
           <CardHeader>
-            <h2 className="text-lg font-semibold text-gray-900">Payment Details</h2>
-            <p className="text-sm text-gray-600">This creates a payment record. After creating, you can add partial payments with different payment modes.</p>
+            <h2 className="text-lg font-semibold text-gray-100">Payment Details</h2>
+            <p className="text-sm text-gray-400">This creates a payment record. After creating, you can add partial payments with different payment modes.</p>
           </CardHeader>
           <CardContent className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

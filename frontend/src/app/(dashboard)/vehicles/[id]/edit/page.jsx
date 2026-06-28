@@ -49,15 +49,15 @@ export default function EditVehiclePage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link href={`/vehicles/${id}`} className="rounded-lg p-2 text-gray-600 transition hover:bg-white/60 hover:text-gray-900">
+        <Link href={`/vehicles/${id}`} className="rounded-lg p-2 text-gray-400 transition hover:bg-transparent/60 hover:text-gray-100">
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <div>
           <div className="flex items-center gap-2">
             <Truck className="h-5 w-5 text-primary-600" />
-            <h1 className="text-2xl font-bold text-gray-900">Edit Vehicle</h1>
+            <h1 className="text-2xl font-bold text-gray-100">Edit Vehicle</h1>
           </div>
-          <p className="mt-1 text-gray-600">{vehicle?.vehicleNo}</p>
+          <p className="mt-1 text-gray-400">{vehicle?.vehicleNo}</p>
         </div>
       </div>
 

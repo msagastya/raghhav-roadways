@@ -9,7 +9,7 @@ import { motion } from 'framer-motion';
 const CustomInput = forwardRef(({ value, onClick, onChange, placeholder, label, error, onClear }, ref) => (
   <div className="w-full">
     {label && (
-      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+      <label className="block text-sm font-medium text-gray-300 mb-1.5">
         {label}
       </label>
     )}
@@ -28,10 +28,10 @@ const CustomInput = forwardRef(({ value, onClick, onChange, placeholder, label, 
           cursor-pointer
           ${error
             ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20'
-            : 'border-gray-300 focus:border-primary-500 focus:ring-primary-500/20'
+            : 'border-white/20 focus:border-primary-500 focus:ring-primary-500/20'
           }
           focus:outline-none focus:ring-4
-          disabled:bg-gray-100 disabled:cursor-not-allowed
+          disabled:bg-transparent/10 disabled:cursor-not-allowed
         `}
       />
       <div className="absolute inset-y-0 right-0 flex items-center gap-1 pr-3">
@@ -42,7 +42,7 @@ const CustomInput = forwardRef(({ value, onClick, onChange, placeholder, label, 
               e.stopPropagation();
               onClear();
             }}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-400 hover:text-gray-400 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>

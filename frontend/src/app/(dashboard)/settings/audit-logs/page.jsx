@@ -58,8 +58,8 @@ export default function AuditLogsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Audit Logs</h1>
-        <p className="text-gray-600 mt-1">
+        <h1 className="text-3xl font-bold text-gray-100">Audit Logs</h1>
+        <p className="text-gray-400 mt-1">
           Track all system changes and user activities
         </p>
       </div>
@@ -89,7 +89,7 @@ export default function AuditLogsPage() {
           {loading ? (
             <PageLoader message="Loading audit logs..." />
           ) : logs.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
+            <div className="text-center py-12 text-gray-400">
               <FileText className="w-16 h-16 mx-auto mb-4 text-gray-400" />
               <p className="text-lg font-medium">No audit logs found</p>
               <p className="text-sm">Audit logs will appear here as changes are made</p>
@@ -99,7 +99,7 @@ export default function AuditLogsPage() {
               {logs.map((log) => (
                 <div
                   key={log.id}
-                  className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                  className="border border-white/10 rounded-lg p-4 hover:bg-transparent/5 transition-colors"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -107,15 +107,15 @@ export default function AuditLogsPage() {
                         <Badge variant={getActionColor(log.action)}>
                           {log.action}
                         </Badge>
-                        <span className="text-sm font-medium text-gray-900">
+                        <span className="text-sm font-medium text-gray-100">
                           {log.tableName}
                         </span>
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-gray-400">
                           #{log.recordId}
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-4 text-sm text-gray-600">
+                      <div className="flex items-center gap-4 text-sm text-gray-400">
                         <div className="flex items-center gap-1">
                           <User className="w-4 h-4" />
                           {log.user?.fullName || 'System'}
@@ -127,7 +127,7 @@ export default function AuditLogsPage() {
                       </div>
 
                       {log.ipAddress && (
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-gray-400 mt-1">
                           IP: {log.ipAddress}
                         </p>
                       )}
@@ -140,20 +140,20 @@ export default function AuditLogsPage() {
                       <summary className="text-sm text-primary-600 cursor-pointer hover:text-primary-700">
                         View changes
                       </summary>
-                      <div className="mt-2 bg-gray-50 rounded p-3 text-xs font-mono">
+                      <div className="mt-2 bg-transparent/5 rounded p-3 text-xs font-mono">
                         <div className="grid grid-cols-2 gap-4">
                           {log.oldValues && (
                             <div>
-                              <p className="font-semibold text-gray-700 mb-1">Before:</p>
-                              <pre className="text-gray-600 whitespace-pre-wrap">
+                              <p className="font-semibold text-gray-300 mb-1">Before:</p>
+                              <pre className="text-gray-400 whitespace-pre-wrap">
                                 {JSON.stringify(log.oldValues, null, 2)}
                               </pre>
                             </div>
                           )}
                           {log.newValues && (
                             <div>
-                              <p className="font-semibold text-gray-700 mb-1">After:</p>
-                              <pre className="text-gray-600 whitespace-pre-wrap">
+                              <p className="font-semibold text-gray-300 mb-1">After:</p>
+                              <pre className="text-gray-400 whitespace-pre-wrap">
                                 {JSON.stringify(log.newValues, null, 2)}
                               </pre>
                             </div>

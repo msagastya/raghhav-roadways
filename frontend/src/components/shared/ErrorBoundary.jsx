@@ -47,7 +47,7 @@ class ErrorBoundary extends React.Component {
             animate={{ opacity: 1, y: 0 }}
             className="max-w-md w-full"
           >
-            <div className="bg-white rounded-2xl shadow-2xl p-8 border border-red-100">
+            <div className="bg-transparent rounded-2xl shadow-2xl p-8 border border-red-100">
               {/* Icon */}
               <motion.div
                 initial={{ scale: 0 }}
@@ -65,7 +65,7 @@ class ErrorBoundary extends React.Component {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
-                className="text-2xl font-bold text-gray-900 text-center mb-2"
+                className="text-2xl font-bold text-gray-100 text-center mb-2"
               >
                 Oops! Something went wrong
               </motion.h1>
@@ -75,7 +75,7 @@ class ErrorBoundary extends React.Component {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="text-gray-600 text-center mb-6"
+                className="text-gray-400 text-center mb-6"
               >
                 Don't worry, we've been notified and are working on it.
               </motion.p>

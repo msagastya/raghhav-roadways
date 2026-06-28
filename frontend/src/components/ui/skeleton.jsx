@@ -6,7 +6,7 @@ import { cn } from '../../lib/utils';
 export function Skeleton({ className, ...props }) {
   return (
     <motion.div
-      className={cn('animate-pulse rounded-md bg-white/25 dark:bg-white/10', className)}
+      className={cn('animate-pulse rounded-md bg-transparent/25 dark:bg-transparent/10', className)}
       initial={{ opacity: 0.6 }}
       animate={{ opacity: [0.6, 1, 0.6] }}
       transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}

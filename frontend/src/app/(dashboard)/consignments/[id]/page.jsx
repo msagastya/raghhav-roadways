@@ -16,17 +16,17 @@ export default function ConsignmentDetailPage({ params }) {
           </Button>
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Consignment Details</h1>
-          <p className="text-gray-600 mt-1">ID: {params.id}</p>
+          <h1 className="text-2xl font-bold text-gray-100">Consignment Details</h1>
+          <p className="text-gray-400 mt-1">ID: {params.id}</p>
         </div>
       </div>
 
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold text-gray-900">Consignment Information</h3>
+          <h3 className="text-lg font-semibold text-gray-100">Consignment Information</h3>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-500">Detail view under development</p>
+          <p className="text-gray-400">Detail view under development</p>
         </CardContent>
       </Card>
     </div>

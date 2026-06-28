@@ -11,7 +11,7 @@ export const PremiumButton = ({
 }) => {
   const variants = {
     primary: 'bg-primary-600 hover:bg-primary-700 text-white shadow-lg shadow-primary-600/25',
-    secondary: 'bg-white/60 dark:bg-white/10 hover:bg-white/80 dark:hover:bg-white/20 text-gray-900 dark:text-white border border-white/30 dark:border-white/10',
+    secondary: 'bg-transparent/60 dark:bg-transparent/10 hover:bg-transparent/80 dark:hover:bg-transparent/20 text-gray-100 dark:text-white border border-white/30 dark:border-white/10',
     danger: 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/25',
   };
 

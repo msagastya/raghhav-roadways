@@ -112,19 +112,19 @@ export default function CommandPalette({ isOpen, onClose }) {
         {/* Dialog */}
         <div className="flex min-h-full items-start justify-center p-4 pt-[15vh]">
           <motion.div
-            className="relative w-full max-w-xl overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl ring-1 ring-black/5"
+            className="relative w-full max-w-xl overflow-hidden rounded-2xl bg-transparent dark:bg-gray-900 shadow-2xl ring-1 ring-black/5"
             initial={{ opacity: 0, scale: 0.95, y: -20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.2 }}
           >
             {/* Search Input */}
-            <div className="relative flex items-center border-b border-gray-200 dark:border-gray-700">
+            <div className="relative flex items-center border-b border-white/10 dark:border-gray-700">
               <Search className="absolute left-4 h-5 w-5 text-gray-400" />
               <input
                 ref={inputRef}
                 type="text"
                 placeholder="Search commands, pages, or type a command..."
-                className="w-full bg-transparent py-4 pl-12 pr-20 text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none"
+                className="w-full bg-transparent py-4 pl-12 pr-20 text-gray-100 dark:text-white placeholder:text-gray-400 focus:outline-none"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -136,7 +136,7 @@ export default function CommandPalette({ isOpen, onClose }) {
                     className={`p-1.5 rounded-lg transition-colors ${
                       isListening
                         ? 'bg-red-100 text-red-600 animate-pulse'
-                        : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500'
+                        : 'hover:bg-transparent/10 dark:hover:bg-gray-800 text-gray-400'
                     }`}
                     title="Voice command"
                   >
@@ -145,7 +145,7 @@ export default function CommandPalette({ isOpen, onClose }) {
                 )}
                 <button
                   onClick={onClose}
-                  className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500"
+                  className="p-1.5 rounded-lg hover:bg-transparent/10 dark:hover:bg-gray-800 text-gray-400"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -155,7 +155,7 @@ export default function CommandPalette({ isOpen, onClose }) {
             {/* Results */}
             <div className="max-h-80 overflow-y-auto py-2">
               {filteredActions.length === 0 ? (
-                <div className="py-8 text-center text-gray-500">
+                <div className="py-8 text-center text-gray-400">
                   <Search className="mx-auto h-8 w-8 text-gray-300 mb-2" />
                   <p>No results found for "{query}"</p>
                 </div>
@@ -170,19 +170,19 @@ export default function CommandPalette({ isOpen, onClose }) {
                         className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors ${
                           index === selectedIndex
                             ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-900 dark:text-primary-100'
-                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
+                            : 'text-gray-300 dark:text-gray-300 hover:bg-transparent/5 dark:hover:bg-gray-800'
                         }`}
                       >
                         <div className={`p-2 rounded-lg ${
                           index === selectedIndex
                             ? 'bg-primary-100 dark:bg-primary-800'
-                            : 'bg-gray-100 dark:bg-gray-800'
+                            : 'bg-transparent/10 dark:bg-gray-800'
                         }`}>
                           <Icon className="w-4 h-4" />
                         </div>
                         <div className="flex-1">
                           <p className="font-medium">{action.name}</p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">{action.type}</p>
+                          <p className="text-xs text-gray-400 dark:text-gray-400 capitalize">{action.type}</p>
                         </div>
                         {index === selectedIndex && (
                           <ArrowRight className="w-4 h-4 text-primary-500" />
@@ -195,25 +195,25 @@ export default function CommandPalette({ isOpen, onClose }) {
             </div>
 
             {/* Footer */}
-            <div className="border-t border-gray-200 dark:border-gray-700 px-4 py-2.5 flex items-center justify-between text-xs text-gray-500">
+            <div className="border-t border-white/10 dark:border-gray-700 px-4 py-2.5 flex items-center justify-between text-xs text-gray-400">
               <div className="flex items-center gap-4">
                 <span className="flex items-center gap-1">
-                  <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-[10px] font-semibold">↑↓</kbd>
+                  <kbd className="px-1.5 py-0.5 bg-transparent/10 dark:bg-gray-800 rounded text-[10px] font-semibold">↑↓</kbd>
                   Navigate
                 </span>
                 <span className="flex items-center gap-1">
-                  <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-[10px] font-semibold">↵</kbd>
+                  <kbd className="px-1.5 py-0.5 bg-transparent/10 dark:bg-gray-800 rounded text-[10px] font-semibold">↵</kbd>
                   Select
                 </span>
                 <span className="flex items-center gap-1">
-                  <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-[10px] font-semibold">esc</kbd>
+                  <kbd className="px-1.5 py-0.5 bg-transparent/10 dark:bg-gray-800 rounded text-[10px] font-semibold">esc</kbd>
                   Close
                 </span>
               </div>
               <div className="flex items-center gap-1">
                 <Command className="w-3 h-3" />
                 <span>+</span>
-                <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-[10px] font-semibold">K</kbd>
+                <kbd className="px-1.5 py-0.5 bg-transparent/10 dark:bg-gray-800 rounded text-[10px] font-semibold">K</kbd>
               </div>
             </div>
           </motion.div>

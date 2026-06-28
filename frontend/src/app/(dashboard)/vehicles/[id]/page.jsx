@@ -14,8 +14,8 @@ import useToast from '@/hooks/useToast';
 
 const Detail = ({ label, value }) => (
   <div>
-    <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">{label}</p>
-    <p className="mt-1 text-sm font-medium text-gray-900">{value || '-'}</p>
+    <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">{label}</p>
+    <p className="mt-1 text-sm font-medium text-gray-100">{value || '-'}</p>
   </div>
 );
 
@@ -48,15 +48,15 @@ export default function VehicleDetailPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <Link href="/vehicles" className="rounded-lg p-2 text-gray-600 transition hover:bg-white/60 hover:text-gray-900">
+          <Link href="/vehicles" className="rounded-lg p-2 text-gray-400 transition hover:bg-transparent/60 hover:text-gray-100">
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div>
             <div className="flex items-center gap-2">
               <Truck className="h-5 w-5 text-primary-600" />
-              <h1 className="text-2xl font-bold text-gray-900">{vehicle?.vehicleNo || 'Vehicle'}</h1>
+              <h1 className="text-2xl font-bold text-gray-100">{vehicle?.vehicleNo || 'Vehicle'}</h1>
             </div>
-            <p className="mt-1 text-gray-600">Vehicle profile and document status</p>
+            <p className="mt-1 text-gray-400">Vehicle profile and document status</p>
           </div>
         </div>
         <Link href={`/vehicles/${id}/edit`}>

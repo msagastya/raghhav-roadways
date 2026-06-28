@@ -123,26 +123,26 @@ export default function InvoiceDetailPage({ params }) {
       >
         <div className="flex items-center gap-3">
           <Link href="/invoices">
-            <button className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-lg hover:bg-white/60 border border-transparent hover:border-black/8 transition-all">
+            <button className="flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-400 hover:text-gray-100 dark:hover:text-white px-3 py-2 rounded-lg hover:bg-transparent/60 border border-transparent hover:border-black/8 transition-all">
               <ArrowLeft className="w-4 h-4" />
               Back
             </button>
           </Link>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white">Bill {invoice.invoiceNumber}</h1>
+              <h1 className="text-xl font-bold text-gray-100 dark:text-white">Bill {invoice.invoiceNumber}</h1>
               <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border ${sc.bg} ${sc.text} ${sc.border}`}>
                 <StatusIcon className="w-3 h-3" />
                 {status}
               </span>
             </div>
-            <p className="text-sm text-gray-500 mt-0.5">{invoice.partyName} · {formatDate(invoice.invoiceDate)}</p>
+            <p className="text-sm text-gray-400 mt-0.5">{invoice.partyName} · {formatDate(invoice.invoiceDate)}</p>
           </div>
         </div>
         <button
           onClick={handleDownload}
           disabled={downloading}
-          className="flex items-center gap-2 bg-white/60 dark:bg-white/5 border border-black/10 dark:border-white/10 text-gray-700 dark:text-gray-300 text-sm font-medium px-4 py-2.5 rounded-xl hover:border-primary-400 hover:text-primary-600 transition-all disabled:opacity-50"
+          className="flex items-center gap-2 bg-transparent/60 dark:bg-transparent/5 border border-black/10 dark:border-white/10 text-gray-300 dark:text-gray-300 text-sm font-medium px-4 py-2.5 rounded-xl hover:border-primary-400 hover:text-primary-600 transition-all disabled:opacity-50"
         >
           {downloading
             ? <div className="w-4 h-4 animate-spin rounded-full border-2 border-primary-500 border-t-transparent" />
@@ -159,12 +159,12 @@ export default function InvoiceDetailPage({ params }) {
         transition={{ duration: 0.35, delay: 0.06 }}
       >
         {[
-          { label: 'Total Bill', value: total, color: 'text-gray-900 dark:text-white' },
+          { label: 'Total Bill', value: total, color: 'text-gray-100 dark:text-white' },
           { label: 'Amount Paid', value: paid, color: 'text-green-600 dark:text-green-400' },
           { label: 'Balance Due', value: balance, color: balance > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400' },
         ].map(s => (
-          <div key={s.label} className="bg-white/60 dark:bg-white/5 backdrop-blur-sm border border-black/8 dark:border-white/8 rounded-xl px-4 py-3">
-            <p className="text-xs text-gray-500 dark:text-gray-400">{s.label}</p>
+          <div key={s.label} className="bg-transparent/60 dark:bg-transparent/5 backdrop-blur-sm border border-black/8 dark:border-white/8 rounded-xl px-4 py-3">
+            <p className="text-xs text-gray-400 dark:text-gray-400">{s.label}</p>
             <p className={`text-xl font-bold mt-0.5 ${s.color}`}>{formatCurrency(s.value)}</p>
           </div>
         ))}
@@ -172,27 +172,27 @@ export default function InvoiceDetailPage({ params }) {
 
       {/* Party info */}
       <motion.div
-        className="bg-white/60 dark:bg-white/5 backdrop-blur-sm border border-black/8 dark:border-white/8 rounded-2xl p-5"
+        className="bg-transparent/60 dark:bg-transparent/5 backdrop-blur-sm border border-black/8 dark:border-white/8 rounded-2xl p-5"
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: 0.1 }}
       >
-        <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">Party Details</h3>
+        <h3 className="text-xs font-semibold text-gray-400 dark:text-gray-400 uppercase tracking-wide mb-3">Party Details</h3>
         <div className="flex flex-wrap gap-x-8 gap-y-1 text-sm">
           <div>
-            <span className="text-gray-500 dark:text-gray-400">Name: </span>
-            <span className="font-medium text-gray-900 dark:text-white">{invoice.partyName}</span>
+            <span className="text-gray-400 dark:text-gray-400">Name: </span>
+            <span className="font-medium text-gray-100 dark:text-white">{invoice.partyName}</span>
           </div>
           {invoice.partyGstin && (
             <div>
-              <span className="text-gray-500 dark:text-gray-400">GST: </span>
-              <span className="font-medium text-gray-900 dark:text-white">{invoice.partyGstin}</span>
+              <span className="text-gray-400 dark:text-gray-400">GST: </span>
+              <span className="font-medium text-gray-100 dark:text-white">{invoice.partyGstin}</span>
             </div>
           )}
           {invoice.partyAddress && (
             <div>
-              <span className="text-gray-500 dark:text-gray-400">Address: </span>
-              <span className="text-gray-700 dark:text-gray-300">{invoice.partyAddress}</span>
+              <span className="text-gray-400 dark:text-gray-400">Address: </span>
+              <span className="text-gray-300 dark:text-gray-300">{invoice.partyAddress}</span>
             </div>
           )}
         </div>
@@ -200,58 +200,58 @@ export default function InvoiceDetailPage({ params }) {
 
       {/* GR Items table */}
       <motion.div
-        className="bg-white/60 dark:bg-white/5 backdrop-blur-sm border border-black/8 dark:border-white/8 rounded-2xl overflow-hidden"
+        className="bg-transparent/60 dark:bg-transparent/5 backdrop-blur-sm border border-black/8 dark:border-white/8 rounded-2xl overflow-hidden"
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: 0.14 }}
       >
         <div className="px-5 py-4 border-b border-black/5 dark:border-white/5">
-          <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Consignment Items</h3>
+          <h3 className="text-xs font-semibold text-gray-400 dark:text-gray-400 uppercase tracking-wide">Consignment Items</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full text-xs">
             <thead>
-              <tr className="bg-gray-50/80 dark:bg-white/3 border-b border-black/5 dark:border-white/5">
-                <th className="px-4 py-2.5 text-left font-semibold text-gray-500 dark:text-gray-400">GR No.</th>
-                <th className="px-4 py-2.5 text-left font-semibold text-gray-500 dark:text-gray-400">Date</th>
-                <th className="px-4 py-2.5 text-left font-semibold text-gray-500 dark:text-gray-400">Vehicle</th>
-                <th className="px-4 py-2.5 text-left font-semibold text-gray-500 dark:text-gray-400">Route</th>
-                <th className="px-4 py-2.5 text-left font-semibold text-gray-500 dark:text-gray-400">Contents</th>
-                <th className="px-4 py-2.5 text-center font-semibold text-gray-500 dark:text-gray-400">QTY</th>
-                <th className="px-4 py-2.5 text-center font-semibold text-gray-500 dark:text-gray-400">Rate</th>
-                <th className="px-4 py-2.5 text-right font-semibold text-gray-500 dark:text-gray-400">Amount</th>
+              <tr className="bg-transparent/5/80 dark:bg-transparent/3 border-b border-black/5 dark:border-white/5">
+                <th className="px-4 py-2.5 text-left font-semibold text-gray-400 dark:text-gray-400">GR No.</th>
+                <th className="px-4 py-2.5 text-left font-semibold text-gray-400 dark:text-gray-400">Date</th>
+                <th className="px-4 py-2.5 text-left font-semibold text-gray-400 dark:text-gray-400">Vehicle</th>
+                <th className="px-4 py-2.5 text-left font-semibold text-gray-400 dark:text-gray-400">Route</th>
+                <th className="px-4 py-2.5 text-left font-semibold text-gray-400 dark:text-gray-400">Contents</th>
+                <th className="px-4 py-2.5 text-center font-semibold text-gray-400 dark:text-gray-400">QTY</th>
+                <th className="px-4 py-2.5 text-center font-semibold text-gray-400 dark:text-gray-400">Rate</th>
+                <th className="px-4 py-2.5 text-right font-semibold text-gray-400 dark:text-gray-400">Amount</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-black/5 dark:divide-white/5">
               {(invoice.items || []).map((item, i) => (
-                <tr key={i} className="hover:bg-gray-50/50 dark:hover:bg-white/3">
+                <tr key={i} className="hover:bg-transparent/5/50 dark:hover:bg-transparent/3">
                   <td className="px-4 py-2.5 font-medium text-primary-600 dark:text-primary-400">{item.grNumber || '—'}</td>
-                  <td className="px-4 py-2.5 text-gray-600 dark:text-gray-400">{item.grDate ? formatDate(item.grDate) : '—'}</td>
-                  <td className="px-4 py-2.5 text-gray-700 dark:text-gray-300">{item.vehicleNumber || '—'}</td>
-                  <td className="px-4 py-2.5 text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                  <td className="px-4 py-2.5 text-gray-400 dark:text-gray-400">{item.grDate ? formatDate(item.grDate) : '—'}</td>
+                  <td className="px-4 py-2.5 text-gray-300 dark:text-gray-300">{item.vehicleNumber || '—'}</td>
+                  <td className="px-4 py-2.5 text-gray-400 dark:text-gray-400 whitespace-nowrap">
                     {item.fromLocation && item.toLocation ? `${item.fromLocation} → ${item.toLocation}` : '—'}
                   </td>
-                  <td className="px-4 py-2.5 text-gray-600 dark:text-gray-400">{item.contents || '—'}</td>
-                  <td className="px-4 py-2.5 text-center text-gray-600 dark:text-gray-400">{item.qtyInMt || '—'}</td>
-                  <td className="px-4 py-2.5 text-center text-gray-600 dark:text-gray-400">{item.rateMt || '—'}</td>
-                  <td className="px-4 py-2.5 text-right font-medium text-gray-900 dark:text-white">{formatCurrency(item.amount)}</td>
+                  <td className="px-4 py-2.5 text-gray-400 dark:text-gray-400">{item.contents || '—'}</td>
+                  <td className="px-4 py-2.5 text-center text-gray-400 dark:text-gray-400">{item.qtyInMt || '—'}</td>
+                  <td className="px-4 py-2.5 text-center text-gray-400 dark:text-gray-400">{item.rateMt || '—'}</td>
+                  <td className="px-4 py-2.5 text-right font-medium text-gray-100 dark:text-white">{formatCurrency(item.amount)}</td>
                 </tr>
               ))}
             </tbody>
             <tfoot className="border-t-2 border-black/8 dark:border-white/8">
               {Number(invoice.grCharge) > 0 && (
-                <tr className="bg-gray-50/60 dark:bg-white/3">
-                  <td colSpan={7} className="px-4 py-2.5 text-right text-xs text-gray-500 dark:text-gray-400 font-medium">GR Charge</td>
-                  <td className="px-4 py-2.5 text-right text-xs font-medium text-gray-700 dark:text-gray-300">{formatCurrency(invoice.grCharge)}</td>
+                <tr className="bg-transparent/5/60 dark:bg-transparent/3">
+                  <td colSpan={7} className="px-4 py-2.5 text-right text-xs text-gray-400 dark:text-gray-400 font-medium">GR Charge</td>
+                  <td className="px-4 py-2.5 text-right text-xs font-medium text-gray-300 dark:text-gray-300">{formatCurrency(invoice.grCharge)}</td>
                 </tr>
               )}
-              <tr className="bg-gray-50/80 dark:bg-white/5">
-                <td colSpan={7} className="px-4 py-3 text-right text-sm font-bold text-gray-900 dark:text-white">TOTAL</td>
+              <tr className="bg-transparent/5/80 dark:bg-transparent/5">
+                <td colSpan={7} className="px-4 py-3 text-right text-sm font-bold text-gray-100 dark:text-white">TOTAL</td>
                 <td className="px-4 py-3 text-right text-sm font-bold text-primary-600 dark:text-primary-400">{formatCurrency(invoice.totalAmount)}</td>
               </tr>
               {invoice.amountInWords && (
                 <tr>
-                  <td colSpan={8} className="px-4 py-2 text-xs italic text-gray-500 dark:text-gray-400">
+                  <td colSpan={8} className="px-4 py-2 text-xs italic text-gray-400 dark:text-gray-400">
                     Rupees: {invoice.amountInWords}
                   </td>
                 </tr>
@@ -263,13 +263,13 @@ export default function InvoiceDetailPage({ params }) {
 
       {/* Payment section */}
       <motion.div
-        className="bg-white/60 dark:bg-white/5 backdrop-blur-sm border border-black/8 dark:border-white/8 rounded-2xl p-5"
+        className="bg-transparent/60 dark:bg-transparent/5 backdrop-blur-sm border border-black/8 dark:border-white/8 rounded-2xl p-5"
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: 0.18 }}
       >
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Payment History</h3>
+          <h3 className="text-xs font-semibold text-gray-400 dark:text-gray-400 uppercase tracking-wide">Payment History</h3>
           {balance > 0 && (
             <button
               onClick={() => setShowPayForm(v => !v)}
@@ -297,7 +297,7 @@ export default function InvoiceDetailPage({ params }) {
                 </p>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <div>
-                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Amount ₹ *</label>
+                    <label className="block text-xs text-gray-400 dark:text-gray-400 mb-1">Amount ₹ *</label>
                     <input
                       type="number"
                       step="0.01"
@@ -307,36 +307,36 @@ export default function InvoiceDetailPage({ params }) {
                       onChange={e => setPayAmount(e.target.value)}
                       placeholder={balance.toFixed(2)}
                       required
-                      className="w-full border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white outline-none focus:border-primary-400"
+                      className="w-full border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 bg-transparent dark:bg-gray-800 text-sm text-gray-100 dark:text-white outline-none focus:border-primary-400"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Mode *</label>
+                    <label className="block text-xs text-gray-400 dark:text-gray-400 mb-1">Mode *</label>
                     <select
                       value={payMode}
                       onChange={e => setPayMode(e.target.value)}
-                      className="w-full border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white outline-none focus:border-primary-400"
+                      className="w-full border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 bg-transparent dark:bg-gray-800 text-sm text-gray-100 dark:text-white outline-none focus:border-primary-400"
                     >
                       {PAYMENT_MODES.map(m => <option key={m}>{m}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Date *</label>
+                    <label className="block text-xs text-gray-400 dark:text-gray-400 mb-1">Date *</label>
                     <input
                       type="date"
                       value={payDate}
                       onChange={e => setPayDate(e.target.value)}
                       required
-                      className="w-full border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white outline-none focus:border-primary-400"
+                      className="w-full border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 bg-transparent dark:bg-gray-800 text-sm text-gray-100 dark:text-white outline-none focus:border-primary-400"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Reference No.</label>
+                    <label className="block text-xs text-gray-400 dark:text-gray-400 mb-1">Reference No.</label>
                     <input
                       value={payRef}
                       onChange={e => setPayRef(e.target.value)}
                       placeholder="Cheque / UTR No."
-                      className="w-full border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white outline-none focus:border-primary-400"
+                      className="w-full border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 bg-transparent dark:bg-gray-800 text-sm text-gray-100 dark:text-white outline-none focus:border-primary-400"
                     />
                   </div>
                 </div>
@@ -359,12 +359,12 @@ export default function InvoiceDetailPage({ params }) {
         ) : (
           <div className="space-y-2">
             {(invoice.payments || []).map((p, i) => (
-              <div key={i} className="flex items-center justify-between py-2.5 px-3 bg-gray-50/60 dark:bg-white/3 rounded-xl border border-black/5 dark:border-white/5">
+              <div key={i} className="flex items-center justify-between py-2.5 px-3 bg-transparent/5/60 dark:bg-transparent/3 rounded-xl border border-black/5 dark:border-white/5">
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
                   <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">{formatCurrency(p.amount)}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{p.paymentMode} · {formatDate(p.paymentDate)}{p.referenceNumber ? ` · Ref: ${p.referenceNumber}` : ''}</p>
+                    <p className="text-sm font-medium text-gray-100 dark:text-white">{formatCurrency(p.amount)}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-400">{p.paymentMode} · {formatDate(p.paymentDate)}{p.referenceNumber ? ` · Ref: ${p.referenceNumber}` : ''}</p>
                   </div>
                 </div>
               </div>

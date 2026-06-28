@@ -30,7 +30,7 @@ export const SearchBar = ({
           onChange={(e) => onChange(e.target.value)}
           onKeyPress={handleKeyPress}
           placeholder={placeholder}
-          className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+          className="w-full pl-10 pr-10 py-2.5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
         />
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
         {value && (
@@ -39,7 +39,7 @@ export const SearchBar = ({
               onChange('');
               if (onClear) onClear();
             }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-400 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -77,13 +77,13 @@ export const FilterPanel = ({
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
-            className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-2xl z-50 overflow-hidden flex flex-col lg:relative lg:shadow-lg lg:rounded-lg"
+            className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-transparent shadow-2xl z-50 overflow-hidden flex flex-col lg:relative lg:shadow-lg lg:rounded-lg"
           >
             {/* Header */}
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
+            <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-transparent/5">
               <div className="flex items-center gap-2">
-                <Filter className="w-5 h-5 text-gray-700" />
-                <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
+                <Filter className="w-5 h-5 text-gray-300" />
+                <h3 className="text-lg font-semibold text-gray-100">Filters</h3>
                 {activeFilters > 0 && (
                   <Badge variant="primary" className="ml-2">
                     {activeFilters}
@@ -92,7 +92,7 @@ export const FilterPanel = ({
               </div>
               <button
                 onClick={onClose}
-                className="lg:hidden text-gray-500 hover:text-gray-700 transition-colors"
+                className="lg:hidden text-gray-400 hover:text-gray-300 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -104,7 +104,7 @@ export const FilterPanel = ({
             </div>
 
             {/* Actions */}
-            <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex gap-3">
+            <div className="px-6 py-4 border-t border-white/10 bg-transparent/5 flex gap-3">
               <Button onClick={onReset} variant="outline" className="flex-1">
                 Reset
               </Button>
@@ -142,14 +142,14 @@ export const FilterButton = ({ onClick, activeCount = 0 }) => {
 export const FilterSelect = ({ label, value, onChange, options, placeholder = 'Select...' }) => {
   return (
     <div className="mb-4">
-      <label className="block text-sm font-medium text-gray-700 mb-2">
+      <label className="block text-sm font-medium text-gray-300 mb-2">
         {label}
       </label>
       <div className="relative">
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full px-4 py-2.5 pr-10 border border-gray-300 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all cursor-pointer"
+          className="w-full px-4 py-2.5 pr-10 border border-white/20 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all cursor-pointer"
         >
           <option value="">{placeholder}</option>
           {options.map((option) => (
@@ -172,9 +172,9 @@ export const FilterCheckbox = ({ label, checked, onChange }) => {
         type="checkbox"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 cursor-pointer"
+        className="w-4 h-4 text-primary-600 border-white/20 rounded focus:ring-primary-500 cursor-pointer"
       />
-      <span className="text-sm text-gray-700 group-hover:text-gray-900 transition-colors">
+      <span className="text-sm text-gray-300 group-hover:text-gray-100 transition-colors">
         {label}
       </span>
     </label>
@@ -191,9 +191,9 @@ export const FilterRadio = ({ name, label, value, checked, onChange }) => {
         value={value}
         checked={checked}
         onChange={() => onChange(value)}
-        className="w-4 h-4 text-primary-600 border-gray-300 focus:ring-primary-500 cursor-pointer"
+        className="w-4 h-4 text-primary-600 border-white/20 focus:ring-primary-500 cursor-pointer"
       />
-      <span className="text-sm text-gray-700 group-hover:text-gray-900 transition-colors">
+      <span className="text-sm text-gray-300 group-hover:text-gray-100 transition-colors">
         {label}
       </span>
     </label>
@@ -206,7 +206,7 @@ export const ActiveFilters = ({ filters, onRemove, onClearAll }) => {
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <span className="text-sm text-gray-600">Active filters:</span>
+      <span className="text-sm text-gray-400">Active filters:</span>
       {filters.map((filter) => (
         <motion.div
           key={filter.key}

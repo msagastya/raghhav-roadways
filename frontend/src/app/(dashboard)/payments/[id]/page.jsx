@@ -184,7 +184,7 @@ export default function PaymentDetailsPage() {
       Completed: 'bg-green-100 text-green-800',
     };
     return (
-      <span className={`px-3 py-1 rounded-full text-sm font-medium ${styles[status] || 'bg-gray-100 text-gray-800'}`}>
+      <span className={`px-3 py-1 rounded-full text-sm font-medium ${styles[status] || 'bg-transparent/10 text-gray-200'}`}>
         {status}
       </span>
     );
@@ -201,7 +201,7 @@ export default function PaymentDetailsPage() {
   if (!payment) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Payment Not Found</h2>
+        <h2 className="text-2xl font-bold text-gray-100 mb-2">Payment Not Found</h2>
         <Link href="/payments">
           <Button variant="outline">Back to Payments</Button>
         </Link>
@@ -220,8 +220,8 @@ export default function PaymentDetailsPage() {
             </Button>
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Payment Details</h1>
-            <p className="text-gray-600 mt-1">{payment.paymentNumber}</p>
+            <h1 className="text-2xl font-bold text-gray-100">Payment Details</h1>
+            <p className="text-gray-400 mt-1">{payment.paymentNumber}</p>
           </div>
         </div>
         {getStatusBadge(payment.paymentStatus)}
@@ -231,7 +231,7 @@ export default function PaymentDetailsPage() {
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold text-gray-900">Payment Summary</h2>
+            <h2 className="text-lg font-semibold text-gray-100">Payment Summary</h2>
             {!editingTotal && (
               <Button
                 variant="outline"
@@ -248,26 +248,26 @@ export default function PaymentDetailsPage() {
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="text-sm font-medium text-gray-700">Payment Date</label>
-              <p className="mt-1 text-gray-900">{formatDate(payment.paymentDate)}</p>
+              <label className="text-sm font-medium text-gray-300">Payment Date</label>
+              <p className="mt-1 text-gray-100">{formatDate(payment.paymentDate)}</p>
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700">Party</label>
-              <p className="mt-1 text-gray-900">{payment.partyName || '-'}</p>
+              <label className="text-sm font-medium text-gray-300">Party</label>
+              <p className="mt-1 text-gray-100">{payment.partyName || '-'}</p>
             </div>
 
             {payment.invoiceNumber && (
               <div>
-                <label className="text-sm font-medium text-gray-700">Invoice</label>
-                <p className="mt-1 text-gray-900">{payment.invoiceNumber}</p>
+                <label className="text-sm font-medium text-gray-300">Invoice</label>
+                <p className="mt-1 text-gray-100">{payment.invoiceNumber}</p>
               </div>
             )}
 
             {payment.description && (
               <div className="md:col-span-2">
-                <label className="text-sm font-medium text-gray-700">Description</label>
-                <p className="mt-1 text-gray-900">{payment.description}</p>
+                <label className="text-sm font-medium text-gray-300">Description</label>
+                <p className="mt-1 text-gray-100">{payment.description}</p>
               </div>
             )}
 
@@ -321,7 +321,7 @@ export default function PaymentDetailsPage() {
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold text-gray-900">Payment Transactions</h2>
+            <h2 className="text-lg font-semibold text-gray-100">Payment Transactions</h2>
             {!showTransactionForm && parseFloat(payment.balanceAmount) > 0 && (
               <Button
                 onClick={() => setShowTransactionForm(true)}
@@ -335,8 +335,8 @@ export default function PaymentDetailsPage() {
         </CardHeader>
         <CardContent className="p-6">
           {showTransactionForm && (
-            <form onSubmit={handleAddTransaction} className="mb-6 p-4 bg-gray-50 rounded-lg border-2 border-primary-200">
-              <h3 className="font-semibold text-gray-900 mb-4">Add New Payment Transaction</h3>
+            <form onSubmit={handleAddTransaction} className="mb-6 p-4 bg-transparent/5 rounded-lg border-2 border-primary-200">
+              <h3 className="font-semibold text-gray-100 mb-4">Add New Payment Transaction</h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
@@ -423,16 +423,16 @@ export default function PaymentDetailsPage() {
                 />
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Receipt Upload (Optional)
                   </label>
                   <input
                     type="file"
                     accept="image/*,.pdf"
                     onChange={(e) => setReceiptFile(e.target.files[0])}
-                    className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white focus:outline-none"
+                    className="block w-full text-sm text-gray-100 border border-white/20 rounded-lg cursor-pointer bg-transparent focus:outline-none"
                   />
-                  <p className="mt-1 text-xs text-gray-500">JPG, PNG or PDF (Max 5MB)</p>
+                  <p className="mt-1 text-xs text-gray-400">JPG, PNG or PDF (Max 5MB)</p>
                 </div>
 
                 <div className="md:col-span-2">
@@ -466,30 +466,30 @@ export default function PaymentDetailsPage() {
           {payment.transactions && payment.transactions.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+                <thead className="bg-transparent/5">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mode</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reference</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Receipt</th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Date</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Amount</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Mode</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Details</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Reference</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Receipt</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-transparent divide-y divide-gray-200">
                   {payment.transactions.map((transaction) => (
                     <tr key={transaction.id}>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-100">
                         {formatDate(transaction.transactionDate)}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-green-600">
                         {formatCurrency(transaction.amount)}
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-100">
                         {transaction.paymentMode}
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-900">
+                      <td className="px-4 py-3 text-sm text-gray-100">
                         {transaction.paymentMode === 'UPI' && transaction.upiId && (
                           <div>UPI: {transaction.upiId}</div>
                         )}
@@ -501,10 +501,10 @@ export default function PaymentDetailsPage() {
                           </div>
                         )}
                         {transaction.remarks && (
-                          <div className="text-xs text-gray-500 mt-1">{transaction.remarks}</div>
+                          <div className="text-xs text-gray-400 mt-1">{transaction.remarks}</div>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-900">
+                      <td className="px-4 py-3 text-sm text-gray-100">
                         {transaction.paymentReference || '-'}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-sm">
@@ -537,7 +537,7 @@ export default function PaymentDetailsPage() {
               </table>
             </div>
           ) : (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-gray-400">
               No payment transactions yet. {parseFloat(payment.balanceAmount) > 0 && 'Add your first payment above.'}
             </div>
           )}

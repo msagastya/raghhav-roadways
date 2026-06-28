@@ -17,7 +17,7 @@ function SummaryBlock({ data }) {
   if (!data) return null;
 
   return (
-    <div className="mt-4 rounded-xl bg-gray-50 p-4 text-sm text-gray-700">
+    <div className="mt-4 rounded-xl bg-transparent/5 p-4 text-sm text-gray-300">
       <pre className="max-h-72 overflow-auto whitespace-pre-wrap font-sans">
         {JSON.stringify(data, null, 2)}
       </pre>
@@ -71,8 +71,8 @@ export default function ReportsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Reports</h1>
-        <p className="mt-1 text-gray-600">Generate daily, monthly, and vehicle settlement reports.</p>
+        <h1 className="text-2xl font-bold text-gray-100">Reports</h1>
+        <p className="mt-1 text-gray-400">Generate daily, monthly, and vehicle settlement reports.</p>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -82,7 +82,7 @@ export default function ReportsPage() {
               <div className="rounded-lg bg-blue-100 p-2">
                 <BarChart3 className="h-6 w-6 text-blue-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">Daily Report</h3>
+              <h3 className="text-lg font-semibold text-gray-100">Daily Report</h3>
             </div>
           </CardHeader>
           <CardContent>
@@ -102,7 +102,7 @@ export default function ReportsPage() {
               <div className="rounded-lg bg-green-100 p-2">
                 <FileText className="h-6 w-6 text-green-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">Monthly Statement</h3>
+              <h3 className="text-lg font-semibold text-gray-100">Monthly Statement</h3>
             </div>
           </CardHeader>
           <CardContent>
@@ -123,7 +123,7 @@ export default function ReportsPage() {
               <div className="rounded-lg bg-purple-100 p-2">
                 <TrendingUp className="h-6 w-6 text-purple-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">Vehicle Settlement</h3>
+              <h3 className="text-lg font-semibold text-gray-100">Vehicle Settlement</h3>
             </div>
           </CardHeader>
           <CardContent>

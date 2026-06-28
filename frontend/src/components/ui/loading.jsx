@@ -37,7 +37,7 @@ export const PageLoader = ({ message = 'Loading...' }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="mt-4 text-gray-600 font-medium"
+          className="mt-4 text-gray-400 font-medium"
         >
           {message}
         </motion.p>
@@ -51,7 +51,7 @@ export const InlineLoader = ({ message, className = '' }) => {
   return (
     <div className={`flex items-center gap-2 ${className}`}>
       <Spinner size="sm" />
-      {message && <span className="text-sm text-gray-600">{message}</span>}
+      {message && <span className="text-sm text-gray-400">{message}</span>}
     </div>
   );
 };
@@ -108,7 +108,7 @@ export const TableSkeleton = ({ rows = 5, columns = 4 }) => {
 // Card Loading Skeleton
 export const CardSkeleton = () => {
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
+    <div className="bg-transparent rounded-lg border border-white/10 p-6 space-y-4">
       <SkeletonLoader variant="title" />
       <SkeletonLoader variant="text" className="w-2/3" />
       <SkeletonLoader variant="text" className="w-full" />
@@ -128,11 +128,11 @@ export const LoadingOverlay = ({ message = 'Processing...' }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50 rounded-lg"
+      className="absolute inset-0 bg-transparent/80 backdrop-blur-sm flex items-center justify-center z-50 rounded-lg"
     >
       <div className="text-center">
         <Spinner size="lg" />
-        <p className="mt-3 text-gray-700 font-medium">{message}</p>
+        <p className="mt-3 text-gray-300 font-medium">{message}</p>
       </div>
     </motion.div>
   );

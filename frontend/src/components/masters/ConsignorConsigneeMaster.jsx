@@ -165,8 +165,8 @@ export default function ConsignorConsigneeMaster() {
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
-          <h3 className="text-base sm:text-lg font-semibold text-gray-900">Consignor/Consignee Master</h3>
-          <p className="text-xs sm:text-sm text-gray-600">Manage consignor and consignee information</p>
+          <h3 className="text-base sm:text-lg font-semibold text-gray-100">Consignor/Consignee Master</h3>
+          <p className="text-xs sm:text-sm text-gray-400">Manage consignor and consignee information</p>
         </div>
         <Button onClick={openNewForm} className="flex items-center gap-2 w-full sm:w-auto">
           <Plus className="w-4 h-4" />
@@ -192,7 +192,7 @@ export default function ConsignorConsigneeMaster() {
               <TableBody>
                 {records.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center text-gray-500 py-8">
+                    <TableCell colSpan={7} className="text-center text-gray-400 py-8">
                       <div className="flex flex-col items-center gap-2">
                         <p className="text-sm sm:text-base">No records found</p>
                         <Button onClick={openNewForm} size="sm" variant="outline">
@@ -244,7 +244,7 @@ export default function ConsignorConsigneeMaster() {
       >
         <div className="space-y-3 sm:space-y-4">
           <div>
-            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1">
               Name <span className="text-red-500">*</span>
             </label>
             <Input
@@ -255,7 +255,7 @@ export default function ConsignorConsigneeMaster() {
           </div>
 
           <div>
-            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1">
               Address
             </label>
             <Input
@@ -267,7 +267,7 @@ export default function ConsignorConsigneeMaster() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1">
                 State <span className="text-red-500">*</span>
               </label>
               <Select value={formData.stateId} onChange={handleStateChange}>
@@ -279,11 +279,11 @@ export default function ConsignorConsigneeMaster() {
                   </option>
                 ))}
               </Select>
-              {states.length > 0 && <p className="text-xs text-gray-500 mt-1">{states.length} states available</p>}
+              {states.length > 0 && <p className="text-xs text-gray-400 mt-1">{states.length} states available</p>}
             </div>
 
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1">
                 City <span className="text-red-500">*</span>
               </label>
               <Select
@@ -299,13 +299,13 @@ export default function ConsignorConsigneeMaster() {
                   </option>
                 ))}
               </Select>
-              {cities.length > 0 && <p className="text-xs text-gray-500 mt-1">{cities.length} cities available</p>}
+              {cities.length > 0 && <p className="text-xs text-gray-400 mt-1">{cities.length} cities available</p>}
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1">
                 Pincode
               </label>
               <Input
@@ -316,7 +316,7 @@ export default function ConsignorConsigneeMaster() {
             </div>
 
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1">
                 GSTIN
               </label>
               <Input
@@ -328,7 +328,7 @@ export default function ConsignorConsigneeMaster() {
           </div>
 
           <div>
-            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1">
               Contact
             </label>
             <Input
@@ -339,7 +339,7 @@ export default function ConsignorConsigneeMaster() {
           </div>
 
           <div>
-            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1">
               Remarks
             </label>
             <Input

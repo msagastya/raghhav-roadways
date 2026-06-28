@@ -74,9 +74,9 @@ const toArrayDistribution = (value, fallbackLabel = 'Unknown') => {
 function EmptyChart({ icon: Icon = BarChart3, label = 'No data available' }) {
   return (
     <div className="flex h-72 flex-col items-center justify-center text-center">
-      <Icon className="mb-3 h-12 w-12 text-gray-300 dark:text-gray-600" />
-      <p className="font-semibold text-gray-500 dark:text-gray-400">{label}</p>
-      <p className="mt-1 text-sm text-gray-400 dark:text-gray-500">New records will appear here automatically.</p>
+      <Icon className="mb-3 h-12 w-12 text-gray-300 dark:text-gray-400" />
+      <p className="font-semibold text-gray-400 dark:text-gray-400">{label}</p>
+      <p className="mt-1 text-sm text-gray-400 dark:text-gray-400">New records will appear here automatically.</p>
     </div>
   );
 }
@@ -87,13 +87,13 @@ function MetricCard({ title, value, detail, icon: Icon, tone, index }) {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, delay: index * 0.04 }}
-      className="rounded-xl border border-white/20 bg-white/45 p-4 shadow-sm backdrop-blur-md dark:bg-white/10 dark:border-white/10"
+      className="rounded-xl border border-white/20 bg-transparent/45 p-4 shadow-sm backdrop-blur-md dark:bg-transparent/10 dark:border-white/10"
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">{title}</p>
-          <p className="mt-2 text-2xl font-bold text-gray-900 dark:text-white">{value}</p>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{detail}</p>
+          <p className="text-xs font-semibold uppercase text-gray-400 dark:text-gray-400">{title}</p>
+          <p className="mt-2 text-2xl font-bold text-gray-100 dark:text-white">{value}</p>
+          <p className="mt-1 text-sm text-gray-400 dark:text-gray-400">{detail}</p>
         </div>
         <div className={`rounded-lg p-2 ${tone}`}>
           <Icon className="h-5 w-5" />
@@ -106,8 +106,8 @@ function MetricCard({ title, value, detail, icon: Icon, tone, index }) {
 function RevenueTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-lg dark:border-gray-700 dark:bg-gray-900">
-      <p className="font-semibold text-gray-900 dark:text-white">{label}</p>
+    <div className="rounded-lg border border-white/10 bg-transparent px-3 py-2 text-sm shadow-lg dark:border-gray-700 dark:bg-gray-900">
+      <p className="font-semibold text-gray-100 dark:text-white">{label}</p>
       <p className="text-green-700 dark:text-green-400">{formatCurrency(payload[0].value)}</p>
     </div>
   );
@@ -116,8 +116,8 @@ function RevenueTooltip({ active, payload, label }) {
 function BasicTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-lg dark:border-gray-700 dark:bg-gray-900">
-      <p className="font-semibold text-gray-900 dark:text-white">{label}</p>
+    <div className="rounded-lg border border-white/10 bg-transparent px-3 py-2 text-sm shadow-lg dark:border-gray-700 dark:bg-gray-900">
+      <p className="font-semibold text-gray-100 dark:text-white">{label}</p>
       {payload.map((item) => (
         <p key={item.dataKey} style={{ color: item.color }}>
           {item.name}: {item.dataKey === 'amount' ? formatCurrency(item.value) : Number(item.value || 0).toLocaleString('en-IN')}
@@ -170,7 +170,7 @@ export default function AnalyticsPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div className="h-16 rounded-xl bg-white/25 animate-pulse" />
+        <div className="h-16 rounded-xl bg-transparent/25 animate-pulse" />
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {Array.from({ length: 4 }).map((_, index) => <CardSkeleton key={index} />)}
         </div>
@@ -240,8 +240,8 @@ export default function AnalyticsPage() {
               <BarChart3 className="h-6 w-6" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Analytics</h1>
-              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+              <h1 className="text-2xl font-bold text-gray-100 dark:text-white">Analytics</h1>
+              <p className="mt-1 text-sm text-gray-400 dark:text-gray-400">
                 Visual overview of revenue, routes, fleet, payments, and operational health.
               </p>
             </div>
@@ -263,8 +263,8 @@ export default function AnalyticsPage() {
           <CardHeader>
             <div className="flex items-center justify-between gap-4">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Revenue Trend</h2>
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Daily revenue movement from recent consignments</p>
+                <h2 className="text-lg font-semibold text-gray-100 dark:text-white">Revenue Trend</h2>
+                <p className="mt-1 text-sm text-gray-400 dark:text-gray-400">Daily revenue movement from recent consignments</p>
               </div>
               <CircleDollarSign className="h-5 w-5 text-green-600" />
             </div>
@@ -298,8 +298,8 @@ export default function AnalyticsPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Status Split</h2>
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Consignment status distribution</p>
+                <h2 className="text-lg font-semibold text-gray-100 dark:text-white">Status Split</h2>
+                <p className="mt-1 text-sm text-gray-400 dark:text-gray-400">Consignment status distribution</p>
               </div>
               <PieChartIcon className="h-5 w-5 text-blue-600" />
             </div>
@@ -321,10 +321,10 @@ export default function AnalyticsPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   {analytics.consignmentStatus.map((item, index) => (
-                    <div key={item.name} className="flex items-center gap-2 rounded-lg bg-white/30 px-2 py-1.5 text-xs dark:bg-white/5">
+                    <div key={item.name} className="flex items-center gap-2 rounded-lg bg-transparent/30 px-2 py-1.5 text-xs dark:bg-transparent/5">
                       <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: chartColors[index % chartColors.length] }} />
-                      <span className="truncate text-gray-700 dark:text-gray-300">{item.name}</span>
-                      <span className="ml-auto font-semibold text-gray-900 dark:text-white">{item.value}</span>
+                      <span className="truncate text-gray-300 dark:text-gray-300">{item.name}</span>
+                      <span className="ml-auto font-semibold text-gray-100 dark:text-white">{item.value}</span>
                     </div>
                   ))}
                 </div>
@@ -341,8 +341,8 @@ export default function AnalyticsPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Top Routes</h2>
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                <h2 className="text-lg font-semibold text-gray-100 dark:text-white">Top Routes</h2>
+                <p className="mt-1 text-sm text-gray-400 dark:text-gray-400">
                   {analytics.totalTrips.toLocaleString('en-IN')} trips tracked across key routes
                 </p>
               </div>
@@ -376,8 +376,8 @@ export default function AnalyticsPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Route Revenue</h2>
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                <h2 className="text-lg font-semibold text-gray-100 dark:text-white">Route Revenue</h2>
+                <p className="mt-1 text-sm text-gray-400 dark:text-gray-400">
                   {formatCurrency(analytics.routeRevenue)} from top routes
                 </p>
               </div>
@@ -390,10 +390,10 @@ export default function AnalyticsPage() {
                 {analytics.topRoutes.map((route, index) => {
                   const percent = analytics.routeRevenue > 0 ? Math.round((Number(route.amount || 0) / analytics.routeRevenue) * 100) : 0;
                   return (
-                    <div key={route.route} className="rounded-xl bg-white/35 p-3 dark:bg-white/5">
+                    <div key={route.route} className="rounded-xl bg-transparent/35 p-3 dark:bg-transparent/5">
                       <div className="flex items-center justify-between gap-3 text-sm">
-                        <p className="truncate font-semibold text-gray-900 dark:text-white">{route.route}</p>
-                        <p className="font-bold text-gray-900 dark:text-white">{formatCurrency(route.amount)}</p>
+                        <p className="truncate font-semibold text-gray-100 dark:text-white">{route.route}</p>
+                        <p className="font-bold text-gray-100 dark:text-white">{formatCurrency(route.amount)}</p>
                       </div>
                       <div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-200/70 dark:bg-gray-700">
                         <div
@@ -401,7 +401,7 @@ export default function AnalyticsPage() {
                           style={{ width: `${percent}%`, backgroundColor: chartColors[index % chartColors.length] }}
                         />
                       </div>
-                      <div className="mt-1 flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                      <div className="mt-1 flex justify-between text-xs text-gray-400 dark:text-gray-400">
                         <span>{Number(route.count || 0).toLocaleString('en-IN')} trips</span>
                         <span>{percent}%</span>
                       </div>
@@ -421,7 +421,7 @@ export default function AnalyticsPage() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <PieChartIcon className="h-5 w-5 text-violet-600" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Payment Status</h2>
+              <h2 className="text-lg font-semibold text-gray-100 dark:text-white">Payment Status</h2>
             </div>
           </CardHeader>
           <CardContent>
@@ -430,8 +430,8 @@ export default function AnalyticsPage() {
                 {analytics.paymentStatus.map((item, index) => (
                   <div key={item.name} className="flex items-center gap-3">
                     <span className="h-3 w-3 rounded-full" style={{ backgroundColor: chartColors[index % chartColors.length] }} />
-                    <span className="flex-1 text-sm text-gray-700 dark:text-gray-300">{item.name}</span>
-                    <span className="text-sm font-bold text-gray-900 dark:text-white">{item.value}</span>
+                    <span className="flex-1 text-sm text-gray-300 dark:text-gray-300">{item.name}</span>
+                    <span className="text-sm font-bold text-gray-100 dark:text-white">{item.value}</span>
                   </div>
                 ))}
               </div>
@@ -445,7 +445,7 @@ export default function AnalyticsPage() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-amber-600" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Alerts</h2>
+              <h2 className="text-lg font-semibold text-gray-100 dark:text-white">Alerts</h2>
             </div>
           </CardHeader>
           <CardContent>
@@ -455,8 +455,8 @@ export default function AnalyticsPage() {
                 { label: 'Expiring documents', value: dashboardData?.alerts?.expiringDocuments?.length || 0, tone: 'warning' },
                 { label: 'Pending amendments', value: dashboardData?.alerts?.pendingAmendments?.length || 0, tone: 'primary' },
               ].map((item) => (
-                <div key={item.label} className="flex items-center justify-between rounded-lg bg-white/35 px-3 py-2 dark:bg-white/5">
-                  <span className="text-sm text-gray-700 dark:text-gray-300">{item.label}</span>
+                <div key={item.label} className="flex items-center justify-between rounded-lg bg-transparent/35 px-3 py-2 dark:bg-transparent/5">
+                  <span className="text-sm text-gray-300 dark:text-gray-300">{item.label}</span>
                   <Badge variant={item.tone}>{item.value}</Badge>
                 </div>
               ))}
@@ -468,19 +468,19 @@ export default function AnalyticsPage() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <Activity className="h-5 w-5 text-blue-600" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Activity</h2>
+              <h2 className="text-lg font-semibold text-gray-100 dark:text-white">Recent Activity</h2>
             </div>
           </CardHeader>
           <CardContent>
             {dashboardData?.recentActivity?.length > 0 ? (
               <div className="space-y-3">
                 {dashboardData.recentActivity.slice(0, 5).map((item, index) => (
-                  <div key={`${item.timestamp}-${index}`} className="rounded-lg bg-white/35 px-3 py-2 dark:bg-white/5">
+                  <div key={`${item.timestamp}-${index}`} className="rounded-lg bg-transparent/35 px-3 py-2 dark:bg-transparent/5">
                     <div className="flex items-start gap-2">
-                      <FileText className="mt-0.5 h-4 w-4 flex-shrink-0 text-gray-500" />
+                      <FileText className="mt-0.5 h-4 w-4 flex-shrink-0 text-gray-400" />
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-gray-900 dark:text-white">{item.description}</p>
-                        <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                        <p className="truncate text-sm font-semibold text-gray-100 dark:text-white">{item.description}</p>
+                        <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-400">
                           {formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })} by {item.user}
                         </p>
                       </div>

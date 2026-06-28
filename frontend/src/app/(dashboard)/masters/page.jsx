@@ -26,13 +26,13 @@ export default function MastersPage() {
         transition={{ duration: 0.4 }}
         className="px-1"
       >
-        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 drop-shadow-sm">Master Data Management</h1>
-        <p className="text-gray-600 mt-1 text-xs sm:text-sm lg:text-base">Manage all master data for the system</p>
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-100 drop-shadow-sm">Master Data Management</h1>
+        <p className="text-gray-400 mt-1 text-xs sm:text-sm lg:text-base">Manage all master data for the system</p>
       </motion.div>
 
       {/* Tabs */}
       <motion.div
-        className="border-b-2 border-gray-200 pb-2 sm:overflow-x-auto sm:pb-0"
+        className="border-b-2 border-white/10 pb-2 sm:overflow-x-auto sm:pb-0"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4, delay: 0.1 }}
@@ -47,7 +47,7 @@ export default function MastersPage() {
                 ${
                   activeTab === tab.id
                     ? 'bg-primary-50 text-primary-700 shadow-sm sm:bg-transparent sm:text-primary-600 sm:shadow-none'
-                    : 'bg-white/50 text-gray-500 hover:bg-white hover:text-gray-700 sm:bg-transparent sm:hover:bg-transparent'
+                    : 'bg-transparent/50 text-gray-400 hover:bg-transparent hover:text-gray-300 sm:bg-transparent sm:hover:bg-transparent'
                 }
               `}
               initial={{ opacity: 0, y: -10 }}

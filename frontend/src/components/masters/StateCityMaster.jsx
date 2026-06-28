@@ -120,8 +120,8 @@ export default function StateCityMaster() {
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
-          <h3 className="text-base sm:text-lg font-semibold text-gray-900">State & City Master</h3>
-          <p className="text-xs sm:text-sm text-gray-600">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-100">State & City Master</h3>
+          <p className="text-xs sm:text-sm text-gray-400">
             {selectedState
               ? `Viewing cities in ${selectedState.stateName}`
               : 'Select a state to view cities'}
@@ -138,7 +138,7 @@ export default function StateCityMaster() {
         <div className="lg:col-span-5">
           <Card>
             <CardHeader>
-              <h3 className="text-sm sm:text-base font-semibold text-gray-900">States of India</h3>
+              <h3 className="text-sm sm:text-base font-semibold text-gray-100">States of India</h3>
             </CardHeader>
             <CardContent className="p-0">
               <div className="overflow-x-auto">
@@ -160,13 +160,13 @@ export default function StateCityMaster() {
                         className={`cursor-pointer transition-colors ${
                           selectedState?.id === state.id
                             ? 'bg-primary-50 hover:bg-primary-100'
-                            : 'hover:bg-gray-50'
+                            : 'hover:bg-transparent/5'
                         }`}
                       >
                         <TableCell className="font-mono text-xs sm:text-sm">{state.stateCode}</TableCell>
                         <TableCell className="font-medium text-xs sm:text-sm">{state.stateName}</TableCell>
                         <TableCell className="text-right">
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-transparent/10 text-gray-200">
                             {state._count?.cities || 0}
                           </span>
                         </TableCell>
@@ -186,14 +186,14 @@ export default function StateCityMaster() {
               <CardHeader>
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                   <div>
-                    <h3 className="text-sm sm:text-base font-semibold text-gray-900">
+                    <h3 className="text-sm sm:text-base font-semibold text-gray-100">
                       Cities in {selectedState.stateName}
                     </h3>
-                    <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                    <p className="text-xs sm:text-sm text-gray-400 mt-1">
                       State Code: {selectedState.stateCode}
                     </p>
                   </div>
-                  <div className="text-xs sm:text-sm text-gray-600">
+                  <div className="text-xs sm:text-sm text-gray-400">
                     Total: <span className="font-semibold">{cities.length}</span> cities
                   </div>
                 </div>
@@ -201,7 +201,7 @@ export default function StateCityMaster() {
               <CardContent className="p-3 sm:p-4 lg:p-6">
                 {cities.length === 0 ? (
                   <div className="text-center py-8 sm:py-12">
-                    <p className="text-sm sm:text-base text-gray-500">No cities found for this state</p>
+                    <p className="text-sm sm:text-base text-gray-400">No cities found for this state</p>
                     <Button
                       onClick={openAddCityModal}
                       className="mt-4"
@@ -216,14 +216,14 @@ export default function StateCityMaster() {
                     {cities.map((city, index) => (
                       <motion.div
                         key={city.id}
-                        className="px-3 sm:px-4 py-2 bg-gradient-to-br from-gray-50 to-white rounded-lg border border-gray-200 hover:border-primary-300 hover:bg-primary-50 hover:shadow-md transition-all cursor-pointer"
+                        className="px-3 sm:px-4 py-2 bg-gradient-to-br from-gray-50 to-white rounded-lg border border-white/10 hover:border-primary-300 hover:bg-primary-50 hover:shadow-md transition-all cursor-pointer"
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: index * 0.02, duration: 0.2 }}
                         whileHover={{ scale: 1.03, y: -2 }}
                         whileTap={{ scale: 0.98 }}
                       >
-                        <p className="text-xs sm:text-sm font-medium text-gray-900">{city.cityName}</p>
+                        <p className="text-xs sm:text-sm font-medium text-gray-100">{city.cityName}</p>
                       </motion.div>
                     ))}
                   </div>
@@ -239,8 +239,8 @@ export default function StateCityMaster() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                     </svg>
                   </div>
-                  <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">Select a State</h3>
-                  <p className="text-xs sm:text-sm text-gray-500">
+                  <h3 className="text-base sm:text-lg font-medium text-gray-100 mb-2">Select a State</h3>
+                  <p className="text-xs sm:text-sm text-gray-400">
                     Click on any state from the list to view its cities
                   </p>
                 </div>
@@ -254,7 +254,7 @@ export default function StateCityMaster() {
       <Modal isOpen={showAddCity} onClose={() => setShowAddCity(false)} title="Add New City">
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-300 mb-1">
               State <span className="text-red-500">*</span>
             </label>
             <Select
@@ -272,7 +272,7 @@ export default function StateCityMaster() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-300 mb-1">
               City Name <span className="text-red-500">*</span>
             </label>
             <Input

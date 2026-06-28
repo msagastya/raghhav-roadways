@@ -106,15 +106,15 @@ export default function EditConsignmentPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link href={`/consignments/${id}`} className="rounded-lg p-2 text-gray-600 transition hover:bg-white/60 hover:text-gray-900">
+        <Link href={`/consignments/${id}`} className="rounded-lg p-2 text-gray-400 transition hover:bg-transparent/60 hover:text-gray-100">
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <div>
           <div className="flex items-center gap-2">
             <Package className="h-5 w-5 text-primary-600" />
-            <h1 className="text-2xl font-bold text-gray-900">Edit Consignment</h1>
+            <h1 className="text-2xl font-bold text-gray-100">Edit Consignment</h1>
           </div>
-          <p className="mt-1 text-gray-600">{formData.grNumber}</p>
+          <p className="mt-1 text-gray-400">{formData.grNumber}</p>
         </div>
       </div>
 

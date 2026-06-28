@@ -46,27 +46,27 @@ const ExportButton = ({
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden z-50"
+            className="absolute right-0 mt-2 w-48 bg-transparent rounded-lg shadow-xl border border-white/10 overflow-hidden z-50"
           >
             <button
               onClick={handleExportCSV}
-              className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center gap-3"
+              className="w-full px-4 py-3 text-left hover:bg-transparent/5 transition-colors flex items-center gap-3"
             >
-              <FileText className="w-4 h-4 text-gray-600" />
+              <FileText className="w-4 h-4 text-gray-400" />
               <div>
-                <div className="text-sm font-medium text-gray-900">Export as CSV</div>
-                <div className="text-xs text-gray-500">Comma-separated values</div>
+                <div className="text-sm font-medium text-gray-100">Export as CSV</div>
+                <div className="text-xs text-gray-400">Comma-separated values</div>
               </div>
             </button>
 
             <button
               onClick={handleExportExcel}
-              className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center gap-3 border-t border-gray-100"
+              className="w-full px-4 py-3 text-left hover:bg-transparent/5 transition-colors flex items-center gap-3 border-t border-gray-100"
             >
-              <File className="w-4 h-4 text-gray-600" />
+              <File className="w-4 h-4 text-gray-400" />
               <div>
-                <div className="text-sm font-medium text-gray-900">Export as Excel</div>
-                <div className="text-xs text-gray-500">Microsoft Excel format</div>
+                <div className="text-sm font-medium text-gray-100">Export as Excel</div>
+                <div className="text-xs text-gray-400">Microsoft Excel format</div>
               </div>
             </button>
           </motion.div>

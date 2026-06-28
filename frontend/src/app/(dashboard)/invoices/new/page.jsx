@@ -207,14 +207,14 @@ export default function NewInvoicePage() {
         transition={{ duration: 0.35 }}
       >
         <Link href="/invoices">
-          <button className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-white/60 border border-transparent hover:border-black/8 transition-all">
+          <button className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-100 px-3 py-2 rounded-lg hover:bg-transparent/60 border border-transparent hover:border-black/8 transition-all">
             <ArrowLeft className="w-4 h-4" />
             Back
           </button>
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">New Bill / Invoice</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Group GRs for a party into one bill</p>
+          <h1 className="text-2xl font-bold text-gray-100 dark:text-white">New Bill / Invoice</h1>
+          <p className="text-sm text-gray-400 mt-0.5">Group GRs for a party into one bill</p>
         </div>
       </motion.div>
 
@@ -222,26 +222,26 @@ export default function NewInvoicePage() {
 
         {/* ── Party + Date ─────────────────────────────────── */}
         <motion.div
-          className="bg-white/60 dark:bg-white/5 backdrop-blur-sm border border-black/8 dark:border-white/8 rounded-2xl p-5"
+          className="bg-transparent/60 dark:bg-transparent/5 backdrop-blur-sm border border-black/8 dark:border-white/8 rounded-2xl p-5"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.05 }}
         >
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wide">
+          <h3 className="text-sm font-semibold text-gray-300 dark:text-gray-300 mb-4 uppercase tracking-wide">
             Party &amp; Invoice Details
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
             {/* Party search dropdown */}
             <div className="md:col-span-2 relative">
-              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+              <label className="block text-xs font-medium text-gray-400 dark:text-gray-400 mb-1">
                 Bill To (Party) <span className="text-red-500">*</span>
               </label>
               <div
-                className="flex items-center justify-between border border-black/12 dark:border-white/12 rounded-xl bg-white/50 dark:bg-white/5 px-3 py-2.5 cursor-pointer hover:border-primary-400 transition-colors"
+                className="flex items-center justify-between border border-black/12 dark:border-white/12 rounded-xl bg-transparent/50 dark:bg-transparent/5 px-3 py-2.5 cursor-pointer hover:border-primary-400 transition-colors"
                 onClick={() => setPartyDropOpen(o => !o)}
               >
-                <span className={partyName ? 'text-gray-900 dark:text-white font-medium text-sm' : 'text-gray-400 text-sm'}>
+                <span className={partyName ? 'text-gray-100 dark:text-white font-medium text-sm' : 'text-gray-400 text-sm'}>
                   {partyName || 'Select party…'}
                 </span>
                 <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${partyDropOpen ? 'rotate-180' : ''}`} />
@@ -252,17 +252,17 @@ export default function NewInvoicePage() {
                     initial={{ opacity: 0, y: 4 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 4 }}
-                    className="absolute z-50 top-full mt-1 w-full bg-white dark:bg-gray-900 border border-black/10 dark:border-white/10 rounded-xl shadow-xl overflow-hidden"
+                    className="absolute z-50 top-full mt-1 w-full bg-transparent dark:bg-gray-900 border border-black/10 dark:border-white/10 rounded-xl shadow-xl overflow-hidden"
                   >
                     <div className="p-2 border-b border-black/5">
-                      <div className="flex items-center gap-2 px-2 py-1.5 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                      <div className="flex items-center gap-2 px-2 py-1.5 bg-transparent/5 dark:bg-gray-800 rounded-lg">
                         <Search className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
                         <input
                           autoFocus
                           value={partySearch}
                           onChange={e => setPartySearch(e.target.value)}
                           placeholder="Search parties…"
-                          className="flex-1 bg-transparent text-sm outline-none text-gray-900 dark:text-white placeholder:text-gray-400"
+                          className="flex-1 bg-transparent text-sm outline-none text-gray-100 dark:text-white placeholder:text-gray-400"
                         />
                       </div>
                     </div>
@@ -273,7 +273,7 @@ export default function NewInvoicePage() {
                         <div
                           key={p.id}
                           onClick={() => handlePartySelect(p)}
-                          className="px-4 py-2.5 text-sm cursor-pointer hover:bg-primary-50 dark:hover:bg-primary-900/20 text-gray-900 dark:text-white transition-colors"
+                          className="px-4 py-2.5 text-sm cursor-pointer hover:bg-primary-50 dark:hover:bg-primary-900/20 text-gray-100 dark:text-white transition-colors"
                         >
                           <span className="font-medium">{p.partyName}</span>
                           <span className="ml-2 text-xs text-gray-400">{p.partyCode}</span>
@@ -287,7 +287,7 @@ export default function NewInvoicePage() {
 
             {/* Invoice Date */}
             <div>
-              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+              <label className="block text-xs font-medium text-gray-400 dark:text-gray-400 mb-1">
                 Bill Date <span className="text-red-500">*</span>
               </label>
               <input
@@ -295,7 +295,7 @@ export default function NewInvoicePage() {
                 value={invoiceDate}
                 onChange={e => setInvoiceDate(e.target.value)}
                 required
-                className="w-full border border-black/12 dark:border-white/12 rounded-xl bg-white/50 dark:bg-white/5 px-3 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-400/40 focus:border-primary-400 transition-all"
+                className="w-full border border-black/12 dark:border-white/12 rounded-xl bg-transparent/50 dark:bg-transparent/5 px-3 py-2.5 text-sm text-gray-100 dark:text-white outline-none focus:ring-2 focus:ring-primary-400/40 focus:border-primary-400 transition-all"
               />
             </div>
           </div>
@@ -309,7 +309,7 @@ export default function NewInvoicePage() {
                 </span>
               )}
               {partyAddress && (
-                <span className="text-xs bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-2.5 py-1 rounded-full border border-gray-200/50">
+                <span className="text-xs bg-transparent/5 dark:bg-gray-800 text-gray-400 dark:text-gray-400 px-2.5 py-1 rounded-full border border-white/10/50">
                   {partyAddress}
                 </span>
               )}
@@ -319,13 +319,13 @@ export default function NewInvoicePage() {
 
         {/* ── GR Selection ────────────────────────────────── */}
         <motion.div
-          className="bg-white/60 dark:bg-white/5 backdrop-blur-sm border border-black/8 dark:border-white/8 rounded-2xl p-5"
+          className="bg-transparent/60 dark:bg-transparent/5 backdrop-blur-sm border border-black/8 dark:border-white/8 rounded-2xl p-5"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.1 }}
         >
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+            <h3 className="text-sm font-semibold text-gray-300 dark:text-gray-300 uppercase tracking-wide">
               Add GR / Consignments
             </h3>
             <span className="text-xs text-gray-400">
@@ -334,13 +334,13 @@ export default function NewInvoicePage() {
           </div>
 
           {/* GR search */}
-          <div className="flex items-center gap-2 border border-black/10 dark:border-white/10 rounded-xl bg-white/50 dark:bg-white/5 px-3 py-2 mb-3">
+          <div className="flex items-center gap-2 border border-black/10 dark:border-white/10 rounded-xl bg-transparent/50 dark:bg-transparent/5 px-3 py-2 mb-3">
             <Search className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
             <input
               value={grSearch}
               onChange={e => setGrSearch(e.target.value)}
               placeholder="Search by GR No, location, contents…"
-              className="flex-1 bg-transparent text-sm outline-none text-gray-900 dark:text-white placeholder:text-gray-400"
+              className="flex-1 bg-transparent text-sm outline-none text-gray-100 dark:text-white placeholder:text-gray-400"
             />
           </div>
 
@@ -352,7 +352,7 @@ export default function NewInvoicePage() {
                   key={c.id}
                   type="button"
                   onClick={() => addGR(c)}
-                  className="flex items-center gap-1.5 text-xs bg-white dark:bg-gray-800 border border-black/10 dark:border-white/10 rounded-lg px-2.5 py-1.5 hover:border-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all text-gray-700 dark:text-gray-300"
+                  className="flex items-center gap-1.5 text-xs bg-transparent dark:bg-gray-800 border border-black/10 dark:border-white/10 rounded-lg px-2.5 py-1.5 hover:border-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all text-gray-300 dark:text-gray-300"
                 >
                   <Plus className="w-3 h-3" />
                   <span className="font-medium">{c.grNumber}</span>
@@ -368,16 +368,16 @@ export default function NewInvoicePage() {
             <div className="overflow-x-auto rounded-xl border border-black/8 dark:border-white/8">
               <table className="min-w-full text-xs">
                 <thead>
-                  <tr className="bg-gray-50 dark:bg-gray-800/50">
-                    <th className="px-3 py-2.5 text-left font-semibold text-gray-600 dark:text-gray-400 whitespace-nowrap">GR No.</th>
-                    <th className="px-3 py-2.5 text-left font-semibold text-gray-600 dark:text-gray-400">Date</th>
-                    <th className="px-3 py-2.5 text-left font-semibold text-gray-600 dark:text-gray-400">Vehicle</th>
-                    <th className="px-3 py-2.5 text-left font-semibold text-gray-600 dark:text-gray-400">Contents</th>
-                    <th className="px-3 py-2.5 text-left font-semibold text-gray-600 dark:text-gray-400">From</th>
-                    <th className="px-3 py-2.5 text-left font-semibold text-gray-600 dark:text-gray-400">To</th>
-                    <th className="px-3 py-2.5 text-center font-semibold text-gray-600 dark:text-gray-400">QTY</th>
-                    <th className="px-3 py-2.5 text-center font-semibold text-gray-600 dark:text-gray-400">Rate</th>
-                    <th className="px-3 py-2.5 text-right font-semibold text-gray-600 dark:text-gray-400">Amount ₹</th>
+                  <tr className="bg-transparent/5 dark:bg-gray-800/50">
+                    <th className="px-3 py-2.5 text-left font-semibold text-gray-400 dark:text-gray-400 whitespace-nowrap">GR No.</th>
+                    <th className="px-3 py-2.5 text-left font-semibold text-gray-400 dark:text-gray-400">Date</th>
+                    <th className="px-3 py-2.5 text-left font-semibold text-gray-400 dark:text-gray-400">Vehicle</th>
+                    <th className="px-3 py-2.5 text-left font-semibold text-gray-400 dark:text-gray-400">Contents</th>
+                    <th className="px-3 py-2.5 text-left font-semibold text-gray-400 dark:text-gray-400">From</th>
+                    <th className="px-3 py-2.5 text-left font-semibold text-gray-400 dark:text-gray-400">To</th>
+                    <th className="px-3 py-2.5 text-center font-semibold text-gray-400 dark:text-gray-400">QTY</th>
+                    <th className="px-3 py-2.5 text-center font-semibold text-gray-400 dark:text-gray-400">Rate</th>
+                    <th className="px-3 py-2.5 text-right font-semibold text-gray-400 dark:text-gray-400">Amount ₹</th>
                     <th className="px-3 py-2.5"></th>
                   </tr>
                 </thead>
@@ -388,37 +388,37 @@ export default function NewInvoicePage() {
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: i * 0.04 }}
-                      className="bg-white dark:bg-gray-900/30"
+                      className="bg-transparent dark:bg-gray-900/30"
                     >
-                      <td className="px-3 py-2 font-medium text-gray-900 dark:text-white whitespace-nowrap">{gr.grNumber}</td>
+                      <td className="px-3 py-2 font-medium text-gray-100 dark:text-white whitespace-nowrap">{gr.grNumber}</td>
                       <td className="px-3 py-2">
                         <input type="date" value={gr.grDate}
                           onChange={e => updateGR(gr.grNumber, 'grDate', e.target.value)}
-                          className="w-30 border border-black/10 dark:border-white/10 rounded-lg px-2 py-1 bg-transparent text-gray-900 dark:text-white outline-none focus:border-primary-400 text-xs" />
+                          className="w-30 border border-black/10 dark:border-white/10 rounded-lg px-2 py-1 bg-transparent text-gray-100 dark:text-white outline-none focus:border-primary-400 text-xs" />
                       </td>
                       <td className="px-3 py-2">
                         <input value={gr.vehicleNo}
                           onChange={e => updateGR(gr.grNumber, 'vehicleNo', e.target.value)}
                           placeholder="Vehicle No"
-                          className="w-24 border border-black/10 dark:border-white/10 rounded-lg px-2 py-1 bg-transparent text-gray-900 dark:text-white outline-none focus:border-primary-400 text-xs" />
+                          className="w-24 border border-black/10 dark:border-white/10 rounded-lg px-2 py-1 bg-transparent text-gray-100 dark:text-white outline-none focus:border-primary-400 text-xs" />
                       </td>
                       <td className="px-3 py-2">
                         <input value={gr.contents}
                           onChange={e => updateGR(gr.grNumber, 'contents', e.target.value)}
                           placeholder="Contents"
-                          className="w-28 border border-black/10 dark:border-white/10 rounded-lg px-2 py-1 bg-transparent text-gray-900 dark:text-white outline-none focus:border-primary-400 text-xs" />
+                          className="w-28 border border-black/10 dark:border-white/10 rounded-lg px-2 py-1 bg-transparent text-gray-100 dark:text-white outline-none focus:border-primary-400 text-xs" />
                       </td>
                       <td className="px-3 py-2">
                         <input value={gr.from}
                           onChange={e => updateGR(gr.grNumber, 'from', e.target.value)}
                           placeholder="From"
-                          className="w-24 border border-black/10 dark:border-white/10 rounded-lg px-2 py-1 bg-transparent text-gray-900 dark:text-white outline-none focus:border-primary-400 text-xs" />
+                          className="w-24 border border-black/10 dark:border-white/10 rounded-lg px-2 py-1 bg-transparent text-gray-100 dark:text-white outline-none focus:border-primary-400 text-xs" />
                       </td>
                       <td className="px-3 py-2">
                         <input value={gr.to}
                           onChange={e => updateGR(gr.grNumber, 'to', e.target.value)}
                           placeholder="To"
-                          className="w-24 border border-black/10 dark:border-white/10 rounded-lg px-2 py-1 bg-transparent text-gray-900 dark:text-white outline-none focus:border-primary-400 text-xs" />
+                          className="w-24 border border-black/10 dark:border-white/10 rounded-lg px-2 py-1 bg-transparent text-gray-100 dark:text-white outline-none focus:border-primary-400 text-xs" />
                       </td>
                       <td className="px-3 py-2">
                         <input
@@ -426,7 +426,7 @@ export default function NewInvoicePage() {
                           value={gr.qty}
                           onChange={e => updateGR(gr.grNumber, 'qty', e.target.value)}
                           placeholder="FT L"
-                          className="w-20 border border-black/10 dark:border-white/10 rounded-lg px-1.5 py-1 bg-transparent text-gray-900 dark:text-white outline-none focus:border-primary-400 text-xs" />
+                          className="w-20 border border-black/10 dark:border-white/10 rounded-lg px-1.5 py-1 bg-transparent text-gray-100 dark:text-white outline-none focus:border-primary-400 text-xs" />
                       </td>
                       <td className="px-3 py-2">
                         <input
@@ -434,12 +434,12 @@ export default function NewInvoicePage() {
                           value={gr.rate}
                           onChange={e => updateGR(gr.grNumber, 'rate', e.target.value)}
                           placeholder="FIXED"
-                          className="w-20 border border-black/10 dark:border-white/10 rounded-lg px-1.5 py-1 bg-transparent text-gray-900 dark:text-white outline-none focus:border-primary-400 text-xs" />
+                          className="w-20 border border-black/10 dark:border-white/10 rounded-lg px-1.5 py-1 bg-transparent text-gray-100 dark:text-white outline-none focus:border-primary-400 text-xs" />
                       </td>
                       <td className="px-3 py-2">
                         <input type="number" step="0.01" min="0" value={gr.amount}
                           onChange={e => updateGR(gr.grNumber, 'amount', e.target.value)}
-                          className="w-24 border border-black/10 dark:border-white/10 rounded-lg px-2 py-1 bg-transparent text-gray-900 dark:text-white outline-none focus:border-primary-400 text-xs text-right" />
+                          className="w-24 border border-black/10 dark:border-white/10 rounded-lg px-2 py-1 bg-transparent text-gray-100 dark:text-white outline-none focus:border-primary-400 text-xs text-right" />
                       </td>
                       <td className="px-3 py-2">
                         <button type="button" onClick={() => removeGR(gr.grNumber)}
@@ -464,13 +464,13 @@ export default function NewInvoicePage() {
 
         {/* ── Extra Charges ────────────────────────────────── */}
         <motion.div
-          className="bg-white/60 dark:bg-white/5 backdrop-blur-sm border border-black/8 dark:border-white/8 rounded-2xl p-5"
+          className="bg-transparent/60 dark:bg-transparent/5 backdrop-blur-sm border border-black/8 dark:border-white/8 rounded-2xl p-5"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.15 }}
         >
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+            <h3 className="text-sm font-semibold text-gray-300 dark:text-gray-300 uppercase tracking-wide">
               Extra Charges
             </h3>
             <button type="button" onClick={addExtra}
@@ -489,11 +489,11 @@ export default function NewInvoicePage() {
                   <input value={item.content}
                     onChange={e => updateExtra(i, 'content', e.target.value)}
                     placeholder="Charge description (e.g. One day detention @Unloading Point)"
-                    className="flex-1 border border-black/10 dark:border-white/10 rounded-xl px-3 py-2 bg-white/50 dark:bg-white/5 text-sm text-gray-900 dark:text-white outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20" />
+                    className="flex-1 border border-black/10 dark:border-white/10 rounded-xl px-3 py-2 bg-transparent/50 dark:bg-transparent/5 text-sm text-gray-100 dark:text-white outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20" />
                   <input type="number" step="0.01" min="0" value={item.charge}
                     onChange={e => updateExtra(i, 'charge', e.target.value)}
                     placeholder="₹ Amount"
-                    className="w-32 border border-black/10 dark:border-white/10 rounded-xl px-3 py-2 bg-white/50 dark:bg-white/5 text-sm text-gray-900 dark:text-white outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 text-right" />
+                    className="w-32 border border-black/10 dark:border-white/10 rounded-xl px-3 py-2 bg-transparent/50 dark:bg-transparent/5 text-sm text-gray-100 dark:text-white outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 text-right" />
                   <button type="button" onClick={() => removeExtra(i)}
                     className="text-red-400 hover:text-red-600 p-1.5 rounded-lg transition-colors">
                     <Trash2 className="w-4 h-4" />
@@ -504,19 +504,19 @@ export default function NewInvoicePage() {
           )}
 
           <div className="mt-4 flex items-center gap-3 pt-4 border-t border-black/5 dark:border-white/5">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
+            <label className="text-sm font-medium text-gray-300 dark:text-gray-300 whitespace-nowrap">
               GR Charge (₹)
             </label>
             <input type="number" step="0.01" min="0" value={grCharges}
               onChange={e => setGrCharges(e.target.value)}
-              className="w-32 border border-black/10 dark:border-white/10 rounded-xl px-3 py-2 bg-white/50 dark:bg-white/5 text-sm text-gray-900 dark:text-white outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 text-right" />
+              className="w-32 border border-black/10 dark:border-white/10 rounded-xl px-3 py-2 bg-transparent/50 dark:bg-transparent/5 text-sm text-gray-100 dark:text-white outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 text-right" />
             <span className="text-xs text-gray-400">Standard ₹150 per bill</span>
           </div>
         </motion.div>
 
         {/* ── Summary + Submit ─────────────────────────────── */}
         <motion.div
-          className="bg-white/70 dark:bg-white/8 backdrop-blur-sm border border-black/8 dark:border-white/8 rounded-2xl p-5"
+          className="bg-transparent/70 dark:bg-transparent/8 backdrop-blur-sm border border-black/8 dark:border-white/8 rounded-2xl p-5"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.2 }}
@@ -524,7 +524,7 @@ export default function NewInvoicePage() {
           <div className="flex items-start justify-between mb-5">
             <div className="flex items-center gap-2">
               <Calculator className="w-5 h-5 text-gray-400" />
-              <span className="font-semibold text-gray-700 dark:text-gray-300">Bill Summary</span>
+              <span className="font-semibold text-gray-300 dark:text-gray-300">Bill Summary</span>
             </div>
             <div className="text-right">
               <div className="text-3xl font-bold text-primary-600">
@@ -534,24 +534,24 @@ export default function NewInvoicePage() {
             </div>
           </div>
 
-          <div className="space-y-1.5 text-sm text-gray-600 dark:text-gray-400 mb-5 border-t border-b border-black/5 dark:border-white/5 py-3">
+          <div className="space-y-1.5 text-sm text-gray-400 dark:text-gray-400 mb-5 border-t border-b border-black/5 dark:border-white/5 py-3">
             <div className="flex justify-between">
               <span>GR Freight Total ({selectedGRs.length} GRs)</span>
-              <span className="font-medium text-gray-900 dark:text-white">
+              <span className="font-medium text-gray-100 dark:text-white">
                 ₹{grTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
               </span>
             </div>
             {extraTotal > 0 && (
               <div className="flex justify-between">
                 <span>Extra Charges ({extraItems.length})</span>
-                <span className="font-medium text-gray-900 dark:text-white">
+                <span className="font-medium text-gray-100 dark:text-white">
                   ₹{extraTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                 </span>
               </div>
             )}
             <div className="flex justify-between">
               <span>GR Charge</span>
-              <span className="font-medium text-gray-900 dark:text-white">
+              <span className="font-medium text-gray-100 dark:text-white">
                 ₹{(parseFloat(grCharges) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
               </span>
             </div>
@@ -571,7 +571,7 @@ export default function NewInvoicePage() {
             </button>
             <Link href="/invoices">
               <button type="button"
-                className="px-5 py-3 border border-black/10 dark:border-white/10 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-white/50 transition-all text-sm">
+                className="px-5 py-3 border border-black/10 dark:border-white/10 text-gray-300 dark:text-gray-300 font-medium rounded-xl hover:bg-transparent/50 transition-all text-sm">
                 Cancel
               </button>
             </Link>

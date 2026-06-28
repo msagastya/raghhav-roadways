@@ -67,8 +67,8 @@ const Pagination = ({
         ${isActive
           ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/30'
           : disabled
-          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-          : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+          ? 'bg-transparent/10 text-gray-400 cursor-not-allowed'
+          : 'bg-transparent text-gray-300 hover:bg-transparent/5 border border-white/20'
         }
       `}
     >
@@ -86,8 +86,8 @@ const Pagination = ({
       className={`
         h-10 w-10 rounded-lg transition-all flex items-center justify-center
         ${disabled
-          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-          : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+          ? 'bg-transparent/10 text-gray-400 cursor-not-allowed'
+          : 'bg-transparent text-gray-300 hover:bg-transparent/5 border border-white/20'
         }
       `}
     >
@@ -98,10 +98,10 @@ const Pagination = ({
   return (
     <div className={`flex flex-col sm:flex-row items-center justify-between gap-4 ${className}`}>
       {/* Items Info */}
-      <div className="text-sm text-gray-600">
-        Showing <span className="font-semibold text-gray-900">{startItem}</span> to{' '}
-        <span className="font-semibold text-gray-900">{endItem}</span> of{' '}
-        <span className="font-semibold text-gray-900">{totalItems}</span> results
+      <div className="text-sm text-gray-400">
+        Showing <span className="font-semibold text-gray-100">{startItem}</span> to{' '}
+        <span className="font-semibold text-gray-100">{endItem}</span> of{' '}
+        <span className="font-semibold text-gray-100">{totalItems}</span> results
       </div>
 
       {/* Pagination Controls */}
@@ -141,7 +141,7 @@ const Pagination = ({
         </div>
 
         {/* Current Page (Mobile) */}
-        <div className="sm:hidden px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium">
+        <div className="sm:hidden px-4 py-2 bg-transparent border border-white/20 rounded-lg text-sm font-medium">
           {currentPage} / {totalPages}
         </div>
 
@@ -166,7 +166,7 @@ const Pagination = ({
           <select
             value={itemsPerPage}
             onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
-            className="ml-2 h-10 px-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="ml-2 h-10 px-3 border border-white/20 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           >
             <option value={10}>10 / page</option>
             <option value={25}>25 / page</option>

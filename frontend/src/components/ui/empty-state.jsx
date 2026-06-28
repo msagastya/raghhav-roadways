@@ -67,7 +67,7 @@ const EmptyState = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
-        className="text-xl font-semibold text-gray-900 mb-2 text-center"
+        className="text-xl font-semibold text-gray-100 mb-2 text-center"
       >
         {title}
       </motion.h3>
@@ -77,7 +77,7 @@ const EmptyState = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3 }}
-        className="text-gray-600 text-center max-w-md mb-6"
+        className="text-gray-400 text-center max-w-md mb-6"
       >
         {description}
       </motion.p>

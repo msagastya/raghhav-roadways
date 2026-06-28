@@ -244,8 +244,8 @@ export default function NewConsignmentPage() {
           </Button>
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">New Consignment</h1>
-          <p className="text-gray-600 mt-1">Create a new consignment record</p>
+          <h1 className="text-2xl font-bold text-gray-100">New Consignment</h1>
+          <p className="text-gray-400 mt-1">Create a new consignment record</p>
         </div>
       </div>
 
@@ -253,12 +253,12 @@ export default function NewConsignmentPage() {
         {/* Basic Information */}
         <Card className="mb-6">
           <CardHeader>
-            <h3 className="text-lg font-semibold text-gray-900">Basic Information</h3>
+            <h3 className="text-lg font-semibold text-gray-100">Basic Information</h3>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   GR Date <span className="text-red-500">*</span>
                 </label>
                 <Input
@@ -270,7 +270,7 @@ export default function NewConsignmentPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Consignment No
                 </label>
                 <Input
@@ -281,7 +281,7 @@ export default function NewConsignmentPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Issuing Branch <span className="text-red-500">*</span>
                 </label>
                 <Input
@@ -292,7 +292,7 @@ export default function NewConsignmentPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Delivery Office
                 </label>
                 <Input
@@ -305,7 +305,7 @@ export default function NewConsignmentPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   From <span className="text-red-500">*</span>
                 </label>
                 <Input
@@ -317,7 +317,7 @@ export default function NewConsignmentPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   To <span className="text-red-500">*</span>
                 </label>
                 <Input
@@ -334,12 +334,12 @@ export default function NewConsignmentPage() {
         {/* Vehicle Details */}
         <Card className="mb-6">
           <CardHeader>
-            <h3 className="text-lg font-semibold text-gray-900">Vehicle Details</h3>
+            <h3 className="text-lg font-semibold text-gray-100">Vehicle Details</h3>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Truck No <span className="text-red-500">*</span>
                 </label>
                 <Select value={formData.vehicleId} onChange={handleVehicleChange} required>
@@ -353,7 +353,7 @@ export default function NewConsignmentPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Load Type
                 </label>
                 <Select
@@ -365,7 +365,7 @@ export default function NewConsignmentPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Vehicle Type
                 </label>
                 <Input
@@ -382,12 +382,12 @@ export default function NewConsignmentPage() {
         {/* E-way Bill Details */}
         <Card className="mb-6">
           <CardHeader>
-            <h3 className="text-lg font-semibold text-gray-900">E-way Bill & Documents</h3>
+            <h3 className="text-lg font-semibold text-gray-100">E-way Bill & Documents</h3>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   E-way Bill No
                 </label>
                 <Input
@@ -398,7 +398,7 @@ export default function NewConsignmentPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   From Date
                 </label>
                 <Input
@@ -409,7 +409,7 @@ export default function NewConsignmentPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Valid Upto
                 </label>
                 <Input
@@ -420,7 +420,7 @@ export default function NewConsignmentPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   E-waybill File
                 </label>
                 <Input
@@ -433,7 +433,7 @@ export default function NewConsignmentPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Challan File
                 </label>
                 <Input
@@ -449,16 +449,16 @@ export default function NewConsignmentPage() {
         {/* Consignor & Consignee */}
         <Card className="mb-6">
           <CardHeader>
-            <h3 className="text-lg font-semibold text-gray-900">Consignor & Consignee Details</h3>
+            <h3 className="text-lg font-semibold text-gray-100">Consignor & Consignee Details</h3>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Consignor */}
-              <div className="border rounded-lg p-4 bg-gray-50">
-                <h4 className="font-medium text-gray-900 mb-3">Consignor</h4>
+              <div className="border rounded-lg p-4 bg-transparent/5">
+                <h4 className="font-medium text-gray-100 mb-3">Consignor</h4>
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-300 mb-1">
                       Select Consignor <span className="text-red-500">*</span>
                     </label>
                     <Select value={formData.consignorId} onChange={handleConsignorChange} required>
@@ -473,16 +473,16 @@ export default function NewConsignmentPage() {
                   {selectedConsignor && (
                     <div className="space-y-1.5 text-sm mt-2 bg-primary-50/40 rounded-lg p-3">
                       {(selectedConsignor.addressLine1 || selectedConsignor.city) && (
-                        <p className="text-gray-600">
+                        <p className="text-gray-400">
                           {[selectedConsignor.addressLine1, selectedConsignor.city, selectedConsignor.state]
                             .filter(Boolean).join(', ')}
                         </p>
                       )}
                       {selectedConsignor.gstin && (
-                        <p className="text-gray-600"><span className="font-medium">GST:</span> {selectedConsignor.gstin}</p>
+                        <p className="text-gray-400"><span className="font-medium">GST:</span> {selectedConsignor.gstin}</p>
                       )}
                       {selectedConsignor.mobile && (
-                        <p className="text-gray-600"><span className="font-medium">Mobile:</span> {selectedConsignor.mobile}</p>
+                        <p className="text-gray-400"><span className="font-medium">Mobile:</span> {selectedConsignor.mobile}</p>
                       )}
                     </div>
                   )}
@@ -490,11 +490,11 @@ export default function NewConsignmentPage() {
               </div>
 
               {/* Consignee */}
-              <div className="border rounded-lg p-4 bg-gray-50">
-                <h4 className="font-medium text-gray-900 mb-3">Consignee</h4>
+              <div className="border rounded-lg p-4 bg-transparent/5">
+                <h4 className="font-medium text-gray-100 mb-3">Consignee</h4>
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-300 mb-1">
                       Select Consignee <span className="text-red-500">*</span>
                     </label>
                     <Select value={formData.consigneeId} onChange={handleConsigneeChange} required>
@@ -509,16 +509,16 @@ export default function NewConsignmentPage() {
                   {selectedConsignee && (
                     <div className="space-y-1.5 text-sm mt-2 bg-primary-50/40 rounded-lg p-3">
                       {(selectedConsignee.addressLine1 || selectedConsignee.city) && (
-                        <p className="text-gray-600">
+                        <p className="text-gray-400">
                           {[selectedConsignee.addressLine1, selectedConsignee.city, selectedConsignee.state]
                             .filter(Boolean).join(', ')}
                         </p>
                       )}
                       {selectedConsignee.gstin && (
-                        <p className="text-gray-600"><span className="font-medium">GST:</span> {selectedConsignee.gstin}</p>
+                        <p className="text-gray-400"><span className="font-medium">GST:</span> {selectedConsignee.gstin}</p>
                       )}
                       {selectedConsignee.mobile && (
-                        <p className="text-gray-600"><span className="font-medium">Mobile:</span> {selectedConsignee.mobile}</p>
+                        <p className="text-gray-400"><span className="font-medium">Mobile:</span> {selectedConsignee.mobile}</p>
                       )}
                     </div>
                   )}
@@ -531,12 +531,12 @@ export default function NewConsignmentPage() {
         {/* Package Details */}
         <Card className="mb-6">
           <CardHeader>
-            <h3 className="text-lg font-semibold text-gray-900">Package & Weight Details</h3>
+            <h3 className="text-lg font-semibold text-gray-100">Package & Weight Details</h3>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   No. of Packages
                 </label>
                 <Input
@@ -549,7 +549,7 @@ export default function NewConsignmentPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Actual Weight
                 </label>
                 <Input
@@ -562,7 +562,7 @@ export default function NewConsignmentPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Charged Weight
                 </label>
                 <Input
@@ -575,7 +575,7 @@ export default function NewConsignmentPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Weight Unit
                 </label>
                 <Select
@@ -591,7 +591,7 @@ export default function NewConsignmentPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Contents / Goods Description <span className="text-red-500">*</span>
                 </label>
                 <Input
@@ -603,7 +603,7 @@ export default function NewConsignmentPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Shipment Value
                 </label>
                 <Input
@@ -621,12 +621,12 @@ export default function NewConsignmentPage() {
         {/* Charges & Payment */}
         <Card className="mb-6">
           <CardHeader>
-            <h3 className="text-lg font-semibold text-gray-900">Charges & Payment</h3>
+            <h3 className="text-lg font-semibold text-gray-100">Charges & Payment</h3>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Freight Amount <span className="text-red-500">*</span>
                 </label>
                 <Input
@@ -640,7 +640,7 @@ export default function NewConsignmentPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Surcharge
                 </label>
                 <Input
@@ -653,7 +653,7 @@ export default function NewConsignmentPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Other Charges
                 </label>
                 <Input
@@ -666,7 +666,7 @@ export default function NewConsignmentPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   GR Charge
                 </label>
                 <Input
@@ -681,19 +681,19 @@ export default function NewConsignmentPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Total Amount
                 </label>
                 <Input
                   type="number"
                   value={formData.totalAmount}
                   readOnly
-                  className="bg-gray-100 font-semibold"
+                  className="bg-transparent/10 font-semibold"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Payment Mode
                 </label>
                 <Select
@@ -707,7 +707,7 @@ export default function NewConsignmentPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   At Risk
                 </label>
                 <Select
@@ -725,12 +725,12 @@ export default function NewConsignmentPage() {
         {/* Insurance Details */}
         <Card className="mb-6">
           <CardHeader>
-            <h3 className="text-lg font-semibold text-gray-900">Insurance Details</h3>
+            <h3 className="text-lg font-semibold text-gray-100">Insurance Details</h3>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Policy No
                 </label>
                 <Input
@@ -741,7 +741,7 @@ export default function NewConsignmentPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Policy Amount
                 </label>
                 <Input
@@ -759,12 +759,12 @@ export default function NewConsignmentPage() {
         {/* Additional Information */}
         <Card className="mb-6">
           <CardHeader>
-            <h3 className="text-lg font-semibold text-gray-900">Additional Information</h3>
+            <h3 className="text-lg font-semibold text-gray-100">Additional Information</h3>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Rate Type
                 </label>
                 <Select
@@ -779,7 +779,7 @@ export default function NewConsignmentPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Rate Calculation
                 </label>
                 <Input
@@ -791,13 +791,13 @@ export default function NewConsignmentPage() {
             </div>
 
             <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-300 mb-1">
                 Remarks
               </label>
               <textarea
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className="w-full px-3 py-2 border border-white/20 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 rows="3"
                 placeholder="Enter any additional notes or remarks"
               />

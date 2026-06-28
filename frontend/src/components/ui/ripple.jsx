@@ -41,7 +41,7 @@ export default function Ripple({ children, className, disabled, ...props }) {
         {ripples.map((ripple) => (
           <motion.span
             key={ripple.id}
-            className="absolute rounded-full bg-white pointer-events-none"
+            className="absolute rounded-full bg-transparent pointer-events-none"
             style={{
               left: ripple.x,
               top: ripple.y,

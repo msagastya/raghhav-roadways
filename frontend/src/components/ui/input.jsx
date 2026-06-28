@@ -22,7 +22,7 @@ export default function Input({
   return (
     <div className={cn('w-full', containerClassName)}>
       {label && (
-        <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 sm:mb-2">
+        <label className="block text-xs sm:text-sm font-semibold text-gray-300 dark:text-gray-300 mb-1.5 sm:mb-2">
           {label}
           {props.required && <span className="text-red-500 ml-1">*</span>}
         </label>
@@ -31,13 +31,13 @@ export default function Input({
         className={cn(
           'w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base',
           'border-2 border-white/25 dark:border-white/10 rounded-lg',
-          'bg-white/35 dark:bg-white/10 backdrop-blur-sm',
+          'bg-transparent/35 dark:bg-transparent/10 backdrop-blur-sm',
           'transition-all duration-200 transform-gpu',
           'focus:outline-none focus:ring-2 focus:ring-primary-500/40 focus:border-primary-500/60',
-          'focus:bg-white/50 dark:focus:bg-white/15 focus:scale-[1.01]',
-          'hover:border-white/40 dark:hover:border-white/20 hover:bg-white/45 dark:hover:bg-white/15',
-          'disabled:bg-white/10 disabled:cursor-not-allowed',
-          'placeholder:text-gray-400 dark:placeholder:text-gray-500',
+          'focus:bg-transparent/50 dark:focus:bg-transparent/15 focus:scale-[1.01]',
+          'hover:border-white/40 dark:hover:border-white/20 hover:bg-transparent/45 dark:hover:bg-transparent/15',
+          'disabled:bg-transparent/10 disabled:cursor-not-allowed',
+          'placeholder:text-gray-400 dark:placeholder:text-gray-400',
           error && 'border-red-400/50 focus:ring-red-500/40 focus:border-red-500/60',
           className
         )}

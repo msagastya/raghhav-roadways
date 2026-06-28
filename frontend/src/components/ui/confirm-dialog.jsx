@@ -52,7 +52,7 @@ const ConfirmDialog = ({
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ type: 'spring', duration: 0.5 }}
-              className="bg-white rounded-2xl shadow-2xl max-w-md w-full pointer-events-auto overflow-hidden"
+              className="bg-transparent rounded-2xl shadow-2xl max-w-md w-full pointer-events-auto overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header with Icon */}
@@ -60,7 +60,7 @@ const ConfirmDialog = ({
                 {/* Close Button */}
                 <button
                   onClick={onClose}
-                  className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute top-4 right-4 text-gray-400 hover:text-gray-400 transition-colors"
                   disabled={loading}
                 >
                   <X className="w-5 h-5" />
@@ -83,7 +83,7 @@ const ConfirmDialog = ({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.2 }}
-                  className="text-xl font-semibold text-gray-900 text-center"
+                  className="text-xl font-semibold text-gray-100 text-center"
                 >
                   {title}
                 </motion.h3>
@@ -96,7 +96,7 @@ const ConfirmDialog = ({
                 transition={{ delay: 0.3 }}
                 className="px-6 pb-6"
               >
-                <p className="text-gray-600 text-center">{message}</p>
+                <p className="text-gray-400 text-center">{message}</p>
               </motion.div>
 
               {/* Actions */}
