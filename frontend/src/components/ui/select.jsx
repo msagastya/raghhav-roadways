@@ -19,7 +19,8 @@ export default function Select({
       )}
       <select
         className={cn(
-          'w-full px-3 py-2 border border-white/20 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-transparent/10 disabled:cursor-not-allowed',
+          'w-full px-3 py-2 border border-white/20 rounded-md shadow-sm bg-transparent text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-transparent/10 disabled:cursor-not-allowed',
+          '[&>option]:bg-slate-900 [&>option]:text-white',
           error && 'border-red-500 focus:ring-red-500 focus:border-red-500',
           className
         )}
