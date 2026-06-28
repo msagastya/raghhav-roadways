@@ -172,7 +172,7 @@ export default function VehiclesPage() {
                         </span>
                       </td>
                       <td className="px-5 py-4">
-                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center justify-end gap-2 transition-opacity">
                           <button
                             onClick={() => handleEdit(vehicle)}
                             className="p-2 text-slate-400 hover:text-brand-500 hover:bg-brand-500/10 hover:border-brand-500/30 border border-transparent rounded-lg transition-all"

@@ -295,7 +295,7 @@ export default function InvoicesPage() {
                         </span>
                       </td>
                       <td className="px-5 py-4">
-                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center justify-end gap-2 transition-opacity">
                           <button
                             onClick={e => { e.stopPropagation(); router.push(`/invoices/${inv.id}`); }}
                             className="p-2 text-slate-400 hover:text-primary-500 hover:bg-primary-500/10 hover:border-primary-500/30 border border-transparent rounded-lg transition-all"

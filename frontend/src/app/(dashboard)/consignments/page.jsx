@@ -204,7 +204,7 @@ export default function ConsignmentsPage() {
                         </span>
                       </td>
                       <td className="px-5 py-4">
-                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center justify-end gap-2 transition-opacity">
                           <button
                             onClick={e => { e.stopPropagation(); router.push(`/consignments/${c.id}/edit`); }}
                             className="p-2 text-slate-400 hover:text-brand-500 hover:bg-brand-500/10 hover:shadow-[0_0_10px_rgba(0,212,255,0.2)] rounded-lg transition-all"
