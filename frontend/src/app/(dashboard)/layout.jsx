@@ -8,6 +8,7 @@ import useAuth from '../../hooks/useAuth';
 import useUIStore from '../../store/uiStore';
 import { cn } from '../../lib/utils';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 export default function DashboardLayout({ children }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -24,10 +25,14 @@ export default function DashboardLayout({ children }) {
       <div className="min-h-screen flex items-center justify-center bg-slate-950 relative z-50">
         <div className="flex flex-col items-center gap-6 relative z-10">
           <div className="relative">
-            <div className="w-24 h-24 border border-primary-500/30 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(0,255,136,0.15)] bg-slate-900/50 backdrop-blur-md relative overflow-hidden">
-              <div className="absolute inset-0 bg-primary-500/10 animate-neon-pulse" />
-              <span className="text-4xl font-orbitron font-bold text-primary-500 relative z-10">R</span>
-            </div>
+            <motion.div 
+               className="w-24 h-24 border border-primary-500/30 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(0,255,136,0.15)] bg-slate-900/50 backdrop-blur-md relative overflow-hidden"
+               animate={{ y: [-10, 10, -10] }}
+               transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <div className="absolute inset-0 bg-primary-500/10 animate-neon-pulse z-0" />
+              <Image src="/logo.png" alt="Loader Logo" fill className="object-contain p-3 relative z-10 drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]" />
+            </motion.div>
             
             {/* Spinning ring */}
             <motion.div
@@ -65,8 +70,14 @@ export default function DashboardLayout({ children }) {
     <div className="min-h-screen relative text-slate-100 selection:bg-primary-500/30">
       
       {/* Full-screen Logo Watermark Background */}
-      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden flex items-center justify-center mix-blend-screen opacity-5">
-        <span className="text-[40vw] font-orbitron font-bold text-primary-500 leading-none blur-[4px]">R</span>
+      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden flex items-center justify-center opacity-[0.03]">
+         <motion.div
+           animate={{ scale: [1, 1.05, 1], rotate: [0, 2, -2, 0] }}
+           transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
+           className="w-[80vw] h-[80vw] max-w-4xl max-h-[80vh] relative"
+         >
+           <Image src="/logo.png" alt="Watermark" fill className="object-contain grayscale" />
+         </motion.div>
       </div>
 
       <Sidebar isOpen={sidebarOpen} />

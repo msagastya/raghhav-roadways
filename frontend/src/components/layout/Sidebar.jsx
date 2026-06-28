@@ -103,10 +103,11 @@ export default function Sidebar({ isOpen }) {
                 transition={{ duration: 0.3 }}
               >
                 <div className={cn(
-                  "bg-slate-900 border border-primary-500/30 flex items-center justify-center shadow-[0_0_15px_rgba(0,255,136,0.2)] text-primary-500 font-orbitron font-bold",
-                  expanded ? 'w-16 h-16 rounded-xl text-3xl' : 'w-11 h-11 rounded-lg text-xl'
+                  "bg-slate-900/80 backdrop-blur-md border border-primary-500/30 flex items-center justify-center shadow-[0_0_15px_rgba(0,255,136,0.2)] relative overflow-hidden",
+                  expanded ? 'w-16 h-16 rounded-xl' : 'w-11 h-11 rounded-lg'
                 )}>
-                  R
+                  <div className="absolute inset-0 bg-primary-500/10 animate-neon-pulse z-0" />
+                  <Image src="/logo.png" alt="Logo" fill className="object-contain p-1.5 relative z-10 drop-shadow-[0_0_5px_rgba(255,255,255,0.2)]" />
                 </div>
               </motion.div>
               {!expanded && (

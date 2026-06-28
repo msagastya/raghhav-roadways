@@ -90,12 +90,14 @@ export default function LoginPage() {
 
         <div className="text-center mb-8 relative">
           <motion.div
-            className="w-20 h-20 mx-auto mb-4 bg-slate-900 border border-primary-500/40 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(0,255,136,0.2)]"
+            className="w-24 h-24 mx-auto mb-4 relative rounded-2xl flex items-center justify-center overflow-hidden border border-primary-500/40 shadow-[0_0_20px_rgba(0,255,136,0.2)] bg-slate-900/50 backdrop-blur-md"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
+            whileHover={{ scale: 1.05, boxShadow: "0 0 35px rgba(0,255,136,0.4)" }}
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
-            <span className="text-3xl font-orbitron font-bold text-primary-500">R</span>
+             <div className="absolute inset-0 bg-primary-500/10 animate-neon-pulse z-0" />
+             <Image src="/logo.png" alt="Raghhav Roadways Logo" fill className="object-contain p-3 relative z-10 drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]" />
           </motion.div>
           <h2 className="text-2xl sm:text-3xl font-orbitron font-bold text-white tracking-widest uppercase mb-1">
             Raghhav <span className="text-brand-500">Roadways</span>
