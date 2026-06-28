@@ -14,11 +14,16 @@
   --brand-rgb: 0, 212, 255;
 }
 
+html {
+  overflow-y: auto;
+}
+
 body {
   color: rgb(var(--foreground-rgb));
   background: #030812;
   font-family: 'Space Grotesk', sans-serif;
   overflow-x: hidden;
+  overflow-y: auto;
   min-height: 100vh;
 }
 
