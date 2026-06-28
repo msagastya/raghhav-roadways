@@ -32,8 +32,21 @@ function formatValue(value, config) {
   return `${config.prefix || ''}${formatted}${config.suffix || ''}`;
 }
 
-export default function KPICards({ kpis = {} }) {
+export default function KPICards({ kpis = {}, onCardClick }) {
   const data = kpis;
+
+  const getTypeFromKey = (key) => {
+    const typeMap = {
+      activeVehicles: 'active-vehicles',
+      pendingDeliveries: 'pending-deliveries',
+      completedOrders: 'completed-orders',
+      onTimeDelivery: 'on-time-delivery',
+      totalParties: 'total-parties',
+      pendingInvoices: 'pending-invoices',
+      totalRevenue: 'revenue'
+    };
+    return typeMap[key];
+  };
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -44,15 +57,21 @@ export default function KPICards({ kpis = {} }) {
         const Icon = config.icon;
         const colors = colorClasses[config.color] || colorClasses.primary;
         const change = kpi.change || 0;
+        const clickableType = getTypeFromKey(key);
 
         return (
           <motion.div
             key={key}
+            onClick={() => {
+              if (clickableType && onCardClick) {
+                onCardClick(clickableType);
+              }
+            }}
             initial={{ opacity: 0, y: 20, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.4, delay: index * 0.05 }}
             whileHover={{ y: -4, scale: 1.02 }}
-            className={cn("glass-panel relative overflow-hidden group border", colors.bg, colors.glow)}
+            className={cn("glass-panel relative overflow-hidden group border", colors.bg, colors.glow, clickableType ? "cursor-pointer" : "")}
           >
             <div className="p-4 relative z-10">
               <div className="flex items-start justify-between">

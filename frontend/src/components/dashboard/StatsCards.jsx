@@ -5,10 +5,11 @@ import { FileText, Receipt, TrendingUp, AlertTriangle } from 'lucide-react';
 import { formatCurrency } from '../../lib/utils';
 import { cn } from '../../lib/utils';
 
-export default function StatsCards({ data }) {
+export default function StatsCards({ data, onCardClick }) {
   const stats = [
     {
       name: 'Total Consignments',
+      type: 'completed-orders',
       value: data?.kpis?.completedOrders || 0,
       icon: FileText,
       color: 'text-primary-500',
@@ -17,6 +18,7 @@ export default function StatsCards({ data }) {
     },
     {
       name: 'Total Revenue',
+      type: 'revenue',
       value: formatCurrency(data?.kpis?.totalRevenue || 0),
       icon: TrendingUp,
       color: 'text-brand-500',
@@ -25,6 +27,7 @@ export default function StatsCards({ data }) {
     },
     {
       name: 'Pending Invoices',
+      type: 'pending-invoices',
       value: data?.kpis?.pendingInvoices || 0,
       icon: Receipt,
       color: 'text-yellow-500',
@@ -33,6 +36,7 @@ export default function StatsCards({ data }) {
     },
     {
       name: 'Pending Deliveries',
+      type: 'pending-deliveries',
       value: data?.kpis?.pendingDeliveries || 0,
       icon: AlertTriangle,
       color: 'text-red-500',
@@ -48,6 +52,7 @@ export default function StatsCards({ data }) {
         return (
           <motion.div
             key={stat.name}
+            onClick={() => onCardClick && stat.type && onCardClick(stat.type)}
             initial={{ opacity: 0, y: 20, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{
@@ -59,7 +64,7 @@ export default function StatsCards({ data }) {
             }}
             whileHover={{ y: -6, scale: 1.02, transition: { duration: 0.2 } }}
             className={cn(
-              "glass-panel relative overflow-hidden group cursor-pointer border",
+              "glass-panel relative overflow-hidden group border cursor-pointer",
               stat.bg
             )}
           >

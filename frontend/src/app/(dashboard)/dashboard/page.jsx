@@ -12,6 +12,7 @@ import { CardSkeleton } from '../../../components/ui/skeleton';
 import useToast from '../../../hooks/useToast';
 import { getErrorMessage, cn } from '../../../lib/utils';
 import { Activity, TrendingUp, Clock, Zap, AlertTriangle, FileText, Truck, ArrowRight } from 'lucide-react';
+import DashboardSummaryModal from '../../../components/dashboard/DashboardSummaryModal';
 
 const RevenueChart = dynamic(() => import('../../../components/analytics/RevenueChart'), {
   ssr: false,
@@ -21,6 +22,7 @@ const RevenueChart = dynamic(() => import('../../../components/analytics/Revenue
 export default function DashboardPage() {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [summaryModalConfig, setSummaryModalConfig] = useState({ isOpen: false, type: null });
   const { showError } = useToast();
 
   useEffect(() => {
@@ -153,11 +155,11 @@ export default function DashboardPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.1 }}
       >
-        <KPICards kpis={kpis} />
+        <KPICards kpis={kpis} onCardClick={(type) => setSummaryModalConfig({ isOpen: true, type })} />
       </motion.div>
 
       {/* Main Stats */}
-      <StatsCards data={dashboardData} />
+      <StatsCards data={dashboardData} onCardClick={(type) => setSummaryModalConfig({ isOpen: true, type })} />
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
@@ -284,11 +286,12 @@ export default function DashboardPage() {
             <div className="p-5 flex-1">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 h-full">
                 {[
-                  { label: 'Active Vehicles', value: dashboardData?.kpis?.activeVehicles || 0, icon: Truck },
-                  { label: 'Total Parties', value: dashboardData?.kpis?.totalParties || 0, icon: FileText },
-                  { label: "Today's Bookings", value: dashboardData?.today?.bookings || 0, icon: FileText },
+                  { label: 'Active Vehicles', type: 'active-vehicles', value: dashboardData?.kpis?.activeVehicles || 0, icon: Truck },
+                  { label: 'Total Parties', type: 'total-parties', value: dashboardData?.kpis?.totalParties || 0, icon: FileText },
+                  { label: "Today's Bookings", type: 'consignments', value: dashboardData?.today?.bookings || 0, icon: FileText },
                   {
                     label: 'Avg. Delivery',
+                    type: null,
                     value: dashboardData?.kpis?.avgDeliveryTime ? `${dashboardData.kpis.avgDeliveryTime} D` : 'N/A',
                     icon: Clock
                   },
@@ -297,7 +300,11 @@ export default function DashboardPage() {
                   return (
                     <motion.div
                       key={stat.label}
-                      className="flex flex-col items-center justify-center text-center p-4 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-brand-500/50 hover:bg-slate-800/80 transition-all relative overflow-hidden group"
+                      onClick={() => stat.type && setSummaryModalConfig({ isOpen: true, type: stat.type })}
+                      className={cn(
+                        "flex flex-col items-center justify-center text-center p-4 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-brand-500/50 hover:bg-slate-800/80 transition-all relative overflow-hidden group",
+                        stat.type ? "cursor-pointer" : ""
+                      )}
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: 0.7 + index * 0.1 }}
@@ -324,6 +331,13 @@ export default function DashboardPage() {
       >
         System Inputs: <kbd className="px-2 py-1 bg-slate-900 border border-slate-700 rounded-md text-primary-500 ml-2">⌘/Ctrl + K</kbd> COMMAND PALETTE
       </motion.div>
+
+      {/* Summary Modal */}
+      <DashboardSummaryModal 
+        isOpen={summaryModalConfig.isOpen}
+        type={summaryModalConfig.type}
+        onClose={() => setSummaryModalConfig({ isOpen: false, type: null })}
+      />
     </div>
   );
 }
